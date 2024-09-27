@@ -1,0 +1,79 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[ngerman]{babel}
+\usepackage{babelbib}
+\usepackage{hologo}
+\usepackage{csquotes}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+\begin{document}
+
+\section{Deckblatt}
+\section{Inhaltsverzeichnis}
+
+
+
+\section{Zusammenfassung}
+
+\section{Einleitung}
+
+\section{Hauptteil}
+
+\section{Fazit}
+
+\section{Ausblick}
+
+\section{Anhang}
+
+
+\section{Formatbeispiele}
+\subsection{Eine Aufzählung}
+
+\begin{enumerate}
+	\item die \textbf{original PDF Vorlage} (also diese Datei),
+	\item das von Ihnen erstellte \textbf{\hologo{LaTeX} Dokument} (also die .tex Datei),
+	\item die von Ihnen erstellte \textbf{Literatur Datenbank} (also die .bib Datei), und
+	\item das von Ihnen \textbf{kompilierte Dokument} (also die erzeugte .pdf Datei).
+\end{enumerate}
+
+
+\subsection{Tabellen}
+Tabelle \ref{HdRTab} gibt eine kleine Übersicht über verschiedene Charaktere und Gruppierungen in \emph{Der Herr der Ringe}.
+
+\begin{table}[b]
+	\begin{tabular}{|r|c|c|c|c|}
+		\hline
+				& Gollum	& Legolas	& Sauron	& Gandalf \\
+		\hline
+		\hline
+		Hobbit	& ja	& nein	& nein	& nein \\
+		\hline
+		Ringträger	& am Finger	& nein	& am Finger	& in der Hand \\
+		\hline
+		Gemeinschaft des Ringes	& nein	& ja	& nein	& ja \\
+		\hline
+	\end{tabular}
+	\caption{Verschiedene Charaktere und Gruppierungen in \emph{Der Herr der Ringe}.}
+	\label{HdRTab}
+\end{table}
+
+\subsection{Formeln}
+Die bekannten Fibonacci-Zahlen $F_n$ sind wie folgt definiert.
+\newtheorem{defn}{Definition}
+\begin{defn}\label{fibonacci}
+	Es sei $F_1 = F_2 = 1$ und $F_n = F_{n-1} + F_{n-2}$ für $n \geq 3$.
+\end{defn}
+Fibonacci-Zahlen treten sowohl in der Natur als auch in vielen theoretischen Anwendungen auf. Die folgende Formel für die in Definition \ref{fibonacci} wurde von verschiedenen Mathematikern im 18. und 19. Jahrhundert entdeckt. Es sei $\phi = \frac{1 + \sqrt{5}}{2}$ (der goldene Schnitt) und $\psi = \frac{1 - \sqrt{5}}{2}$. Dann gilt
+\[ \forall n \in \mathbb{N}: \quad F_n = \frac{\phi^n - \psi^n}{\sqrt{5}}. \]
+
+\subsection{Zitieren}
+In Ihrer Abschlussarbeit werden Sie existierende Literatur bearbeiten und zitieren müssen. Das korrekte Formatieren übernimmt \hologo{LaTeX} (beziehungsweise \hologo{BibTeX}) für Sie. Dabei werden Sie vermutlich nicht aus dem Buch von Tolki-\linebreak en \cite{HdR1954} zitieren, aber möglicherweise aus einem Buch zum Übersetzerbau \cite{compilers2006}.
+
+\bibliographystyle{babplain-fl}
+\bibliography{literature}
+
+\end{document}

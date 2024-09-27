@@ -1,2 +1,11 @@
 simulation/.venv*
 *.pyc
+*.pdf
+document/Kubernetes.pdf
+document/Kubernetes.aux
+document/Kubernetes.bbl
+document/Kubernetes.blg
+document/Kubernetes.fdb_latexmk
+document/Kubernetes.fls
+document/Kubernetes.log
+document/Kubernetes.synctex.gz
