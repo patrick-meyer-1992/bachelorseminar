@@ -42,13 +42,67 @@ class VehicleAgent(mesa.Agent):
         if self.health >= 100:
             self.status = "operational"
 
+class WorkerAgent(mesa.Agent):
+    def __init__(self, unique_id, model, repair_rate: float):
+        super().__init__(unique_id, model)
+        self.repair_rate = repair_rate
+
+class WorkspaceAgent(mesa.Agent):
+    def __init__(self, unique_id, model, workers: list[WorkerAgent], repair_facility: 'RepairFacilityAgent'):
+        super().__init__(unique_id, model)
+        self.workers = dict()
+        self.available = True
+        self.vehicle = None
+        self.repair_facility = repair_facility
+
+        for worker in workers:
+            self.workers["id"] = WorkerAgent(worker["id"], self.model, worker["repair_rate"])
+    
+    def check_in_vehicle(self, vehicle: VehicleAgent):
+        self.vehicle = vehicle
+        self.available = False
+
+    def step(self):
+        if self.vehicle is not None:
+            self.repair_vehicle()
+    
+    def check_out_vehicle(self):
+        self.vehicle = None
+        self.available = True
+
+    def repair_vehicle(self):
+        repair_rate = sum([worker.repair_rate for worker in self.workers])
+        self.vehicle.health = self.vehicle.health + repair_rate    
+
+class RepairFacilityAgent(mesa.Agent):
+    def __init__(self, unique_id, model, workspaces: list[dict]):
+        super().__init__(unique_id, model)
+        self.workspaces = dict()
+
+        for workspace in workspaces:
+            self.workspaces[workspace["id"]] = WorkspaceAgent(workspace["id"], self.model, workspace["workers"], repair_facility=self)
+
+        self.vehicles = dict()
+
+    def check_in_vehicle(self, vehicle: VehicleAgent):
+        self.vehicles[vehicle.unique_id] = vehicle
+
+    def check_out_vehicle(self, vehicle: VehicleAgent):
+        self.vehicles.pop(vehicle.unique_id)
+
 class FleetModel(mesa.Model):
-    def __init__(self, num_vehicles: int = 100, start_date: date = date(2024, 1, 1), end_date: date = date(2024, 12, 31)):
+    def __init__(self, 
+                 num_vehicles: int = 100, 
+                 start_date: date = date(2024, 1, 1), 
+                 end_date: date = date(2024, 12, 31),
+                 repair_facilities: list = list()
+            ):
         super().__init__()
+        self.schedule = mesa.time.RandomActivation(self)
         self.num_vehicles = num_vehicles
         self.current_date = start_date
         self.end_date = end_date
-        self.schedule = mesa.time.RandomActivation(self)
+        self.set_repair_facilities(repair_facilities)
         self.datacollector = mesa.DataCollector(
             agent_reporters={"Status": "status"}
         )
@@ -62,6 +116,11 @@ class FleetModel(mesa.Model):
             vehicle = VehicleAgent(i, self, failure_rate)
             self.schedule.add(vehicle)
 
+
+    def set_repair_facilities(self, repair_facilities: list):
+        for repair_facility in repair_facilities:
+            self.schedule.add(RepairFacilityAgent(repair_facility["id"], self, repair_facility["workspaces"]))
+    
     def step(self):
         self.schedule.step()
         self.datacollector.collect(self)

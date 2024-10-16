@@ -7,15 +7,19 @@ import mesa
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
+import json
 
 # %%
 # params = {"width": 10, "height": 10, "N": range(5, 100, 5)}
 
-params = {}
+with open("D:/GitHub/bachelorseminar/simulation/workspaces.json") as f:
+    params = json.load(f)
+
+    
 results = mesa.batch_run(
     FleetModel,
-    parameters={"num_vehicles": 100},
-    iterations=2,
+    parameters=params,
+    iterations=1,
     max_steps=np.inf,
     number_processes=1,
     data_collection_period=1,
