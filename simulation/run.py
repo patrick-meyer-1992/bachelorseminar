@@ -1,54 +1,49 @@
 # %%
-from money_model import MoneyModel
+import pika
 from fleet_model import FleetModel
-import seaborn as sns
-import numpy as np
 import mesa
+import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
-import plotly.express as px
 import json
 
 # %%
-# params = {"width": 10, "height": 10, "N": range(5, 100, 5)}
+# Queue parameters
+queue_name = 'json_queue'
 
-with open("D:/GitHub/bachelorseminar/simulation/workspaces.json") as f:
-    params = json.load(f)
+# Connect to RabbitMQ
+credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_password)
+connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, port=mq_port, credentials=credentials))
+channel = connection.channel()
 
+# Declare queue (in case it doesn't exist)
+channel.queue_declare(queue=queue_name, durable=True)
+
+# Callback function to process messages
+def callback(ch, method, properties, body):
+    params = json.loads(body)
+    # Acknowledge the message
+    ch.basic_ack(delivery_tag=method.delivery_tag)
     
-results = mesa.batch_run(
-    FleetModel,
-    parameters=params,
-    iterations=1,
-    max_steps=np.inf,
-    number_processes=1,
-    data_collection_period=1,
-    display_progress=True,
-)
-# %%
-results = pd.DataFrame(results)
-# print(results)
-# %%
+    # Run mesa.batch_run with the received params
+    results = mesa.batch_run(
+        FleetModel,
+        parameters=params,
+        iterations=1,
+        max_steps=np.inf,
+        number_processes=1,
+        data_collection_period=1,
+        display_progress=True,
+    )
+    # Convert results to DataFrame and print
+    results_df = pd.DataFrame(results)
+    print(results_df)
 
-def plot(data):
-    """ Create a plotly figure with the number of operational vehicles per day. """
-    data = data.loc[:,["iteration", "Step", "Status"]]
-    data = data.groupby(["iteration", "Step"])["Status"].value_counts().reset_index(name="Count")
-    return data
-    # Create the bar plot
-    # fig = px.bar(
-    #     operational_counts, 
-    #     x="Step", 
-    #     y="Operational",
-    #     title="Number of Operational Vehicles per Day")
-    
-    # return fig
-# %%
-p = plot(results)
-print(p)
-# p.show()
-# %%
+# Set up consumer
+channel.basic_consume(queue=queue_name, on_message_callback=callback)
 
-p
+print('Waiting for messages. To exit press CTRL+C')
+channel.start_consuming()
 
-# %%
+
+
+
