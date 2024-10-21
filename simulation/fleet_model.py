@@ -5,6 +5,7 @@ import numpy as np
 class VehicleAgent(mesa.Agent):
     def __init__(self, unique_id, model, failure_rate):
         super().__init__(unique_id, model)
+        self.type = "Vehicle"
         # self.usage_model = usage_model
         # self.maintenance_interval = maintenance_interval
         # self.mtbf = mtbf
@@ -22,9 +23,11 @@ class VehicleAgent(mesa.Agent):
         # Check for failure
         self.check_failure()
         # Repair if failed
-        if self.status == "failed" or self.status == "repairing":
-            self.perform_repair()
+        if self.status == "failed":
+            self.look_for_repair_facility()
 
+    def look_for_repair_facility(self):
+        self.model.distribute_vehicle_to_repair_facility(self)
 
     # def perform_maintenance(self):
     #     self.last_maintenance = self.model.schedule.time
@@ -36,59 +39,86 @@ class VehicleAgent(mesa.Agent):
             self.health = 0
             self.status = "failed"
 
-    def perform_repair(self):
-        self.status = "repairing"
-        self.health += np.random.normal(self.repair_rate, 3)
-        if self.health >= 100:
-            self.status = "operational"
-
 class WorkerAgent(mesa.Agent):
     def __init__(self, unique_id, model, repair_rate: float):
         super().__init__(unique_id, model)
         self.repair_rate = repair_rate
+        self.type = "Worker"
+        self.model.schedule.add(self)
 
 class WorkspaceAgent(mesa.Agent):
     def __init__(self, unique_id, model, workers: list[WorkerAgent], repair_facility: 'RepairFacilityAgent'):
         super().__init__(unique_id, model)
+        self.type = "Workspace"
         self.workers = dict()
         self.available = True
         self.vehicle = None
         self.repair_facility = repair_facility
+        self.model.schedule.add(self)
 
         for worker in workers:
-            self.workers["id"] = WorkerAgent(worker["id"], self.model, worker["repair_rate"])
+            self.add_worker(worker["id"], worker["repair_rate"])
+
+    def add_worker(self, id: str, repair_rate: float):
+        self.workers[id] = WorkerAgent(id, self.model, repair_rate)
     
     def check_in_vehicle(self, vehicle: VehicleAgent):
         self.vehicle = vehicle
+        self.vehicle.status = "repairing"
         self.available = False
-
-    def step(self):
-        if self.vehicle is not None:
-            self.repair_vehicle()
-    
+ 
     def check_out_vehicle(self):
+        self.repair_facility.check_out_vehicle(self.vehicle)
         self.vehicle = None
         self.available = True
 
     def repair_vehicle(self):
         repair_rate = sum([worker.repair_rate for worker in self.workers])
-        self.vehicle.health = self.vehicle.health + repair_rate    
+        self.vehicle.health = self.vehicle.health + repair_rate  
+        if self.vehicle.health >= 100:
+            self.vehicle.health = 100             
+    
+    def step(self):
+        if self.vehicle is not None:
+            self.repair_vehicle()
+
+    def step(self):
+        if self.vehicle is not None:
+            self.repair_vehicle()
+            if self.vehicle.health >= 100:
+                self.vehicle.status = "operational" 
+                self.check_out_vehicle()
 
 class RepairFacilityAgent(mesa.Agent):
     def __init__(self, unique_id, model, workspaces: list[dict]):
         super().__init__(unique_id, model)
+        self.type = "Repair Facility"
         self.workspaces = dict()
-
-        for workspace in workspaces:
-            self.workspaces[workspace["id"]] = WorkspaceAgent(workspace["id"], self.model, workspace["workers"], repair_facility=self)
-
         self.vehicles = dict()
+        for workspace in workspaces:
+            self.add_workspace(workspace["id"], workspace["workers"])
+
+    def add_workspace(self, id: str, workers: list[dict]):
+        self.workspaces[id] = WorkspaceAgent(id, self.model, workers, self)
 
     def check_in_vehicle(self, vehicle: VehicleAgent):
         self.vehicles[vehicle.unique_id] = vehicle
 
     def check_out_vehicle(self, vehicle: VehicleAgent):
         self.vehicles.pop(vehicle.unique_id)
+
+    def get_queue_length(self):
+        return len(self.vehicles) - len([workspace for workspace in self.workspaces.values() if not workspace.available])
+
+    def step(self):
+        # Distribute vehicles to workspaces
+        for vehicle in self.vehicles.values():
+            if vehicle.status == "repairing":
+                continue
+            for workspace in self.workspaces.values():
+                if workspace.available:
+                    workspace.check_in_vehicle(vehicle)
+                    break
 
 class FleetModel(mesa.Model):
     def __init__(self, 
@@ -104,7 +134,10 @@ class FleetModel(mesa.Model):
         self.end_date = end_date
         self.set_repair_facilities(repair_facilities)
         self.datacollector = mesa.DataCollector(
-            agent_reporters={"Status": "status"}
+            model_reporters={"Date": "current_date"},
+            agent_reporters={"Status": "status", "ID": "unique_id", "Type": "type"},
+            
+            # agenttype_reporters={VehicleAgent: {"Status": "status", "ID": "unique_id"}},
         )
         self.running = True
 
@@ -116,10 +149,13 @@ class FleetModel(mesa.Model):
             vehicle = VehicleAgent(i, self, failure_rate)
             self.schedule.add(vehicle)
 
-
     def set_repair_facilities(self, repair_facilities: list):
         for repair_facility in repair_facilities:
             self.schedule.add(RepairFacilityAgent(repair_facility["id"], self, repair_facility["workspaces"]))
+
+    def distribute_vehicle_to_repair_facility(self, vehicle: VehicleAgent):
+        repair_facility = np.random.choice([agent for agent in self.schedule.agents if isinstance(agent, RepairFacilityAgent)])
+        repair_facility.check_in_vehicle(vehicle)
     
     def step(self):
         self.schedule.step()

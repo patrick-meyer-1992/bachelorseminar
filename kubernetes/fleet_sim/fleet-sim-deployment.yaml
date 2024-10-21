@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fleet-sim-deployment
+  labels:
+    app: fleet-sim
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fleet-sim
+  template:
+    metadata:
+      labels:
+        app: fleet-sim
+    spec:
+      containers:
+      - name: fleet-sim
+        image: patrickmeyer/fleet_sim:latest
+        env:
+        - name: RABBITMQ_DEFAULT_USER
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: RABBITMQ_DEFAULT_USER
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: RABBITMQ_DEFAULT_PASS

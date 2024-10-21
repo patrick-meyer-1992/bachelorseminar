@@ -3,10 +3,16 @@ import pika
 from fleet_model import FleetModel
 import mesa
 import numpy as np
-import pandas as pd
 import json
+import os
 
 # %%
+# Connection parameters
+rabbitmq_host = 'rabbitmq-service.default.svc.cluster.local'
+mq_port = 5672
+rabbitmq_user = os.getenv('RABBITMQ_DEFAULT_USER')
+rabbitmq_password = os.getenv('RABBITMQ_DEFAULT_PASS')
+
 # Queue parameters
 queue_name = 'json_queue'
 
@@ -32,11 +38,12 @@ def callback(ch, method, properties, body):
         max_steps=np.inf,
         number_processes=1,
         data_collection_period=1,
-        display_progress=True,
+        display_progress=False,
     )
     # Convert results to DataFrame and print
-    results_df = pd.DataFrame(results)
-    print(results_df)
+    print(results)
+    # results_df = pd.DataFrame(results)
+    # print(results_df)
 
 # Set up consumer
 channel.basic_consume(queue=queue_name, on_message_callback=callback)

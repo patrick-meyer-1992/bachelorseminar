@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fleet-sim-ingress
+  annotations:
+    kubernetes.io/ingress.class: "gce" # Use GCE Ingress controller
+    kubernetes.io/ingress.global-static-ip-name: "fleet-sim-ip"
+spec:
+  rules:
+  - host: rmq.quantumshoe.duckdns.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: rabbitmq-service
+            port:
+              number: 15672
+  # - host: result.quantumpants.duckdns.org
+  #   http:
+  #     paths:
+  #     - path: /
+  #       pathType: Prefix
+  #       backend:
+  #         service:
+  #           name: result-service
+  #           port:
+  #             number: 80

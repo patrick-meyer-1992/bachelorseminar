@@ -1,67 +1,45 @@
 {
   "num_vehicles": 100,
-  "repair_facilities": [[
-    {
-      "id": 1,
-      "workspaces": [
-        {
-          "id": 1,
-          "workers": [
-            {
-              "id": 1,
-              "repair_rate": 10
-            },
-            {
-              "id": 2,
-              "repair_rate": 10
-            }
-          ]
-        },
-        {
-          "id": 2,
-          "workers": [
-            {
-              "id": 3,
-              "repair_rate": 10
-            },
-            {
-              "id": 4,
-              "repair_rate": 10
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "workspaces": [
-        {
-          "id": 3,
-          "workers": [
-            {
-              "id": 5,
-              "repair_rate": 5
-            },
-            {
-              "id": 6,
-              "repair_rate": 5
-            }
-          ]
-        },
-        {
-          "id": 4,
-          "workers": [
-            {
-              "id": 7,
-              "repair_rate": 2
-            },
-            {
-              "id": 8,
-              "repair_rate": 2
-            }
-          ]
-        }
-      ]
-    }
-  ]]
+  "repair_facilities": [
+    [
+      {
+        "id": 1,
+        "workspaces": [
+          {
+            "id": 1,
+            "workers": [
+              { "id": 1, "repair_rate": 10 },
+              { "id": 2, "repair_rate": 10 }
+            ]
+          },
+          {
+            "id": 2,
+            "workers": [
+              { "id": 3, "repair_rate": 10 },
+              { "id": 4, "repair_rate": 10 }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "workspaces": [
+          {
+            "id": 3,
+            "workers": [
+              { "id": 5, "repair_rate": 5 },
+              { "id": 6, "repair_rate": 5 }
+            ]
+          },
+          {
+            "id": 4,
+            "workers": [
+              { "id": 7, "repair_rate": 2 },
+              { "id": 8, "repair_rate": 2 }
+            ]
+          }
+        ]
+      }
+    ]
+  ]
 }
