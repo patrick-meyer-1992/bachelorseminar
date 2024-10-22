@@ -4,12 +4,14 @@ FROM python:3.10-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Install any necessary dependencies
+# Copy the requirements file first to leverage Docker cache
 COPY requirements.txt /app/
+
+# Install any necessary dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the Python scripts into the container
-COPY fleet_model.py run.py
+# Copy the rest of the application code
+COPY . /app/
 
 # Command to run the application
 CMD ["python", "run.py"]

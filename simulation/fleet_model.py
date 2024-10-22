@@ -1,6 +1,17 @@
 from datetime import date, timedelta
 import mesa
 import numpy as np
+from pymongo import MongoClient
+import os
+
+mongodb_host = os.getenv('MONGODB_HOST')
+mongodb_port = os.getenv('MONGODB_PORT')
+mongodb_user = os.getenv('MONGO_INITDB_ROOT_USERNAME')
+mongodb_password = os.getenv('MONGO_INITDB_ROOT_PASSWORD')
+
+client = MongoClient(f'mongodb://{mongodb_user}:{mongodb_password}@{mongodb_host}:{mongodb_port}/')
+db = client['fleet-sim']
+collection = db['configs']
 
 class VehicleAgent(mesa.Agent):
     def __init__(self, unique_id, model, failure_rate):
@@ -19,9 +30,9 @@ class VehicleAgent(mesa.Agent):
         # Check if maintenance is due
         # if self.model.schedule.time - self.last_maintenance >= self.maintenance_interval:
         #     self.perform_maintenance()
-
-        # Check for failure
-        self.check_failure()
+        if self.status == "operational":
+            # Check for failure
+            self.check_failure()
         # Repair if failed
         if self.status == "failed":
             self.look_for_repair_facility()
@@ -73,14 +84,14 @@ class WorkspaceAgent(mesa.Agent):
         self.available = True
 
     def repair_vehicle(self):
-        repair_rate = sum([worker.repair_rate for worker in self.workers])
+        repair_rate = sum([worker.repair_rate for worker in self.workers.values()])
         self.vehicle.health = self.vehicle.health + repair_rate  
         if self.vehicle.health >= 100:
             self.vehicle.health = 100             
     
-    def step(self):
-        if self.vehicle is not None:
-            self.repair_vehicle()
+    # def step(self):
+    #     if self.vehicle is not None:
+    #         self.repair_vehicle()
 
     def step(self):
         if self.vehicle is not None:
@@ -122,22 +133,20 @@ class RepairFacilityAgent(mesa.Agent):
 
 class FleetModel(mesa.Model):
     def __init__(self, 
+                 repair_config: str,
                  num_vehicles: int = 100, 
                  start_date: date = date(2024, 1, 1), 
                  end_date: date = date(2024, 12, 31),
-                 repair_facilities: list = list()
             ):
         super().__init__()
         self.schedule = mesa.time.RandomActivation(self)
         self.num_vehicles = num_vehicles
         self.current_date = start_date
         self.end_date = end_date
-        self.set_repair_facilities(repair_facilities)
+        self.set_repair_facilities(repair_config)
         self.datacollector = mesa.DataCollector(
             model_reporters={"Date": "current_date"},
             agent_reporters={"Status": "status", "ID": "unique_id", "Type": "type"},
-            
-            # agenttype_reporters={VehicleAgent: {"Status": "status", "ID": "unique_id"}},
         )
         self.running = True
 
@@ -149,7 +158,15 @@ class FleetModel(mesa.Model):
             vehicle = VehicleAgent(i, self, failure_rate)
             self.schedule.add(vehicle)
 
-    def set_repair_facilities(self, repair_facilities: list):
+    def load_repair_config(self, repair_config: str):
+        result = collection.find_one(
+            { "name": repair_config },
+            { "config": 1, "_id": 0 }
+        )
+        return result['config']["repair_facilities"]
+
+    def set_repair_facilities(self, repair_config: str):
+        repair_facilities = self.load_repair_config(repair_config)
         for repair_facility in repair_facilities:
             self.schedule.add(RepairFacilityAgent(repair_facility["id"], self, repair_facility["workspaces"]))
 

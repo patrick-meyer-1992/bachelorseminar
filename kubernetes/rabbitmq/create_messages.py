@@ -4,8 +4,8 @@ import json
 # Connection parameters
 rabbitmq_host = 'localhost'
 rabbitmq_port = 5672
-rabbitmq_user = 'guest'
-rabbitmq_password = 'guest'
+rabbitmq_user = ''
+rabbitmq_password = ''
 
 # Queue and exchange parameters
 queue_name = 'json_queue'
@@ -27,7 +27,7 @@ channel.queue_declare(queue=queue_name, durable=True)
 channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key=routing_key)
 
 # Example of sending a JSON message
-with open("D:/GitHub/bachelorseminar/simulation/workspaces.json") as f:
+with open("D:/GitHub/bachelorseminar/simulation/config.json") as f:
     message = f.read()
 
 channel.basic_publish(exchange=exchange_name, routing_key=routing_key, body=message)

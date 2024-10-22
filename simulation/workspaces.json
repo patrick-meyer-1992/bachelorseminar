@@ -1,7 +1,7 @@
 {
-  "num_vehicles": 100,
-  "repair_facilities": [
-    [
+  "name": "config1",
+  "config": {
+    "repair_facilities": [
       {
         "id": 1,
         "workspaces": [
@@ -41,5 +41,5 @@
         ]
       }
     ]
-  ]
+  }
 }

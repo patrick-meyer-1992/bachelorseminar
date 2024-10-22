@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: fleet-sim
-        image: patrickmeyer/fleet_sim:latest
+        image: patrickmeyer/fleet_sim:0.1
         env:
         - name: RABBITMQ_DEFAULT_USER
           valueFrom:
@@ -28,3 +28,33 @@ spec:
             secretKeyRef:
               name: rabbitmq-secret
               key: RABBITMQ_DEFAULT_PASS
+        - name: RABBITMQ_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: rabbitmq-config
+              key: RABBITMQ_HOST
+        - name: RABBITMQ_PORT 
+          valueFrom:
+            configMapKeyRef:
+              name: rabbitmq-config
+              key: RABBITMQ_PORT
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: MONGO_INITDB_ROOT_USERNAME
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: MONGO_INITDB_ROOT_PASSWORD
+        - name: MONGODB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: mongodb-config
+              key: MONGODB_HOST
+        - name: MONGODB_PORT 
+          valueFrom:
+            configMapKeyRef:
+              name: mongodb-config
+              key: MONGODB_PORT
