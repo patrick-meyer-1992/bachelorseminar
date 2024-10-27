@@ -22,28 +22,56 @@ interface RepairFacility {
   children: Workspace[];
 }
 
+interface Config {
+  id: number;
+  name: string;
+}
+
 @Component({
   selector: 'app-configuration',
-  standalone: false,
   templateUrl: './configuration.component.html',
   styleUrls: ['./configuration.component.css'],
 })
 export class ConfigurationComponent implements OnInit {
   config: RepairFacility[] = [];
+  availableConfigs: String[] = [];
+  selectedConfig: string = '';
+  configName: string = '';
 
   constructor(private http: HttpClient) {}
 
-  ngOnInit() {
-    this.fetchConfiguration().subscribe((data: RepairFacility[]) => {
-      this.config = data;
-    });
+  ngOnInit(): void {
+    this.http
+      .get<{ configs: String[] }>('http://localhost:8000/get_configs/')
+      .subscribe(
+        (data) => {
+          console.log('Fetched configurations:', data);
+          this.availableConfigs = data.configs;
+          console.log('Available configurations:', this.availableConfigs);
+        },
+        (error) => {
+          console.error('Error fetching configurations', error);
+        }
+      );
   }
 
-  fetchConfiguration(): Observable<RepairFacility[]> {
-    return this.http.get<RepairFacility[]>(
-      // 'http://fastapi-service.default.svc.cluster.local'
-      'http://localhost:8000'
-    );
+  onConfigChange(event: Event): void {
+    const selectedName = (event.target as HTMLSelectElement).value;
+    console.log('Selected configuration:', selectedName);
+
+    this.http
+      .get<{ config: RepairFacility[] }>(
+        `http://localhost:8000/get_config/${selectedName}`
+      )
+      .subscribe(
+        (data) => {
+          console.log('Fetched configuration data:', data);
+          this.config = data.config;
+        },
+        (error) => {
+          console.error('Error fetching configuration data', error);
+        }
+      );
   }
 
   addFacility() {
@@ -92,5 +120,6 @@ export class ConfigurationComponent implements OnInit {
 
   onSubmit() {
     console.log('Configuration saved:', this.config);
+    console.log('Configuration name:', this.configName);
   }
 }

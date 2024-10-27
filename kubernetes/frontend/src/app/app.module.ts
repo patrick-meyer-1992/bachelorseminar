@@ -5,17 +5,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatTabsModule } from '@angular/material/tabs';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { provideHttpClient } from '@angular/common/http';
+import { routes } from './app.routes';
 
 import { AppComponent } from './app.component';
 import { ConfigurationComponent } from './configuration/configuration.component';
 import { StartComponent } from './start/start.component';
 import { ResultsComponent } from './results/results.component';
-import { routes } from './app.routes';
-import {
-  HttpClientModule,
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -31,9 +27,8 @@ import {
     RouterModule.forRoot(routes),
     FormsModule,
     CommonModule,
-    HttpClientModule,
   ],
-  providers: [provideHttpClient(withInterceptorsFromDi())],
-  bootstrap: [],
+  providers: [provideHttpClient()],
+  bootstrap: [AppComponent],
 })
 export class AppModule {}

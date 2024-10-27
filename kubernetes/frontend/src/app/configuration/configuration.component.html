@@ -1,17 +1,23 @@
 <div>
-  <h2>Configuration</h2>
+  <h2>Konfiguration</h2>
+  <select [(ngModel)]="selectedConfig" (change)="onConfigChange($event)">
+    <option *ngFor="let config of availableConfigs" [value]="config">
+      {{ config }}
+    </option>
+  </select>
+  <hr />
   <form (ngSubmit)="onSubmit()">
     <div *ngFor="let facility of config; let i = index">
-      <h3>Repair Facility {{ i + 1 }}</h3>
+      <h3>Instandhaltungseinrichtung {{ i + 1 }}</h3>
       <button type="button" (click)="removeFacility(i)">Remove Facility</button>
       <div *ngFor="let workspace of facility.children; let j = index">
-        <h4>Workspace {{ j + 1 }}</h4>
+        <h4>Dock {{ j + 1 }}</h4>
         <button type="button" (click)="removeWorkspace(i, j)">
-          Remove Workspace
+          Dock entfernen
         </button>
         <div *ngFor="let worker of workspace.children; let k = index">
           <label>
-            Worker {{ k + 1 }} Repair Rate:
+            Arbeiter {{ k + 1 }} Reparatur Rate:
             <input
               type="number"
               [(ngModel)]="worker.repair_rate"
@@ -19,15 +25,28 @@
             />
           </label>
           <button type="button" (click)="removeWorker(i, j, k)">
-            Remove Worker
+            Arbeiter entfernen
           </button>
         </div>
-        <button type="button" (click)="addWorker(i, j)">Add Worker</button>
+        <button type="button" (click)="addWorker(i, j)">
+          Arbeiter hinzufügen
+        </button>
       </div>
-      <button type="button" (click)="addWorkspace(i)">Add Workspace</button>
+      <button type="button" (click)="addWorkspace(i)">Dock hinzufügen</button>
       <hr />
     </div>
-    <button type="button" (click)="addFacility()">Add Repair Facility</button>
-    <button type="submit">Save Configuration</button>
+    <button type="button" (click)="addFacility()">
+      Instandhaltungseinrichtung hinzufügen
+    </button>
+    <br />
+    <br />
+    <br />
+    <input
+      type="text"
+      [(ngModel)]="configName"
+      placeholder="Speichern als..."
+      name="configName"
+    />
+    <button type="submit">Konfiguration speichern</button>
   </form>
 </div>

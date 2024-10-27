@@ -2,13 +2,24 @@ from typing import Union
 from fastapi import FastAPI, status, HTTPException
 from pymongo import MongoClient
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
 mongodb_host = os.getenv('MONGODB_HOST')
 mongodb_port = os.getenv('MONGODB_PORT')
 mongodb_user = os.getenv('MONGO_INITDB_ROOT_USERNAME')
 mongodb_password = os.getenv('MONGO_INITDB_ROOT_PASSWORD')
 
+
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 @app.get("/")
 def read_root():
@@ -22,7 +33,7 @@ collection = db["configs"]
 def get_config(name: str):
     result = collection.find_one({"name": name})
     if result and "config" in result:
-        return result["config"]
+        return {"config": result["config"]}
     else:
         raise HTTPException(status_code=404, detail="Item not found")
 
