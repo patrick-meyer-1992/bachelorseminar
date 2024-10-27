@@ -1,0 +1,43 @@
+{
+  "name": "config1",
+  "config": [
+    {
+      "id": 1,
+      "type": "repair_facility",
+      "children": [
+        {
+          "id": 1,
+          "type": "workspace",
+          "children": [
+            { "id": 1, "type": "worker", "repair_rate": 10 },
+            { "id": 2, "type": "worker", "repair_rate": 10 }
+          ]
+        },
+
+        {
+          "id": 2,
+          "type": "workspace",
+          "children": [
+            { "id": 3, "type": "worker", "repair_rate": 4 },
+            { "id": 4, "type": "worker", "repair_rate": 4 }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": 2,
+      "type": "repair_facility",
+      "children": [
+        {
+          "id": 3,
+          "type": "workspace",
+          "children": [
+            { "id": 5, "type": "worker", "repair_rate": 1 },
+            { "id": 6, "type": "worker", "repair_rate": 1 }
+          ]
+        }
+      ]
+    }
+  ]
+}

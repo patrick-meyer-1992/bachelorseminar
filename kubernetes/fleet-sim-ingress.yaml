@@ -7,23 +7,23 @@ metadata:
     kubernetes.io/ingress.global-static-ip-name: "fleet-sim-ip"
 spec:
   rules:
-  - host: rmq.quantumshoe.duckdns.org
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: rabbitmq-service
-            port:
-              number: 15672
-  # - host: result.quantumpants.duckdns.org
-  #   http:
-  #     paths:
-  #     - path: /
-  #       pathType: Prefix
-  #       backend:
-  #         service:
-  #           name: result-service
-  #           port:
-  #             number: 80
+    - host: rmq.quantumshoe.duckdns.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rabbitmq-service
+                port:
+                  number: 15672
+    - host: api.quantumshoe.duckdns.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fastapi-service
+                port:
+                  number: 8000

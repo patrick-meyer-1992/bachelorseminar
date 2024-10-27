@@ -12,3 +12,44 @@ document/Kubernetes.synctex.gz
 simulation/test.py
 simulation/test.json
 *secret.yaml
+
+
+# Angular
+
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# Compiled output
+kubernetes/frontend/dist
+kubernetes/frontend/tmp
+kubernetes/frontend/out-tsc
+kubernetes/frontend/bazel-out
+
+# Node
+kubernetes/frontend/node_modules
+kubernetes/frontend/npm-debug.log
+kubernetes/frontend/yarn-error.log
+
+# IDEs and editors
+kubernetes/frontend/.idea/
+kubernetes/frontend/.project
+kubernetes/frontend/.classpath
+kubernetes/frontend/.c9/
+kubernetes/frontend/*.launch
+kubernetes/frontend/.settings/
+kubernetes/frontend/*.sublime-workspace
+
+# Visual Studio Code
+kubernetes/frontend/.vscode/
+
+# Miscellaneous
+kubernetes/frontend/.angular/cache
+kubernetes/frontend/.sass-cache/
+kubernetes/frontend/connect.lock
+kubernetes/frontend/coverage
+kubernetes/frontend/libpeerconnection.log
+kubernetes/frontend/testem.log
+kubernetes/frontend/typings
+
+# System files
+.DS_Store
+Thumbs.db

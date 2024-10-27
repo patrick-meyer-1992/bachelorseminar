@@ -1,0 +1,33 @@
+<div>
+  <h2>Configuration</h2>
+  <form (ngSubmit)="onSubmit()">
+    <div *ngFor="let facility of config; let i = index">
+      <h3>Repair Facility {{ i + 1 }}</h3>
+      <button type="button" (click)="removeFacility(i)">Remove Facility</button>
+      <div *ngFor="let workspace of facility.children; let j = index">
+        <h4>Workspace {{ j + 1 }}</h4>
+        <button type="button" (click)="removeWorkspace(i, j)">
+          Remove Workspace
+        </button>
+        <div *ngFor="let worker of workspace.children; let k = index">
+          <label>
+            Worker {{ k + 1 }} Repair Rate:
+            <input
+              type="number"
+              [(ngModel)]="worker.repair_rate"
+              name="repair_rate_{{ i }}_{{ j }}_{{ k }}"
+            />
+          </label>
+          <button type="button" (click)="removeWorker(i, j, k)">
+            Remove Worker
+          </button>
+        </div>
+        <button type="button" (click)="addWorker(i, j)">Add Worker</button>
+      </div>
+      <button type="button" (click)="addWorkspace(i)">Add Workspace</button>
+      <hr />
+    </div>
+    <button type="button" (click)="addFacility()">Add Repair Facility</button>
+    <button type="submit">Save Configuration</button>
+  </form>
+</div>
