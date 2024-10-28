@@ -8,16 +8,16 @@
   <hr />
   <form (ngSubmit)="onSubmit()">
     <div *ngFor="let facility of config; let i = index">
-      <h3>Instandhaltungseinrichtung {{ i + 1 }}</h3>
+      <h3>Instandhaltungseinrichtung {{ facility.id }}</h3>
       <button type="button" (click)="removeFacility(i)">Remove Facility</button>
       <div *ngFor="let workspace of facility.children; let j = index">
-        <h4>Dock {{ j + 1 }}</h4>
+        <h4>Dock {{ workspace.id }}</h4>
         <button type="button" (click)="removeWorkspace(i, j)">
           Dock entfernen
         </button>
         <div *ngFor="let worker of workspace.children; let k = index">
           <label>
-            Arbeiter {{ k + 1 }} Reparatur Rate:
+            Arbeiter {{ worker.id }} Reparatur Rate:
             <input
               type="number"
               [(ngModel)]="worker.repair_rate"

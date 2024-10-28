@@ -37,6 +37,9 @@ export class ConfigurationComponent implements OnInit {
   availableConfigs: String[] = [];
   selectedConfig: string = '';
   configName: string = '';
+  num_facilities: number = 0;
+  num_workspaces: number = 0;
+  num_workers: number = 0;
 
   constructor(private http: HttpClient) {}
 
@@ -75,33 +78,39 @@ export class ConfigurationComponent implements OnInit {
   }
 
   addFacility() {
+    this.num_facilities += 1;
     this.config.push({
-      id: this.config.length + 1,
+      // id: this.config.length + 1,
+      id: this.num_facilities,
       type: 'repair_facility',
       children: [],
     });
   }
 
   removeFacility(index: number) {
+    this.num_facilities -= 1;
     this.config.splice(index, 1);
   }
 
   addWorkspace(facilityIndex: number) {
+    this.num_workspaces += 1;
     this.config[facilityIndex].children.push({
-      id: this.config[facilityIndex].children.length + 1,
+      id: this.num_workspaces,
       type: 'workspace',
       children: [],
     });
   }
 
   removeWorkspace(facilityIndex: number, workspaceIndex: number) {
+    this.num_workspaces -= 1;
     this.config[facilityIndex].children.splice(workspaceIndex, 1);
   }
 
   addWorker(facilityIndex: number, workspaceIndex: number) {
+    this.num_workers += 1;
     this.config[facilityIndex].children[workspaceIndex].children.push({
-      id:
-        this.config[facilityIndex].children[workspaceIndex].children.length + 1,
+      id: this.num_workers,
+        // this.config[facilityIndex].children[workspaceIndex].children.length + 1,
       type: 'worker',
       repair_rate: 0,
     });
@@ -116,10 +125,24 @@ export class ConfigurationComponent implements OnInit {
       workerIndex,
       1
     );
+    this.num_workers -= 1;
   }
 
   onSubmit() {
     console.log('Configuration saved:', this.config);
     console.log('Configuration name:', this.configName);
+    this.http
+      .post(`http://localhost:8000/add_config/${this.configName}`, {
+      name: this.configName,
+      config: this.config,
+      })
+      .subscribe(
+      (response) => {
+        console.log('Configuration successfully saved:', response);
+      },
+      (error) => {
+        console.error('Error saving configuration', error);
+      }
+      );
   }
 }
