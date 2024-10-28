@@ -26,7 +26,9 @@ channel.queue_declare(queue=queue_name, durable=True)
 
 # Callback function to process messages
 def callback(ch, method, properties, body):
-    params = json.loads(body)
+    response = json.loads(body)
+    num_iterations = response.pop('num_iterations')
+    params = response
     # Acknowledge the message
     ch.basic_ack(delivery_tag=method.delivery_tag)
     
@@ -34,7 +36,7 @@ def callback(ch, method, properties, body):
     results = mesa.batch_run(
         FleetModel,
         parameters=params,
-        iterations=1,
+        iterations=num_iterations,
         max_steps=np.inf,
         number_processes=1,
         data_collection_period=1,
