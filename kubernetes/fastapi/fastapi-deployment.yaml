@@ -61,3 +61,13 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: POSTGRES_PORT
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: POSTGRES_HOST

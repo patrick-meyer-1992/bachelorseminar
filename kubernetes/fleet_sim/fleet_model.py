@@ -51,16 +51,20 @@ class VehicleAgent(mesa.Agent):
             self.status = "failed"
 
 class WorkerAgent(mesa.Agent):
-    def __init__(self, unique_id, model, repair_rate: float):
+    def __init__(self, unique_id, model, repair_rate_mean: float, repair_rate_sd: float):
         super().__init__(unique_id, model)
-        self.repair_rate = repair_rate
+        self.repair_rate_mean = repair_rate_mean
+        self.repair_rate_sd = repair_rate_sd
         self.type = "Worker"
         self.model.schedule.add(self)
+
+    def get_repair_rate(self):
+        return np.random.normal(self.repair_rate_mean, self.repair_rate_sd)
 
 class WorkspaceAgent(mesa.Agent):
     def __init__(self, unique_id, model, workers: list[WorkerAgent], repair_facility: 'RepairFacilityAgent'):
         super().__init__(unique_id, model)
-        self.type = "Workspace"
+        self.type = "workspace"
         self.workers = dict()
         self.available = True
         self.vehicle = None
@@ -68,10 +72,10 @@ class WorkspaceAgent(mesa.Agent):
         self.model.schedule.add(self)
 
         for worker in workers:
-            self.add_worker(worker["id"], worker["repair_rate"])
+            self.add_worker(worker["id"], worker["repair_rate_mean"], worker["repair_rate_sd"])
 
-    def add_worker(self, id: str, repair_rate: float):
-        self.workers[id] = WorkerAgent(id, self.model, repair_rate)
+    def add_worker(self, id: str, repair_rate_mean: float, repair_rate_sd: float):
+        self.workers[id] = WorkerAgent(id, self.model, repair_rate_mean, repair_rate_sd)
     
     def check_in_vehicle(self, vehicle: VehicleAgent):
         self.vehicle = vehicle
@@ -84,7 +88,7 @@ class WorkspaceAgent(mesa.Agent):
         self.available = True
 
     def repair_vehicle(self):
-        repair_rate = sum([worker.repair_rate for worker in self.workers.values()])
+        repair_rate = sum([worker.get_repair_rate() for worker in self.workers.values()])
         self.vehicle.health = self.vehicle.health + repair_rate  
         if self.vehicle.health >= 100:
             self.vehicle.health = 100             
@@ -103,11 +107,11 @@ class WorkspaceAgent(mesa.Agent):
 class RepairFacilityAgent(mesa.Agent):
     def __init__(self, unique_id, model, workspaces: list[dict]):
         super().__init__(unique_id, model)
-        self.type = "Repair Facility"
+        self.type = "repair_facility"
         self.workspaces = dict()
         self.vehicles = dict()
         for workspace in workspaces:
-            self.add_workspace(workspace["id"], workspace["workers"])
+            self.add_workspace(workspace["id"], workspace["children"])
 
     def add_workspace(self, id: str, workers: list[dict]):
         self.workspaces[id] = WorkspaceAgent(id, self.model, workers, self)
@@ -133,9 +137,9 @@ class RepairFacilityAgent(mesa.Agent):
 
 class FleetModel(mesa.Model):
     def __init__(self, 
-                 repair_config: str,
+                 repair_config_name: str,
                  num_vehicles: int = 100, 
-                 start_date: date = date(2024, 1, 1), 
+                 start_date: date = date(2023, 12, 31), 
                  end_date: date = date(2024, 12, 31),
             ):
         super().__init__()
@@ -143,10 +147,10 @@ class FleetModel(mesa.Model):
         self.num_vehicles = num_vehicles
         self.current_date = start_date
         self.end_date = end_date
-        self.set_repair_facilities(repair_config)
+        self.set_repair_facilities(repair_config_name)
         self.datacollector = mesa.DataCollector(
-            model_reporters={"Date": "current_date"},
-            agent_reporters={"Status": "status", "ID": "unique_id", "Type": "type"},
+            model_reporters={"date": "current_date"},
+            agent_reporters={"status": "status", "id": "unique_id", "type": "type"},
         )
         self.running = True
 
@@ -158,17 +162,17 @@ class FleetModel(mesa.Model):
             vehicle = VehicleAgent(i, self, failure_rate)
             self.schedule.add(vehicle)
 
-    def load_repair_config(self, repair_config: str):
+    def load_repair_config(self, repair_config_name: str) -> list:
         result = collection.find_one(
-            { "name": repair_config },
+            { "name": repair_config_name },
             { "config": 1, "_id": 0 }
         )
-        return result['config']["repair_facilities"]
+        return result['config']
 
-    def set_repair_facilities(self, repair_config: str):
-        repair_facilities = self.load_repair_config(repair_config)
+    def set_repair_facilities(self, repair_config_name: str):
+        repair_facilities = self.load_repair_config(repair_config_name)
         for repair_facility in repair_facilities:
-            self.schedule.add(RepairFacilityAgent(repair_facility["id"], self, repair_facility["workspaces"]))
+            self.schedule.add(RepairFacilityAgent(repair_facility["id"], self, repair_facility["children"]))
 
     def distribute_vehicle_to_repair_facility(self, vehicle: VehicleAgent):
         repair_facility = np.random.choice([agent for agent in self.schedule.agents if isinstance(agent, RepairFacilityAgent)])

@@ -1,3 +1,7 @@
 fastapi
 pymongo
 uvicorn
+sqlalchemy
+pika
+pandas
+psycopg2

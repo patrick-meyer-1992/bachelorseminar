@@ -5,34 +5,37 @@ import os
 from fastapi.middleware.cors import CORSMiddleware
 import pika
 import json
+from sqlalchemy import create_engine
+import pandas as pd
 
 mongodb_host = os.getenv('MONGODB_HOST')
 mongodb_port = os.getenv('MONGODB_PORT')
 mongodb_user = os.getenv('MONGO_INITDB_ROOT_USERNAME')
 mongodb_password = os.getenv('MONGO_INITDB_ROOT_PASSWORD')
-# Connection parameters
+
 rabbitmq_host = os.getenv('RABBITMQ_HOST')
 rabbitmq_port = os.getenv('RABBITMQ_PORT')
 rabbitmq_user = os.getenv('RABBITMQ_DEFAULT_USER')
 rabbitmq_password = os.getenv('RABBITMQ_DEFAULT_PASS')
 
+postgres_host = os.getenv('POSTGRES_HOST')
+postgres_db = os.getenv('POSTGRES_DB')
+postgres_port = "5432"
+postgres_user = os.getenv('POSTGRES_USER')
+postgres_password = os.getenv('POSTGRES_PASSWORD')
+
+engine = create_engine(f'postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}')
+
 # Queue and exchange parameters
 queue_name = 'json_queue'
 exchange_name = 'json_exchange'
 routing_key = 'json_key'
-
 # Connect to RabbitMQ
 credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_password)
 connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port, credentials=credentials))
 channel = connection.channel()
-
-# Declare exchange
 channel.exchange_declare(exchange=exchange_name, exchange_type='direct')
-
-# Declare queue
 channel.queue_declare(queue=queue_name, durable=True)
-
-# Bind queue to exchange
 channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key=routing_key)
 
 app = FastAPI()
@@ -79,15 +82,22 @@ def add_config(name: str, config: Union[str, dict]):
         collection.insert_one({"name": name, "config": config})
         return {"status": "success"}
     
-@app.post("/add_sim_job/", status_code=status.HTTP_200_OK)
-def add_sim_job(config_name: str, num_vehicles: int, num_iterations: int):
+@app.post("/sim_jobs/", status_code=status.HTTP_200_OK)
+def sim_jobs(config_name: str, num_vehicles: int, num_iterations: int):
     message = {
         "config": config_name,
         "num_vehicles": num_vehicles,
-        "num_iterations": num_iterations
     }
     message = json.dumps(message).encode('utf-8')
-    channel.basic_publish(exchange=exchange_name, routing_key=routing_key, body=message)
+    for _ in range(num_iterations):
+        channel.basic_publish(exchange=exchange_name, routing_key=routing_key, body=message)
+    return {"status": "success"}
+
+@app.post("/result/", status_code=status.HTTP_200_OK)
+def result(result: dict):
+    # result = json.loads(result)
+    df = pd.DataFrame(result)
+    df.to_sql("vehicle_status", con=engine, if_exists="append", index=False)
     return {"status": "success"}
 
     

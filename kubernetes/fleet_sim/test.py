@@ -5,35 +5,17 @@ import numpy as np
 import json
 import pandas as pd
 from pymongo import MongoClient
+import plotly.express as px
+import plotly.graph_objects as go
+import requests
 
-# %%
-# # Step 2: Connect to the MongoDB server
-# username = 'guest'
-# password = 'guest'
-# client = MongoClient(f'mongodb://{username}:{password}@localhost:27017/')
-
-
-# # Step 3: Access the "fleet-sim" database
-# db = client['fleet-sim']
-
-# # Step 4: Access the "configs" collection
-# collection = db['configs']
-
-# # Step 5: Perform the query
-# result = collection.find_one(
-#     { "name": "config1" },
-#     { "config": 1, "_id": 0 }
-# )
-
-# params = result['config']
-# print(params)
-# with open('D:/GitHub/bachelorseminar/simulation/workspaces.json', 'r') as f:
-#     params = json.load(f)
-
-with open('D:/GitHub/bachelorseminar/simulation/config.json', 'r') as f:
+with open('D:/GitHub/bachelorseminar/kubernetes/fleet_sim/workspaces.json', 'r') as f:
     params = json.load(f)
 
-print(params)
+params = {
+    "num_vehicles": 100,
+    "repair_config_name": "config4"
+}
 # %%
 results = mesa.batch_run(
     FleetModel,
@@ -46,7 +28,32 @@ results = mesa.batch_run(
 )
 # Convert results to DataFrame and print
 results_df = pd.DataFrame(results)
-# results_df = results_df.loc[results_df["Status"] is not None,]
-#results_df = results_df[results_df["Status"].notna()]
-print(results_df)
+results_df = results_df[results_df["type"].notna()]
+vehicle_df = results_df[results_df["type"] == "Vehicle"]
+status_counts = vehicle_df.groupby(["date", "status"]).size().unstack(fill_value=0).reset_index()
+status_counts["repair_config_name"] = results[0]["repair_config_name"]
+status_counts["num_vehicles"] = results[0]["num_vehicles"]
+# %%
+print(status_counts.head())
+status_counts["date"] = status_counts["date"].astype(str)
+message = json.dumps(status_counts.to_dict())
+print(message)
+print(type(message))
+
+# with open("D:/GitHub/bachelorseminar/kubernetes/fleet_sim/message.json", "w") as f:
+#     f.write(message)
+
+# %%
+response = requests.post("http://localhost:8000/result", data=message)
+if response.status_code == 200:
+    print("Data successfully sent to the database.")
+else:
+    print(f"Failed to send data to the database. Status code: {response.status_code}")
+
+# %%
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=status_counts["Date"], y=status_counts["failed"], mode='lines', name='Failed'))
+fig.add_trace(go.Scatter(x=status_counts["Date"], y=status_counts["operational"], mode='lines', name='Operational'))
+fig.add_trace(go.Scatter(x=status_counts["Date"], y=status_counts["repairing"], mode='lines', name='Repairing'))
+fig.show()
 # %%

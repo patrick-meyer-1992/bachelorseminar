@@ -5,6 +5,7 @@ import mesa
 import numpy as np
 import json
 import os
+import pandas as pd
 
 # %%
 # Connection parameters
@@ -26,9 +27,7 @@ channel.queue_declare(queue=queue_name, durable=True)
 
 # Callback function to process messages
 def callback(ch, method, properties, body):
-    response = json.loads(body)
-    num_iterations = response.pop('num_iterations')
-    params = response
+    params = json.loads(body)
     # Acknowledge the message
     ch.basic_ack(delivery_tag=method.delivery_tag)
     
@@ -36,16 +35,18 @@ def callback(ch, method, properties, body):
     results = mesa.batch_run(
         FleetModel,
         parameters=params,
-        iterations=num_iterations,
+        iterations=1,
         max_steps=np.inf,
         number_processes=1,
         data_collection_period=1,
         display_progress=False,
     )
-    # Convert results to DataFrame and print
-    print(results)
-    # results_df = pd.DataFrame(results)
-    # print(results_df)
+    results_df = pd.DataFrame(results)
+    results_df = results_df[results_df["Type"].notna()]
+    vehicle_df = results_df[results_df["Type"] == "Vehicle"]
+    status_counts = vehicle_df.groupby(["Date", "Status"]).size().unstack(fill_value=0).reset_index()
+    status_counts["repair_config_name"] = results[0]["repair_config_name"]
+    status_counts["num_vehicles"] = results[0]["num_vehicles"]
 
 # Set up consumer
 channel.basic_consume(queue=queue_name, on_message_callback=callback)
