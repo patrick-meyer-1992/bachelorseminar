@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
       - name: fleet-sim
-        image: patrickmeyer/fleet_sim:0.1
+        image: patrickmeyer/fleet_sim:latest
+        imagePullPolicy: Always
         env:
         - name: RABBITMQ_DEFAULT_USER
           valueFrom:

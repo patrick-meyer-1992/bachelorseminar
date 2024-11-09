@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: fastapi
-          image: patrickmeyer/fastapi:0.2
+          image: patrickmeyer/fastapi:latest
+          imagePullPolicy: Always
           env:
             - name: RABBITMQ_DEFAULT_USER
               valueFrom:
