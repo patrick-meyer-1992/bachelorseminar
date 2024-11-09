@@ -5,3 +5,4 @@ sqlalchemy
 pika
 pandas
 psycopg2-binary
+plotly
