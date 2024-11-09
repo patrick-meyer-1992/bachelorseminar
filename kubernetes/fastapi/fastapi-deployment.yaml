@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: fastapi
-          image: patrickmeyer/fastapi:latest
+          image: patrickmeyer/fastapi:0.1
           imagePullPolicy: Always
           env:
             - name: RABBITMQ_DEFAULT_USER
@@ -27,6 +27,16 @@ spec:
                 secretKeyRef:
                   name: rabbitmq-secret
                   key: RABBITMQ_DEFAULT_PASS
+            - name: RABBITMQ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: rabbitmq-config
+                  key: RABBITMQ_PORT
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: rabbitmq-config
+                  key: RABBITMQ_HOST
             - name: MONGO_INITDB_ROOT_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -65,10 +75,10 @@ spec:
             - name: POSTGRES_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: db-config
+                  name: postgres-config
                   key: POSTGRES_PORT
             - name: POSTGRES_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: db-config
+                  name: postgres-config
                   key: POSTGRES_HOST
