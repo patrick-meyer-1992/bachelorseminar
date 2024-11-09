@@ -34,7 +34,7 @@ interface Config {
 })
 export class ConfigurationComponent implements OnInit {
   config: RepairFacility[] = [];
-  availableConfigs: String[] = [];
+  availableConfigs: string[] = [];
   selectedConfig: string = '';
   configName: string = '';
   num_facilities: number = 0;
@@ -45,12 +45,11 @@ export class ConfigurationComponent implements OnInit {
 
   ngOnInit(): void {
     this.http
-      .get<{ configs: String[] }>('http://localhost:8000/get_configs/')
+      .get<{ configs: string[] }>('http://localhost:8000/configs/')
       .subscribe(
         (data) => {
-          console.log('Fetched configurations:', data);
           this.availableConfigs = data.configs;
-          console.log('Available configurations:', this.availableConfigs);
+          this.selectedConfig = this.availableConfigs[0];
         },
         (error) => {
           console.error('Error fetching configurations', error);
@@ -64,7 +63,7 @@ export class ConfigurationComponent implements OnInit {
 
     this.http
       .get<{ config: RepairFacility[] }>(
-        `http://localhost:8000/get_config/${selectedName}`
+        `http://localhost:8000/config/${selectedName}`
       )
       .subscribe(
         (data) => {

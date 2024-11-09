@@ -1,1 +1,6 @@
-<p>results works!</p>
+<select [(ngModel)]="selectedExperiment">
+    <option *ngFor="let experiment of availableExperiments" [value]="experiment">
+      {{ experiment }}
+    </option>
+</select>
+<div id="plot"></div>

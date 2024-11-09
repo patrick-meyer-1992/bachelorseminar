@@ -1,17 +1,21 @@
 from datetime import date, timedelta
 import mesa
 import numpy as np
-from pymongo import MongoClient
+# from pymongo import MongoClient
 import os
+import requests
 
-mongodb_host = os.getenv('MONGODB_HOST')
-mongodb_port = os.getenv('MONGODB_PORT')
-mongodb_user = os.getenv('MONGO_INITDB_ROOT_USERNAME')
-mongodb_password = os.getenv('MONGO_INITDB_ROOT_PASSWORD')
+# mongodb_host = os.getenv('MONGODB_HOST')
+# mongodb_port = os.getenv('MONGODB_PORT')
+# mongodb_user = os.getenv('MONGO_INITDB_ROOT_USERNAME')
+# mongodb_password = os.getenv('MONGO_INITDB_ROOT_PASSWORD')
 
-client = MongoClient(f'mongodb://{mongodb_user}:{mongodb_password}@{mongodb_host}:{mongodb_port}/')
-db = client['fleet-sim']
-collection = db['configs']
+fastapi_host = os.getenv('FASTAPI_HOST')
+fastapi_port = os.getenv('FASTAPI_PORT')
+
+# client = MongoClient(f'mongodb://{mongodb_user}:{mongodb_password}@{mongodb_host}:{mongodb_port}/')
+# db = client['fleet-sim']
+# collection = db['configs']
 
 class VehicleAgent(mesa.Agent):
     def __init__(self, unique_id, model, failure_rate):
@@ -163,10 +167,11 @@ class FleetModel(mesa.Model):
             self.schedule.add(vehicle)
 
     def load_repair_config(self, repair_config_name: str) -> list:
-        result = collection.find_one(
-            { "name": repair_config_name },
-            { "config": 1, "_id": 0 }
-        )
+        # result = collection.find_one(
+        #     { "name": repair_config_name },
+        #     { "config": 1, "_id": 0 }
+        # )
+        result = requests.get(f'http://{fastapi_host}:{fastapi_port}/config/{repair_config_name}').json()
         return result['config']
 
     def set_repair_facilities(self, repair_config_name: str):

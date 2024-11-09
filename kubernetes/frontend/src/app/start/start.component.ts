@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class StartComponent implements OnInit {
   availableConfigs: String[] = [];
+  experimentId: string = '';
   selectedConfig: string = '';
   numVehicles: number = 100;
   iterations: number = 20;
@@ -16,7 +17,7 @@ export class StartComponent implements OnInit {
 
   ngOnInit(): void {
     this.http
-      .get<{ configs: String[] }>('http://localhost:8000/get_configs/')
+      .get<{ configs: String[] }>('http://localhost:8000'+'/configs/')
       .subscribe(
         (data) => {
           console.log('Fetched configurations:', data);
@@ -38,6 +39,20 @@ export class StartComponent implements OnInit {
     console.log('Starting simulation with config:', this.selectedConfig);
     console.log('Number of vehicles:', this.numVehicles);
     console.log('Iterations:', this.iterations);
-    // Add logic to start the simulation
+    const payload = {
+      experiment_id: this.experimentId,
+      repair_config_name: this.selectedConfig,
+      num_vehicles: this.numVehicles,
+      num_iterations: this.iterations,
+    };
+
+    this.http.post('http://localhost:8000'+'/sim_jobs', payload).subscribe(
+      (response) => {
+      console.log('Simulation started successfully:', response);
+      },
+      (error) => {
+      console.error('Error starting simulation', error);
+      }
+    );
   }
 }

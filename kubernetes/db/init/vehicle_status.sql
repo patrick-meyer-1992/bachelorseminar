@@ -1,4 +1,5 @@
 CREATE TABLE vehicle_status (
+    experiment_id VARCHAR(255),
     Date DATE,
     operational INT,
     failed INT,

@@ -7,6 +7,8 @@ import pika
 import json
 from sqlalchemy import create_engine
 import pandas as pd
+from sqlalchemy.sql import text
+import plotly.graph_objects as go
 
 mongodb_host = os.getenv('MONGODB_HOST')
 mongodb_port = os.getenv('MONGODB_PORT')
@@ -57,16 +59,16 @@ client = MongoClient(f'mongodb://{mongodb_user}:{mongodb_password}@{mongodb_host
 db = client["fleet-sim"]
 collection = db["configs"]
 
-@app.get("/get_config/{name}")
-def get_config(name: str):
+@app.get("/config/{name}")
+def config(name: str):
     result = collection.find_one({"name": name})
     if result and "config" in result:
         return {"config": result["config"]}
     else:
         raise HTTPException(status_code=404, detail="Item not found")
 
-@app.get("/get_configs/")
-def get_configs():
+@app.get("/configs/")
+def configs():
     results = collection.find({}, {"_id": 0, "name": 1})
     configs = [result["name"] for result in results if "name" in result]
     if configs:
@@ -74,6 +76,13 @@ def get_configs():
     else:
         raise HTTPException(status_code=404, detail="No configs found")
     
+@app.get("/experiments/")
+def experiments():
+    query = text("SELECT DISTINCT experiment_id FROM vehicle_status")  
+    df = pd.read_sql(query, con=engine)
+    experiments = df["experiment_id"].tolist()
+    return {"experiments": experiments}
+
 @app.post("/add_config/{name}", status_code=status.HTTP_200_OK)
 def add_config(name: str, config: Union[str, dict]):
     if collection.find_one({"name": name}):
@@ -83,22 +92,41 @@ def add_config(name: str, config: Union[str, dict]):
         return {"status": "success"}
     
 @app.post("/sim_jobs/", status_code=status.HTTP_200_OK)
-def sim_jobs(config_name: str, num_vehicles: int, num_iterations: int):
-    message = {
-        "config": config_name,
-        "num_vehicles": num_vehicles,
-    }
+def sim_jobs(message: dict):
+    print(message)
+    num_iterations = message.pop("num_iterations")
+    # message = {
+    #     "experiment_id": experiment_id,
+    #     "config": config_name,
+    #     "num_vehicles": num_vehicles,
+    # }
     message = json.dumps(message).encode('utf-8')
     for _ in range(num_iterations):
         channel.basic_publish(exchange=exchange_name, routing_key=routing_key, body=message)
     return {"status": "success"}
 
-@app.post("/result/", status_code=status.HTTP_200_OK)
-def result(result: dict):
+@app.post("/result/{experiment_id}", status_code=status.HTTP_200_OK)
+def result(result: dict, experiment_id: str):
     # result = json.loads(result)
     df = pd.DataFrame(result)
+    df["experiment_id"] = experiment_id
     df.to_sql("vehicle_status", con=engine, if_exists="append", index=False)
     return {"status": "success"}
+
+@app.get("/plot_result/{experiment_id}")
+def plot_result(experiment_id: str):
+    query = text("SELECT * FROM vehicle_status WHERE experiment_id = :experiment_id")
+    params = {"experiment_id": experiment_id}    
+    df = pd.read_sql(query, con=engine, params=params)
+    df_mean = df.groupby("date")[["operational", "failed", "repairing"]].mean().reset_index()
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=df_mean["date"], y=df_mean["failed"], mode='lines', name='Failed'))
+    fig.add_trace(go.Scatter(x=df_mean["date"], y=df_mean["operational"], mode='lines', name='Operational'))
+    fig.add_trace(go.Scatter(x=df_mean["date"], y=df_mean["repairing"], mode='lines', name='Repairing'))
+    fig_json = fig.to_json(engine="json")
+    fig_json = json.loads(fig_json)
+    print("Generated plot JSON:", fig_json)  
+    return fig_json
 
     
 
