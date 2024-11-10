@@ -1,0 +1,4 @@
+fastapi-config.yaml
+fastapi-deployment.yaml
+fastapi-service.yaml
+__pycache__
