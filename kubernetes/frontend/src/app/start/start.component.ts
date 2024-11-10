@@ -17,12 +17,11 @@ export class StartComponent implements OnInit {
 
   ngOnInit(): void {
     this.http
-      .get<{ configs: String[] }>('http://localhost:8000'+'/configs/')
+      // .get<{ configs: String[] }>('http://localhost:8000'+'/configs/')
+      .get<{ configs: String[] }>('http://api.quantumshoe.duckdns.org'+'/configs/')
       .subscribe(
         (data) => {
-          console.log('Fetched configurations:', data);
           this.availableConfigs = data.configs;
-          console.log('Available configurations:', this.availableConfigs);
         },
         (error) => {
           console.error('Error fetching configurations', error);
@@ -32,13 +31,9 @@ export class StartComponent implements OnInit {
 
   onConfigChange(event: Event): void {
     this.selectedConfig = (event.target as HTMLSelectElement).value;
-    console.log('Selected configuration:', this.selectedConfig);
   }
 
   startSimulation(): void {
-    console.log('Starting simulation with config:', this.selectedConfig);
-    console.log('Number of vehicles:', this.numVehicles);
-    console.log('Iterations:', this.iterations);
     const payload = {
       experiment_id: this.experimentId,
       repair_config_name: this.selectedConfig,
@@ -46,7 +41,8 @@ export class StartComponent implements OnInit {
       num_iterations: this.iterations,
     };
 
-    this.http.post('http://localhost:8000'+'/sim_jobs', payload).subscribe(
+    // this.http.post('http://localhost:8000'+'/sim_jobs', payload).subscribe(
+    this.http.post('http://api.quantumshoe.duckdns.org'+'/sim_jobs', payload).subscribe(
       (response) => {
       console.log('Simulation started successfully:', response);
       },

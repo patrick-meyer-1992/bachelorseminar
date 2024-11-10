@@ -17,7 +17,8 @@ export class ResultsComponent implements OnInit {
 
   ngOnInit(): void {
     this.http
-      .get<{ experiments: string[] }>('http://localhost:8000/experiments/')
+      // .get<{ experiments: string[] }>('http://localhost:8000/experiments/')
+      .get<{ experiments: string[] }>('http://api.quantumshoe.duckdns.org/experiments/')
       .subscribe(
         (data) => {
           this.availableExperiments = data.experiments;
@@ -33,15 +34,14 @@ export class ResultsComponent implements OnInit {
 
   onExperimentChange(event: Event): void {
     this.selectedExperiment = (event.target as HTMLSelectElement).value;
-    console.log('Selected experiment:', this.selectedExperiment);
     this.fetchDataAndPlot();
   }
 
   fetchDataAndPlot(): void {
-    this.http.get('http://localhost:8000/plot_result/test2').subscribe((data: any) => {
-      console.log(data)
-      console.log(data.data);
-      console.log('Attributes of data:', Object.keys(data));
+    this.http
+    // .get('http://localhost:8000/plot_result/test2').subscribe((data: any) => {
+    .get(`http://api.quantumshoe.duckdns.org/plot_result/${this.selectedExperiment}`).subscribe((data: any) => {
+      
       const plotData = data.data.map((item: any) => ({
         x: item.x,
         y: item.y,
@@ -55,7 +55,6 @@ export class ResultsComponent implements OnInit {
         xaxis: { title: 'Date' },
         yaxis: { title: 'Value' },
       };
-      console.log('Plotting...');
       Plotly.newPlot('plot', plotData, layout);
     });
   }

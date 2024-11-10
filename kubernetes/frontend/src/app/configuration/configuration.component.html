@@ -1,8 +1,8 @@
 <div>
   <h2>Konfiguration</h2>
-  <select [(ngModel)]="selectedConfig" (change)="onConfigChange($event)">
-    <option *ngFor="let config of availableConfigs" [value]="config">
-      {{ config }}
+  <select [(ngModel)]="selectedConfigName" (change)="onConfigChange($event)">
+    <option *ngFor="let configName of availableConfigNames" [value]="configName">
+      {{ configName }}
     </option>
   </select>
   <hr />
@@ -17,13 +17,23 @@
         </button>
         <div *ngFor="let worker of workspace.children; let k = index">
           <label>
-            Arbeiter {{ worker.id }} Reparatur Rate:
+            Arbeiter {{ worker.id }} Reparatur Rate (Mittelwert):
             <input
               type="number"
-              [(ngModel)]="worker.repair_rate"
-              name="repair_rate_{{ i }}_{{ j }}_{{ k }}"
+              [(ngModel)]="worker.repair_rate_mean"
+              name="repair_rate_mean_{{ i }}_{{ j }}_{{ k }}"
             />
           </label>
+          <br />
+          <label>
+            Arbeiter {{ worker.id }} Reparatur Rate (Standardabweichung):
+            <input
+              type="number"
+              [(ngModel)]="worker.repair_rate_sd"
+              name="repair_rate_sd_{{ i }}_{{ j }}_{{ k }}"
+            />
+          </label>
+          <br />
           <button type="button" (click)="removeWorker(i, j, k)">
             Arbeiter entfernen
           </button>
@@ -43,9 +53,9 @@
     <br />
     <input
       type="text"
-      [(ngModel)]="configName"
+      [(ngModel)]="newConfigName"
       placeholder="Speichern als..."
-      name="configName"
+      name="newConfigName"
     />
     <button type="submit">Konfiguration speichern</button>
   </form>
