@@ -88,7 +88,7 @@ def add_config(name: str, config: Union[str, dict]):
     if collection.find_one({"name": name}):
         raise HTTPException(status_code=400, detail="Item already exists")
     else:
-        collection.insert_one({"name": name, "config": config})
+        collection.insert_one({"name": name, "config": config["config"]})
         return {"status": "success"}
     
 @app.post("/sim_jobs/", status_code=status.HTTP_200_OK)
