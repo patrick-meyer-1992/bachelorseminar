@@ -27,3 +27,13 @@ spec:
                 name: fastapi-service
                 port:
                   number: 8000
+    - host: app.quantumshoe.duckdns.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 80
