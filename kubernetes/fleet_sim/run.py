@@ -15,8 +15,8 @@ mq_port = os.getenv('RABBITMQ_PORT')
 rabbitmq_user = os.getenv('RABBITMQ_DEFAULT_USER')
 rabbitmq_password = os.getenv('RABBITMQ_DEFAULT_PASS')
 
-fastapi_host = os.getenv('FASTAPI_HOST')
-fastapi_port = os.getenv('FASTAPI_PORT')
+fastapi_host = 'http://api.quantumshow.duckdns.org'
+fastapi_port = '80'
 
 # Queue parameters
 queue_name = 'json_queue'
