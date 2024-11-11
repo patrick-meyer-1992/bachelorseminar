@@ -1,4 +1,4 @@
-<select [(ngModel)]="selectedExperiment">
+<select [(ngModel)]="selectedExperiment" (change)="onExperimentChange($event)">
     <option *ngFor="let experiment of availableExperiments" [value]="experiment">
       {{ experiment }}
     </option>

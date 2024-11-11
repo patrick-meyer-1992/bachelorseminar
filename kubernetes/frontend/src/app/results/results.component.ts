@@ -23,24 +23,22 @@ export class ResultsComponent implements OnInit {
         (data) => {
           this.availableExperiments = data.experiments;
           this.selectedExperiment = this.availableExperiments[0];
+          this.fetchDataAndPlot(this.selectedExperiment);
         },
         (error) => {
           console.error('Error fetching configurations', error);
         }
       );
-    this.fetchDataAndPlot();
-
   }
 
   onExperimentChange(event: Event): void {
-    this.selectedExperiment = (event.target as HTMLSelectElement).value;
-    this.fetchDataAndPlot();
+    this.fetchDataAndPlot((event.target as HTMLSelectElement).value);
   }
 
-  fetchDataAndPlot(): void {
+  fetchDataAndPlot(experiment: string): void {
     this.http
     // .get('http://localhost:8000/plot_result/test2').subscribe((data: any) => {
-    .get(`http://api.quantumshoe.duckdns.org/plot_result/${this.selectedExperiment}`).subscribe((data: any) => {
+    .get(`http://api.quantumshoe.duckdns.org/plot_result/${experiment}`).subscribe((data: any) => {
       
       const plotData = data.data.map((item: any) => ({
         x: item.x,
