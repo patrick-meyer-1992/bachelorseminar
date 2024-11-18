@@ -4,5 +4,5 @@ metadata:
   name: fastapi-config
   namespace: default
 data:
-  FASTAPI_HOST: "fastapi-service.default.svc.cluster.local"
+  FASTAPI_HOST: "fastapi-service"
   FASTAPI_PORT: "8000"

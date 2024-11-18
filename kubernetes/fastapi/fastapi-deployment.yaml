@@ -14,8 +14,15 @@ spec:
     spec:
       containers:
         - name: fastapi
-          image: patrickmeyer/fastapi:0.2
+          image: patrickmeyer/fastapi:0.4
           imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
           env:
             - name: RABBITMQ_DEFAULT_USER
               valueFrom:
@@ -36,7 +43,7 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: rabbitmq-config
-                  key: RABBITMQ_HOST
+                  key: RABBITMQ_HOST_INTERNAL
             - name: MONGO_INITDB_ROOT_USERNAME
               valueFrom:
                 secretKeyRef:

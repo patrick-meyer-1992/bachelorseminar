@@ -34,11 +34,6 @@ exchange_name = 'json_exchange'
 routing_key = 'json_key'
 # Connect to RabbitMQ
 credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_password)
-connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port, credentials=credentials))
-channel = connection.channel()
-channel.exchange_declare(exchange=exchange_name, exchange_type='direct')
-channel.queue_declare(queue=queue_name, durable=True)
-channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key=routing_key)
 
 app = FastAPI()
 
@@ -93,7 +88,11 @@ def add_config(name: str, config: Union[str, dict]):
     
 @app.post("/sim_jobs/", status_code=status.HTTP_200_OK)
 def sim_jobs(message: dict):
-    print(message)
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port, credentials=credentials))
+    channel = connection.channel()
+    channel.exchange_declare(exchange=exchange_name, exchange_type='direct')
+    channel.queue_declare(queue=queue_name, durable=True)
+    channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key=routing_key)
     num_iterations = message.pop("num_iterations")
     # message = {
     #     "experiment_id": experiment_id,
@@ -103,6 +102,7 @@ def sim_jobs(message: dict):
     message = json.dumps(message).encode('utf-8')
     for _ in range(num_iterations):
         channel.basic_publish(exchange=exchange_name, routing_key=routing_key, body=message)
+    connection.close()
     return {"status": "success"}
 
 @app.post("/result/{experiment_id}", status_code=status.HTTP_200_OK)
@@ -128,5 +128,13 @@ def plot_result(experiment_id: str):
     print("Generated plot JSON:", fig_json)  
     return fig_json
 
-    
-
+# @app.get("/health", status_code=status.HTTP_200_OK)
+# def health_check():
+#     try:
+#         # Check if the persistent connection is open
+#         if connection.is_open:
+#             return {"status": "ok"}
+#         else:
+#             raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="RabbitMQ connection is closed")
+#     except Exception as e:
+#         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
