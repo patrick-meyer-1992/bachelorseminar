@@ -1,4 +1,5 @@
 pika
-mesa
+mesa==2.4.0
 numpy
 pymongo
+requests

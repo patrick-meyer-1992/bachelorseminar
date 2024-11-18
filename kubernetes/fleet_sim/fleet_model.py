@@ -56,6 +56,7 @@ class VehicleAgent(mesa.Agent):
 
 class WorkerAgent(mesa.Agent):
     def __init__(self, unique_id, model, repair_rate_mean: float, repair_rate_sd: float):
+        print(f"Calling super from WorkerAgent with unique_id: {unique_id} and model {model}")
         super().__init__(unique_id, model)
         self.repair_rate_mean = repair_rate_mean
         self.repair_rate_sd = repair_rate_sd
@@ -67,6 +68,7 @@ class WorkerAgent(mesa.Agent):
 
 class WorkspaceAgent(mesa.Agent):
     def __init__(self, unique_id, model, workers: list[WorkerAgent], repair_facility: 'RepairFacilityAgent'):
+        print(f"Calling super from WorkspaceyAgent with unique_id: {unique_id} and model {model}")
         super().__init__(unique_id, model)
         self.type = "workspace"
         self.workers = dict()
@@ -167,10 +169,6 @@ class FleetModel(mesa.Model):
             self.schedule.add(vehicle)
 
     def load_repair_config(self, repair_config_name: str) -> list:
-        # result = collection.find_one(
-        #     { "name": repair_config_name },
-        #     { "config": 1, "_id": 0 }
-        # )
         result = requests.get(f'http://{fastapi_host}:{fastapi_port}/config/{repair_config_name}').json()
         return result['config']
 

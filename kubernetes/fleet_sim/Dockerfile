@@ -9,6 +9,7 @@ COPY requirements.txt /app/
 
 # Install any necessary dependencies
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --pre mesa[viz]
 
 # Copy the rest of the application code
 COPY . /app/

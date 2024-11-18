@@ -11,19 +11,19 @@ import requests
 # %%
 # Connection parameters
 rabbitmq_host = os.getenv('RABBITMQ_HOST')
-mq_port = os.getenv('RABBITMQ_PORT')
+rabbitmq_port = os.getenv('RABBITMQ_PORT')
 rabbitmq_user = os.getenv('RABBITMQ_DEFAULT_USER')
 rabbitmq_password = os.getenv('RABBITMQ_DEFAULT_PASS')
 
-fastapi_host = 'http://api.quantumshow.duckdns.org'
-fastapi_port = '80'
+fastapi_host = os.getenv('FASTAPI_HOST')
+fastapi_port = os.getenv('FASTAPI_PORT')
 
 # Queue parameters
 queue_name = 'json_queue'
 
 # Connect to RabbitMQ
 credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_password)
-connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, port=mq_port, credentials=credentials))
+connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, port=rabbitmq_port, credentials=credentials))
 channel = connection.channel()
 
 # Declare queue (in case it doesn't exist)
@@ -32,6 +32,7 @@ channel.queue_declare(queue=queue_name, durable=True)
 # Callback function to process messages
 def callback(ch, method, properties, body):
     params = json.loads(body)
+    print(params)
     # Acknowledge the message
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
@@ -61,9 +62,9 @@ def callback(ch, method, properties, body):
     print("Results posted to FastAPI")
 
 # Set up consumer
+print('Waiting for messages. To exit press CTRL+C')
 channel.basic_consume(queue=queue_name, on_message_callback=callback)
 
-print('Waiting for messages. To exit press CTRL+C')
 channel.start_consuming()
 
 
