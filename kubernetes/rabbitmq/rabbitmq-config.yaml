@@ -4,5 +4,6 @@ metadata:
   name: rabbitmq-config
   namespace: default
 data:
-  RABBITMQ_HOST: "rabbitmq-service.default.svc.cluster.local"
+  RABBITMQ_HOST_EXTERNAL: "rabbitmq-service.default.svc.cluster.local"
+  RABBITMQ_HOST_INTERNAL: "rabbitmq-service"
   RABBITMQ_PORT: "5672"
