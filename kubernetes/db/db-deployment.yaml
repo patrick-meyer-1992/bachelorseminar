@@ -17,6 +17,13 @@ spec:
         image: postgres:latest
         ports:
         - containerPort: 5432
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
         env:
         - name: PGDATA
           value: /var/lib/postgresql/data/pgdata
