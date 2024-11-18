@@ -1,0 +1,124 @@
+[{
+  "_id": {
+    "$oid": "671fca98f15b3fca7f7a5e0c"
+  },
+  "name": "config4",
+  "config": [
+    {
+      "id": 1,
+      "type": "repair_facility",
+      "children": [
+        {
+          "id": 1,
+          "type": "workspace",
+          "children": [
+            {
+              "id": 1,
+              "type": "worker",
+              "repair_rate_mean": 10,
+              "repair_rate_sd": 2
+            },
+            {
+              "id": 2,
+              "type": "worker",
+              "repair_rate_mean": 10,
+              "repair_rate_sd": 2
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "workspace",
+          "children": [
+            {
+              "id": 3,
+              "type": "worker",
+              "repair_rate_mean": 4,
+              "repair_rate_sd": 1
+            },
+            {
+              "id": 4,
+              "type": "worker",
+              "repair_rate_mean": 4,
+              "repair_rate_sd": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "repair_facility",
+      "children": [
+        {
+          "id": 3,
+          "type": "workspace",
+          "children": [
+            {
+              "id": 5,
+              "type": "worker",
+              "repair_rate_mean": 1,
+              "repair_rate_sd": 0.5
+            },
+            {
+              "id": 6,
+              "type": "worker",
+              "repair_rate_mean": 1,
+              "repair_rate_sd": 0.5
+            }
+          ]
+        }
+      ]
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6730f42c9bc9081b2cd0c156"
+  },
+  "name": "config1",
+  "config": [
+    {
+      "id": 1,
+      "type": "repair_facility",
+      "children": [
+        {
+          "id": 1,
+          "type": "workspace",
+          "children": [
+            {
+              "id": 1,
+              "type": "worker",
+              "repair_rate_mean": 10,
+              "repair_rate_sd": 2
+            },
+            {
+              "id": 2,
+              "type": "worker",
+              "repair_rate_mean": 10,
+              "repair_rate_sd": 2
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "workspace",
+          "children": [
+            {
+              "id": 3,
+              "type": "worker",
+              "repair_rate_mean": 4,
+              "repair_rate_sd": 1
+            },
+            {
+              "id": 4,
+              "type": "worker",
+              "repair_rate_mean": 4,
+              "repair_rate_sd": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}]
