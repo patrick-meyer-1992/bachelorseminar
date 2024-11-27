@@ -21,6 +21,47 @@
 
 \section{Einleitung}
 
+Zunächst soll die Historie betrachtet werden, vor deren Hintergrund Kubernetes entstanden ist.
+Das stetige Ziel, das in sich durch diese Historie zieht, ist das Bereitstellen von Applikationen.
+Kominos et al. beschreiben die 1960er Jahre als Ursprung des Cloud Computing \cite{7899247}.
+Zu dieser Zeit liefen Applikationen oft auf einer gemeinsamen Hardware und die Ressourcenverteilung erfolgte unmittelbar durch das zugrundeliegende Betriebssystem.
+Ein derartiges Szenario (auch als "Bare-metal" bezeichnet) bringt in der Regel mehrere Herausforderungen mit sich.
+Zum einen kann es schnell zu Abhängigkeitskonflikten zwischen den verschiedenen Applikationen geben.
+Ist eine Applikation darauf angewiesen eine bestimmte Abhängigkeit in der Version <1.4 zu nutzen und eine andere
+benötigt eine Version \(\geq 1.4\) derselben Abhängigkeit, lässt sich das nur schwer vereinbaren.
+Zum anderen erschwert dieser Aufbau eine effiziente Ressourcenverteilung. Selbst wenn eine Applikation alleine auf einem Rechner betrieben wird (z.B. um Konflikte zu anderen
+Applikationen zu vermeiden), muss dieser Rechner ausreichende Kapazitäten haben, um die höchsten Anfragespitzen an diese Applikation zu verarbeiten.
+Selbst dann wenn diese Anfragespitzen nur äußerst selten erreicht werden.
+
+Eine Weiterentwicklung dieser Bare-metal-Architektur waren virtuelle Maschinen. Virtuelle Maschinen erlauben es, auf derselben Hardware mehrere virtuelle Instanzen eines
+Systems zu nutzen. Die Instanzen nutzen dabei nicht direkt die physischen Ressourcen, sondern lediglich virtuelle, die durch Software nachgebildet werden \cite{kofler2021docker}.
+Dadurch, dass verschiedene Applikationen in verschiedenen virtuellen Maschinen betrieben werden, können Abhängigkeitskonflikte zwischen Applikationen
+vermieden werden. Weiterhin sind virtuelle Maschinen leichter auszubringen und zu administrieren als Bare-metal-Lösungen.
+Grundsätzlich können mit diesem Ansatz Applikationen auch flexibler und skalierbarer bereitgestellt werden.
+Leistungsfähige Hardware kann Anfragespitzen einer Applikation in einer virtuellen Maschine abfangen und zu anderen Zeiten anderen virtuellen Maschinen mit anderen
+Applikationen diese Ressourcen zuweisen.
+Obwohl das schon einige Verbesserungen im Vergleich zu Bare-metal-Lösungen sind, haben auch virtuelle Maschinen ihre eigenen Limitationen.
+Da virtuelle Maschinen jeweils Ressourcen für ein eigenes Betriebssystem beanspruchen, geht vergleichsweise viel Leistung verloren, 
+die besser in der Applikation genutzt werden könnte.
+
+Die nächste Stufe der Weiterentwicklung waren (Software-)Container. Container haben einige Gemeinsamkeiten mit virtuellen Maschinen doch der wesentliche Unterschied ist,
+dass Container deutlich leichtgewichtiger sind. Das wird unter anderem dadurch erreicht, dass sie statt ein komplett eigenes Betriebssystem zu verwenden, 
+Anteile des Host-Betriebssystems mitnutzen. Dadurch sind die "Baupläne" (sog. Images) für Container im Allgemeinen kleiner als für klassische virtuelle Maschinen.
+Durch den verringerten Overhead können auf gleicher Hardware auch mehr Container parallel betrieben werden, als es mit virtuellen Maschinen möglich wäre.
+Durch diesen Umstand und dadurch, dass Container meist innerhalb weniger Sekunden gestartet werden können, sind diese besonders geeignet,
+um flexibel auf unterschiedliche Anfrageintensitäten zu reagieren und Ressourcen effizient zu verteilen \cite{kofler2021docker}.
+
+Einzelne Container führen in der Regel nur eine klar umgrenzte Aufgabe aus (z.B. Betrieb einer Datenbank oder eines Webservers). Da sie in sich geschlossen sind,
+können sie auch unabhängig von anderen Containern repliziert werden. Um eine vollständige Anwendung zu erhalten, betreibt man daher oft mehrere Container,
+die im Verbund zusammenwirken; eine sogenannte Microservice-Architektur. Die Verwaltung einer solchen Microservice-Architektur kann schnell komplex werden,
+weshalb verschiedene Werkzeuge zur Unterstützung entwickelt wurden.
+
+Eines der heute populärsten Werkzeuge dieser Art ist Kubernetes. Im Folgenden soll die Funktionsweise von Kubernetes beschrieben und schließlich anhand eines Beispiels 
+verdeutlicht werden.
+
+
+% Verteilbar auf viele Maschinen?
+
 \begin{enumerate}
 	\item Bereitstellen von WebServices
 	\item Direkt auf Hardware
@@ -32,7 +73,7 @@
 
 \section{Hauptteil}
 \begin{enumerate}
-	\item Nachteile verteilter Services (s. 86ff. in Schmeling_Dargatz_2022)
+	\item Nachteile verteilter Services (s. 86ff. in Schmeling\_Dargatz\_2022)
 \end{enumerate}
 
 \section{Fazit}
