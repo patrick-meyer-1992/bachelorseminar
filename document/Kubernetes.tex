@@ -53,8 +53,9 @@ um flexibel auf unterschiedliche Anfrageintensitäten zu reagieren und Ressource
 
 Einzelne Container führen in der Regel nur eine klar umgrenzte Aufgabe aus (z.B. Betrieb einer Datenbank oder eines Webservers). Da sie in sich geschlossen sind,
 können sie auch unabhängig von anderen Containern repliziert werden. Um eine vollständige Anwendung zu erhalten, betreibt man daher oft mehrere Container,
-die im Verbund zusammenwirken; eine sogenannte Microservice-Architektur. Die Verwaltung einer solchen Microservice-Architektur kann schnell komplex werden,
-weshalb verschiedene Werkzeuge zur Unterstützung entwickelt wurden.
+die im Verbund zusammenwirken; eine sogenannte Microservice-Architektur. Um den hohen Anforderungen an Rechenleistung moderner Anwendungen gerecht zu werden,
+werden die Container dabei oft auf viele Rechner verteilt.
+Die Verwaltung einer solchen verteilten Microservice-Architektur kann schnell komplex werden, weshalb verschiedene Werkzeuge zur Unterstützung entwickelt wurden.
 
 Eines der heute populärsten Werkzeuge dieser Art ist Kubernetes. Im Folgenden soll die Funktionsweise von Kubernetes beschrieben und schließlich anhand eines Beispiels 
 verdeutlicht werden.
