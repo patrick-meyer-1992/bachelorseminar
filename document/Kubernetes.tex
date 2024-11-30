@@ -30,7 +30,7 @@ Zunächst soll die Historie betrachtet werden, vor deren Hintergrund Kubernetes 
 Das stetige Ziel, das in sich durch diese Historie zieht, ist das Bereitstellen von Applikationen.
 Kominos et al. \cite{7899247} beschreiben die 1960er Jahre als Ursprung des Cloud Computing.
 Zu dieser Zeit liefen Applikationen oft auf einer gemeinsamen Hardware und die Ressourcenverteilung erfolgte unmittelbar durch das zugrundeliegende Betriebssystem.
-Ein derartiges Szenario (auch als ``Bare-metal`` bezeichnet) bringt in der Regel mehrere Herausforderungen mit sich.
+Ein derartiges Szenario (auch als ``Bare-metal'' bezeichnet) bringt in der Regel mehrere Herausforderungen mit sich.
 Zum einen kann es schnell zu Abhängigkeitskonflikten zwischen den verschiedenen Applikationen geben.
 Ist eine Applikation darauf angewiesen eine bestimmte Abhängigkeit in der Version <1.4 zu nutzen und eine andere
 benötigt eine Version \(\geq 1.4\) derselben Abhängigkeit, lässt sich das nur schwer vereinbaren.
@@ -51,7 +51,7 @@ die besser in der Applikation genutzt werden könnte.
 
 Die nächste Stufe der Weiterentwicklung waren (Software-)Container. Container haben einige Gemeinsamkeiten mit virtuellen Maschinen, doch der wesentliche Unterschied ist,
 dass Container deutlich leichtgewichtiger sind. Das wird unter anderem dadurch erreicht, dass sie statt ein komplett eigenes Betriebssystem zu verwenden, 
-Anteile des Host-Betriebssystems mitnutzen. Dadurch sind die ``Baupläne`` (sog. Images) für Container im Allgemeinen kleiner als für klassische virtuelle Maschinen.
+Anteile des Host-Betriebssystems mitnutzen. Dadurch sind die ``Baupläne'' (sog. Images) für Container im Allgemeinen kleiner als für klassische virtuelle Maschinen.
 Durch den verringerten Overhead können auf gleicher Hardware auch mehr Container parallel betrieben werden, als es mit virtuellen Maschinen möglich wäre.
 Durch diesen Umstand und dadurch, dass Container meist innerhalb weniger Sekunden gestartet werden können, sind diese besonders geeignet,
 um flexibel auf unterschiedliche Anfrageintensitäten zu reagieren und Ressourcen effizient zu verteilen \cite{kofler2021docker}.
@@ -86,6 +86,7 @@ Heutzutage ist Kubernetes, nach Linux, das zweitgrößte Open-Source Projekt der
 % https://www.ibm.com/think/topics/kubernetes-history abgerufen am 28.11.2024
 
 \section{Container}
+\label{sec:Container}
 
 Um den Begriff des (Docker-)Containers zu verstehen, wird zunächst der Begriff \emph{Image} benötigt.
 Ein Image kann wie in der Einleitung bereits beschrieben als eine Art Bauplan für einen Container gesehen werden.
@@ -101,7 +102,7 @@ oder dem Ändern von Umgebungsvariablen angepasst werden soll. Dieses \emph{Dock
 eines neuen Images verwendet.
 % Bild von Workflow einbinden?
 
-Aus dem erstellten Image können dann Container abgeleitet werden. Ein Container ist insofern ``flüchtig`` als dass er nach seiner
+Aus dem erstellten Image können dann Container abgeleitet werden. Ein Container ist insofern ``flüchtig'' als dass er nach seiner
 Beendigung restlos gelöscht wird. Bei einem Neustart enthält er wieder nur die Daten, die vorher durch das Image definiert wurden.
 Natürlich gibt es Anwendungsfälle, in denen die persistente Speicherung von Daten durch einen Container gewünscht ist, z.B. wenn
 eine Datenbank in einem Container betrieben wird. Für diesen Fall gibt es das Konzept der \emph{Volumes}.
@@ -142,7 +143,7 @@ die im folgenden beschrieben werden.
 Bei \emph{Etcd} handelt es sich um einen \emph{key-value-store} (Schlüssel-Wert-Speicher),
 der alle Informationen über den Zustand eines Kubernetes Clusters speichert.
 Jede Änderung an den Cluster-Ressourcen wird im Etcd gespeichert und von dort wieder abgerufen.
-Etcd wird auf jedem Master Node ausgeführt, wobei einer dieser Nodes als ``Anführer`` 
+Etcd wird auf jedem Master Node ausgeführt, wobei einer dieser Nodes als ``Anführer'' 
 ausgewählt wird und dieser die Schreibanfragen verarbeitet.
 
 \subsubsection{Kube-apiserver}
@@ -160,6 +161,7 @@ dies zu erkennen und über eine Anfrage an den Kube-apiserver den gewünschten Z
 
 
 \subsubsection{Kube-Scheduler}
+\label{sec:Kube-Scheduler}
 Der Kube-Scheduler entscheidet, welche Container auf welchem Node betrieben werden.
 Er verwaltet dazu Informationen über verfügbare Rechen- und Speicherressourcen sowie weiterer Eigenschaften
 der Nodes. 
@@ -175,28 +177,139 @@ Kubelet gibt diesen Auftrag weiter an die Komponente \emph{Container Runtime}.
 Diese übernimmt das eigentliche Starten des Containers, in dem sie das zugehörige Image
 abruft (z.B. von DockerHub) und daraus einen Container erstellt.
 
-Der physische ``Standort`` eines Containers, also der Node, auf dem er betrieben wird, ist insofern
+Der physische ``Standort'' eines Containers, also der Node, auf dem er betrieben wird, ist insofern
 flüchtig, als dass der Container jederzeit auf einem anderen Node neu ausgebracht werden könnte.
 Um trotzdem einen Überblick zu behalten, welcher Container wo verortet ist, gibt es die Komponente
 \emph{Kube-Proxy}. Auf jedem Node läuft genau eine Instanz des Kube-Proxy.
 
-Eine ausführlichere Erläuterung der oben aufgeführten Komponenten kann bei Schmeling und Dargatz \cite{Schmeling_Dargatz_2022}
-gefunden werden.
 
 \subsection{Pods}
+\emph{Pods} sind die kleinste adressierbare Einheit in einem Kubernetes Cluster. 
+Sie sind die Entitäten, innerhalb derer der Anwendungscode ausgeführt wird.
+Im Abschnitt \ref{sec:Kube-Scheduler} wurde beschrieben, dass Container auf Nodes betrieben werden.
+Diese Darstellung ist allerdings nur indirekt richtig. Tatsächlich werden nicht Container sondern Pods auf Nodes betrieben.
+Ein Pod wiederum kann einen oder mehrere Container enthalten. Enthält ein Pod nur einen Container,
+kann dieser als einfacher ``Wrapper'' für diesen verstanden werden. 
+Wenn ein Pod mehrere Container enthält, heißt das, dass diese Container nicht unabhängig von einander skalierbar sind.
+Das bietet sich in der Regel dann an, wenn die Funktionen dieser Container eng gekoppelt sind und eine Instanz eines
+Containers nur dann sinnvoll zu betreiben ist, wenn auch ihr ``Partner-''Container vorhanden ist.
+Ein gängiges Beispiel ist der Betrieb eines Webservers in einem Container, dessen wesentliche Aufgabe es ist,
+Anfragen an den eigentlichen Anwendungscontainer im gleichen Pod weiterzuleiten. 
 \subsection{ReplicaSets}
+Die gerade beschriebenen Pods können über \emph{kubectl} gestartet, gelöscht oder verändert werden.
+Soweit betrachtet das aber nur einzelne Pods. Das Ziel von Kubernetes ist es jedoch, 
+Pods zu replizieren und gegebenenfalls auf mehreren Nodes gleichzeitig zu betreiben.
+Dazu stehen \emph{ReplicaSets} zur Verfügung. 
+In einem ReplicaSet ist definiert, welche Art von Pods (basierend auf einem gemeinsamen Image)
+in welcher Konfiguration betrieben werden sollen. Zusätzlich wird hier festgelegt, wie viele \emph{Replikationen}
+dieses Pods gleichzeitig vorhanden sein sollen.
+Kubernetes versucht nun die geforderte Anzahl an Pods zu starten und aufrechtzuerhalten. 
+Wird ein Pod des ReplicaSets gelöscht, wird automatisch einer neuer Pod gestartet, um diesen zu ersetzen.
 \subsection{Deployments}
-\subsection{Services}
-\subsection{Ingress}
-\subsection{Flottensimulation}
-\subsection{Volumes}
-\subsection{ConfigMaps und Secrets}
-% \subsection{Namespaces?}
-% Vorstellung der realen Problemstellung (Hohe Kosten für Betrieb (s. auch 10408594 S. 1), Vorhersage von effizientem Ressourceneinsatz)
+Ein \emph{Deployment} ist ein Konzept, das im Schwerpunkt genutzt wird, um Änderungen an Anwendungen auszubringen.
+Das Szenario, das ein Deployment notwendig macht, kann wie folgt beschrieben werden:
 
-% Motivation für Simulationen 
+Eine Anzahl von Pods wurde im Rahmen eines ReplicaSets auf Basis eines gemeinsamen Images erstellt.
+Es stellt sich heraus, dass das Image einen Fehler hat oder aus anderen Gründen aktualisiert werden muss.
+Das ReplicaSet kann so konfiguriert werden, dass es zukünftig das neue Image für seine Pods verwendet.
+Da die Pods aber bereits laufen, wird an diesen keine Änderung mehr vorgenommen. Es ist zwar möglich,
+einzelne Pods zu löschen, die dann automatisch durch neue Pods, basierend auf dem neuen Image, ersetzt würden.
+Gerade mit steigender Anzahl an Pods ist dieser Prozess allerdings höchst 
+fehleranfällig, da es schwer zu überblicken ist, welche Pods noch mit dem alten und welche schon mit dem
+neuen Image laufen. Alternativ könnten auch das gesamte ReplicaSet und damit alle zugehörigen Pods gelöscht werden.
+Das kann in einer Testumgebung problemlos möglich sein. In einer Produktivumgebung möchte man derartige
+Ausfälle aber in der Regel vermeiden.
+
+Um diese Probleme zu bewältigen, kann ein Deployment erstellt werden.
+Ein Deployment enthält wiederum ein ReplicaSet. Tritt nun das oben aufgeführte Szenario ein und ein Image
+muss aktualisiert werden, reicht es, das Deployment dafür anzupassen.
+Kubernetes stellt dann sicher, dass das alte ReplicaSet und die dazugehörigen Pods gelöscht werden.
+Damit es dadurch aber keine Serviceunterbrechungen gibt, wird zunächst ein anderes ReplicaSet mit dem neuen
+Image initialisiert. Während das alte ReplicaSet also schrittweise abgebaut wird, wird das neue ReplicaSet
+schrittweise aufgebaut. Ein Deployment kann so konfiguriert werden, dass immer eine bestimmte Mindestanzahl an
+Pods während der Aktualisierung zur Verfügung steht.
+Ein weiterer Vorteil von Deployments ist, dass sie anhand eines einzelnen Befehls auf die vorherige Version
+zurückgesetzt werden können (sog. \emph{Rollback}). Das kann hilfreich sein, wenn sich nach Ausbringung eines
+Updates herausstellt, dass dieses doch nicht den Erwartungen entspricht und man stattdessen bei der vorherigen
+Version bleiben möchte.
+
+\subsection{Services}
+Innerhalb eines Kubernetes Clusters besteht ein internes Netzwerk. Dementsprechend hat auch jeder Pod
+eine eigene IP-Adresse, über die er erreichbar ist. Diese IP-Adresse wird automatisch zugewiesen wenn der Pod startet.
+Auf diese Weise können Anwendungen innerhalb des Clusters über Pod-Grenzen hinweg miteinander kommunizieren.
+Die Herausforderung in diesem Kontext ergibt sich daraus, dass Pods jederzeit beliebig gelöscht
+und wieder neu gestart werden können. Da dabei auch jedes Mal eine neue IP-Adresse vergeben wird,
+ist die direkte Pod-Adressierung wenig zuverlässig. Außerdem muss davon ausgegangen werden, dass
+ein in einem ReplicaSet mehrere Replikationen eines Pods vom gleichen Typ vorliegt, wodurch unklar wird
+an welcher der gleichartigen Pods eine Anfrage gesendet werden sollte. Im schlimmsten Fall gehen alle Anfragen
+an denselben Pod des ReplicaSets, wodurch dieser überlastet wäre, während alle anderen Pods im Leerlauf sind.
+
+Diesem Umstand wird mit \emph{Services} begegnet. Ein Service hat eine eigene IP-Adresse und ihm ist eine Menge
+von Pods zugeordnet. Anfragen können nun an den Service gestellt werden und dieser entscheidet selbstständig,
+an welchen seiner zugehörigen Pods diese Anfrage weitergegeben wird. Der Service übernimmt damit also 
+nicht nur die Aufgabe der einfachen Adressierbarkeit sondern auch die der Lastverteilung (sog. \emph{Load Balancing}).
+
+Natürlich kann auch ein Service gelöscht und neugestartet werden, wodurch ihm auch eine neue IP-Adresse zugewiesen wird.
+Es ist also in der Regel nicht zielführend einen Service anhand seiner IP-Adresse anzusprechen.
+Damit das nicht notwendig ist, verwaltet Kubernetes ein internes Domain-Name-System (DNS), in dem
+der Name des Services automatisch registriert wird.
+
+Kubernetes unterscheidet zwischen den Service-Typen \emph{ClusterIP} und \emph{NodePort}.
+Während ClusterIP genutzt wird, um einen Services (und die zugehörigen Pods) \emph{innerhalb} eines Clusters
+einheitlich adressierbar zu machen, wird NodePort verwendet, um einen Service von \emph{außerhalb}
+über die öffentlichen IP-Adressen der Nodes des Clusters an einem zufällig gewählten Port erreichbar zu machen.
+
+\subsection{Ingress}
+Die Verwendung eines NodePort-Services wird meist nur zu Testzwecken verwendet. In einer Produktivumgebung
+ist die gängigere Lösung, um das Cluster von außerhalb erreichbar zu machen, die Verwendung eines \emph{Ingress}.
+In der Definition eines Ingress kann ein Hostname und ein dazugehöriger interner Service gesetzt werden.
+Anfragen an diesen Hostname werden dann an den zugehörigen Service weitergeleitet. Über unterschiedliche Hostnames
+oder Subdomains, die mit verschiedenen Services verknüpft werden, können Anfragen an den Ingress flexibel
+an die richtigen Services weitergeleitet werden. Das Verhalten eines Ingress kann mit dem eines \emph{Reverse Proxy}
+verglichen werden.
+
+Kubernetes stellt dabei natürlich nicht sicher, dass die entsprechenden Hostnames in öffentlichen DNS Services auch mit
+der öffentlichen IP-Adresse des Ingress verbunden sind.
+
+\subsection{Volumes}
+Das Konzept der \emph{Volumes} und deren Notwendigkeit wurde bereits in Kapitel \ref{sec:Container} eingeführt.
+Kubernetes unterscheidet in diesem Zusammenhang zwischen \emph{PersistentVolumes} (PV) und \emph{PersistentVolumesClaims} (PVC).
+Bei PV handelt es sich um eine Abstraktion eines Speicherbereichs des Hostsystems.
+Ein PVC beansprucht ein derartiges PersistentVolume und spiegelt es in einen
+definierten Speicherbereich zugehöriger Pods. Um ein PVC zu nutzen wird dieses innerhalb eines Deployments festgelegt.
+Alle zu diesem Deployment gehörigen Pods teilen sich also dasselbe Volume.
+
+
+\subsection{ConfigMaps und Secrets}
+Die Daten, die von einer Anwendungen in Volumes gespeichert werden, unterliegen oft regelmäßigen Veränderungen
+(z.B. bei einer Datenbank). Darüber hinaus benötigen Anwendungen aber auch einige Informationen, die sich nur 
+selten verändern. Dabei handelt es sich häufig um Konfigurationsdaten, die zum Beispiel die URL eines anderen
+Services enthalten oder Informationen über die Umgebung, in der die Anwendung betrieben wird.
+Derartige Daten können Pods über \emph{ConfigMaps} in Form von \emph{Key-Value-Paaren} bereitgestellt werden.
+
+Neben ConfigMaps gibt es auch \emph{Secrets}, die ihre Daten ebenfalls in Key-Value-Paaren speichern.
+Der Unterschied ist, dass die Werte, die in Secrets eingetragen werden, üblicherweise geheim bleiben sollen und
+dass sie base64 kodiert sind. Innerhalb der Pods werden die Werte automatisch dekodiert.
+Es ist allerdings zu beachten, dass das Eintragen von Geheimnissen in Secrets sie nicht automatisch sicher
+aufbewahrt. Davon ab, dass natürlich niemand Unbefugtes Zugriff auf die Konfigurationsdateien der Secrets haben sollte,
+sind auch noch weitere Maßnahmen für einen sicheren Betrieb erforderlich, da die Secrets ansonsten
+unverschlüsselt im Etcd gespeichert werden.
+
+Die Daten aus ConfigMaps und Secrets werden den Anwendungen innerhalb der Pods als Umgebungsvariablen
+bereitgestellt und können darüber ausgelesen werden.
+
+Eine ausführlichere Erläuterung und Beispiele der in diesem Kapitel aufgeführten Komponenten 
+kann bei Schmeling und Dargatz \cite{Schmeling_Dargatz_2022} gefunden werden.
+
+% \subsection{Namespaces?}
+
+% Einführung in praktisches Beispiel, aber 
+% Erst Motivation für Simulationen 
+	% Vorstellung der realen Problemstellung (Hohe Kosten für Betrieb (s. auch 10408594 S. 1), Vorhersage von effizientem Ressourceneinsatz)
 % Voraussetzung für Simulation (System- und Datenanalyse)
 % Herausforderungen bei Simulationen (Hohe Anzahl an möglichen Parameterkombinationen)
+
+% Dann konkretes Beispiel
 
 \section{Flottensimulation}
 \begin{figure}
@@ -207,14 +320,6 @@ gefunden werden.
 
 
 \subsection{Schritte zum Aufsetzen und zum Betrieb der Flottensimulation}
-% \begin{enumerate}
-% 	\item Wie entstand Kubernetes (Historie Google)
-% 	\item Was ist ein Container? \cite{Bentaleb_Belloum_Sebaa_El-Maouhab_2021}
-% 	\item Grundprinzipen/Elemente von Kubernetes (Pods, Deployments, Replicasets etc.)
-% 	\item Kubernetes Workflow (allgemein)
-% 	\item Nachteile verteilter Services (s. 86ff. in Schmeling\_Dargatz\_2022)
-% 	\item Kubernetes anhand eines realen Beispiels
-% \end{enumerate}
 
 \section{Limitationen}
 % Begrenzte Hardware und hohe Kosten bei Cloud Providern 
