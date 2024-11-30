@@ -3,6 +3,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage[ngerman]{babel}
+\usepackage{graphicx}
 \usepackage{babelbib}
 \usepackage{hologo}
 \usepackage{csquotes}
@@ -182,17 +183,30 @@ Um trotzdem einen Überblick zu behalten, welcher Container wo verortet ist, gib
 Eine ausführlichere Erläuterung der oben aufgeführten Komponenten kann bei Schmeling und Dargatz \cite{Schmeling_Dargatz_2022}
 gefunden werden.
 
-\subsection{}
-
-\section{Flottensimulation}
+\subsection{Pods}
+\subsection{ReplicaSets}
+\subsection{Deployments}
+\subsection{Services}
+\subsection{Ingress}
+\subsection{Flottensimulation}
+\subsection{Volumes}
+\subsection{ConfigMaps und Secrets}
+% \subsection{Namespaces?}
 % Vorstellung der realen Problemstellung (Hohe Kosten für Betrieb (s. auch 10408594 S. 1), Vorhersage von effizientem Ressourceneinsatz)
 
 % Motivation für Simulationen 
 % Voraussetzung für Simulation (System- und Datenanalyse)
 % Herausforderungen bei Simulationen (Hohe Anzahl an möglichen Parameterkombinationen)
 
+\section{Flottensimulation}
+\begin{figure}
+	\includegraphics[width=\textwidth]{media/Microservice-Architektur.png}
+\end{figure}
 
-\section{Schritte zum Aufsetzen und zum Betrieb der Flottensimulation}
+
+
+
+\subsection{Schritte zum Aufsetzen und zum Betrieb der Flottensimulation}
 % \begin{enumerate}
 % 	\item Wie entstand Kubernetes (Historie Google)
 % 	\item Was ist ein Container? \cite{Bentaleb_Belloum_Sebaa_El-Maouhab_2021}
@@ -211,7 +225,7 @@ gefunden werden.
 % Nutzung einer anderen Cluster Engine als minikube (s. auch 10408202 für Rancher Alternative)
 % Erweiterung des Simulationsmodells um Condition based maintenance/digital twin (s. auch 10408594)
 % Erhöhung der Komplexität des Modells durch weitere Input-Faktoren
-
+% FastAPI um Authentisierung ergänzen
 \section{Anhang}
 
 
