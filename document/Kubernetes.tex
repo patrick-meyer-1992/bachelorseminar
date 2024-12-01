@@ -1,15 +1,21 @@
+% TODO:
+% Referenzen für Kapitel und Abbildungen kontrollieren und überarbeiten
+% Beschriftungen für Abbildungen ergänzen
+
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage[ngerman]{babel}
 \usepackage{graphicx}
-\usepackage{babelbib}
+% \usepackage{babelbib}
 \usepackage{hologo}
 \usepackage{csquotes}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{biblatex}
+\addbibresource{literature.bib}
 
 \begin{document}
 
@@ -312,6 +318,108 @@ kann bei Schmeling und Dargatz \cite{Schmeling_Dargatz_2022} gefunden werden.
 % Dann konkretes Beispiel
 
 \section{Flottensimulation}
+Für ein besseres Verständnis der grundlegedenden Konzepte von Kubernetes sollen diese anhand eines
+Anwendungsfalls vorgestellt werden.
+Vor der Implementierung des Anwendungsfalls muss aber die Motviation für diesen geklärt werden.
+
+Konkret soll der Anwendungsfall die simulationsgestützte Analyse einer Fahrzeugflotte behandeln.
+Im Kern handelt es hier um eine Abwandlung eines Warteschlangenmodells \cite{Leonelli2021}, bei dem
+``Kunden'' (hier: Fahrzeuge) an einem ``Dienstleistungspunkt'' (hier: Instandsetzungseinrichtung) ankommen 
+und dort bedient (hier: instandgesetzt) werden.
+Wenn die Kapazitäten des Dienstleistungspunkts voll ausgelastet sind und trotzdem neue Kunden ankommen, entsteht eine Warteschlange.
+
+Der grundlegende Ablauf in dem verwendeten Modell ist in Abbildung \ref{fig:Simulationsmodell} dargestellt.
+Die Simulation enthält eine Menge an Fahrzeugen, die einer nicht näher definierten Nutzung unterliegen. 
+Für jeden Iterationsschritt besteht eine Wahrscheinlichkeit von $\lambda$, dass das Fahrzeug ausfällt.
+Tritt dieser Fall ein, wird das Fahrzeug einer Instandsetzungseinrichtung zugewiesen. 
+Eine Instandsetzungseinrichtung hat einen oder mehrere Arbeitsplätze und diese enthalten wiederum Arbeiter.
+Hat die Instandsetzungseinrichtung einen freien Arbeitsplatz, wird das defekte Fahrzeug diesem zugewiesen und
+dort mit einer Rate instandgesetzt, die abhängig von der Anzahl und Fertigkeit der zugehörigen Arbeiter ist.
+Falls gerade keine freien Kapazitäten vorhanden sind, verbleibt das Fahrzeug in der Warteschlange der jeweiligen Einrichtung.
+Ist die Instandsetzung abgeschlossen, verlässt das Fahrzeug die Instandsetzungseinrichtung und wird weiter genutzt.
+
+\begin{figure}
+	\label{fig:Simulationsmodell}
+	\includegraphics[width=\textwidth]{media/Simulationsmodell.png}
+\end{figure}
+
+Bereits in diesem vergleichsweise simplen Modell sind mehrere verschiedene Eingangsparameter (im Folgenden als \emph{Faktoren} bezeichnet)
+und Ausgangsvariablen (im Folgenden als \emph{Key-Performance-Indicators bzw. KPI} bezeichnet) denkbar.
+
+Beispiele für Faktoren:
+\begin{enumerate}
+	\item Anzahl der Fahrzeuge
+	\item Ausfallwahrscheinlichkeit der Fahrzeuge $\lambda$
+	\item Höhe der Instandsetzungskapazitäten
+	\item Reparaturrate der Fahrzeuge
+\end{enumerate}
+Beispiele für KPI:
+\begin{enumerate}
+	\item Anzahl einsatzbereiter Fahrzeuge
+	\item Dauer von Reparaturen
+	\item Länge der Warteschlangen
+	\item Höhe der Wartezeiten
+	\item Auslastung der Instandsetzungseinrichtungen
+\end{enumerate}
+
+Ziel eines solchen Modells ist die Optimierung eines realen Systems mithilfe der Simulation.
+Dazu wird das reale System mit möglichst allen relevanten Eigenschaften in der Simulation nachgebildet.
+Dabei werden auch alle Faktoren bestimmt, von denen man im realen System erwartet, dass sie einen Einfluss auf die KPI
+haben könnten und die auch aktiv verändert werden können.
+Um eine möglichst optimale Konfiguration der Faktoren zu identifizieren, wird die Simulation 
+mit vielen verschiedenen Konfigurationen durchgeführt und die dazugehörigen KPI ausgewertet.
+Diese Methode ist auch unter dem Begriff \emph{Data Farming} bekannt. % Quelle?
+
+In einer Simulation werden statt fester Werte oft Verteilungsfunktionen verwendet, aus denen Einflussgrößen abgeleitet werden. 
+Aufgrund dieser Eigenschaft wird ein Simulationsmodell in der Regel mehrfach
+mit gleichen Faktoren ausgeführt, um die stochastischen Effekte in den KPI zu beobachten und
+um einzelne Ausreißer auszuschließen. 
+
+Eine populäre Klassifizierung von Analysemodellen erfolgte durch Gartner \cite{Gartner} (vgl. Abbildung \ref{fig:gartner-modell}).
+Diese Klassifizierung geht von vier Stufen von Analysemethoden aus, die anhand der Skalen \emph{Schwierigkeit} und \emph{Mehrwert} sortiert werden.
+Beginnend bei niedriger Schwierigkeit und bei niedrigem Mehrwert bis hin zu hoher Schwierigkeit und hohem Mehrwert
+handelt es sich dabei um:
+\begin{enumerate}
+	\item Deskriptive Analyse
+	\item Diagnostische Analyse
+	\item Prediktive Analyse
+	\item Präskriptive Analyse
+\end{enumerate}
+
+\begin{figure}
+	\label{fig:gartner-modell}
+	\includegraphics[width=\textwidth]{media/analytic-maturity.png}
+\end{figure}
+
+Ein Simulationsmodell der hier vorliegenden Art fällt grundsätzlich in den Bereich der präskriptiven Analyse, 
+da es nicht nur die Vorhersage zukünftiger Systemzustände erlaubt, sondern auch Faktoren identifiziert,
+die verändert werden können, um einen bestimmten Zustand zu erreichen.
+
+Ein Beispiel für eventuelle Nutzer einer Simulation wie der hier genutzten, könnten 
+Betreiber größerer Fahrzeugflotten (z.B. LKW oder Busse) sein. 
+Fahrzeuge, die sich lange in Instandsetzung befinden, können in dieser Zeit keinen Mehrwert generieren.
+Es besteht also ein Interesse daran, immer ausreichende Instandsetzungskapazitäten vorhalten zu können.
+Da der Unterhalt derartiger Kapazitäten aber mit hohen Kosten verbunden ist, ist es von großem
+Interesse, die \emph{optimale} Instandsetzungskapazität für eine gegebene Flotte zu identifizieren.
+
+Der Bedarf an skalierbarer Infrastruktur zum Betrieb der Simulation ergibt sich daher wie folgt:
+Bereits bei den vier oben aufgeführten Faktoren, mit denen das vorliegende Simulationsmodell betrieben werden könnte,
+ergibt sich eine große Anzahl an Faktorkombinationen.
+Angenommen jeder Faktor soll um fünf Stufen variiert werden. Dann ergeben sich daraus
+$5^4 = 625$ Kombinationen. Aufgrund stochastischer Effekte empfiehlt es sich, jede einzelne
+Kombination mehrfach zu wiederholen. Davon ausgehend, dass jede Kombination 20 mal wiederholt wird,
+ergeben sich daraus schon $625 * 20 = 12.500$ Simulationsläufe. Bei einer angenommenen Laufzeit von ca. 10 Sekunden
+pro Simulationslauf und rein serieller Ausführung ergibt sich daraus bereits eine Gesamtlaufzeit von
+knapp 35 Stunden.
+
+Bei Modellen für realistische Szenarien ist natürlich von mehr Faktoren und auch von einer höheren Zeit 
+für einzelne Simulationsläufe auszugehen. Um einen vollständigen Simulationslauf möglichst schnell abzuschließen
+und folglich auswertbare Ergebnisse zu erhalten, bietet es sich an, die Rechenlast zu verteilen.  
+
+
+
+
+
 \begin{figure}
 	\includegraphics[width=\textwidth]{media/Microservice-Architektur.png}
 \end{figure}
@@ -334,47 +442,9 @@ kann bei Schmeling und Dargatz \cite{Schmeling_Dargatz_2022} gefunden werden.
 \section{Anhang}
 
 
-\section{Formatbeispiele}
-\subsection{Eine Aufzählung}
+% \bibliographystyle{babplain-fl}
+% \bibliography{literature}
 
-\begin{enumerate}
-	\item die \textbf{original PDF Vorlage} (also diese Datei),
-	\item das von Ihnen erstellte \textbf{\hologo{LaTeX} Dokument} (also die .tex Datei),
-	\item die von Ihnen erstellte \textbf{Literatur Datenbank} (also die .bib Datei), und
-	\item das von Ihnen \textbf{kompilierte Dokument} (also die erzeugte .pdf Datei).
-\end{enumerate}
-
-
-\subsection{Tabellen}
-Tabelle \ref{HdRTab} gibt eine kleine Übersicht über verschiedene Charaktere und Gruppierungen in \emph{Der Herr der Ringe}.
-
-\begin{table}[b]
-	\begin{tabular}{|r|c|c|c|c|}
-		\hline
-				& Gollum	& Legolas	& Sauron	& Gandalf \\
-		\hline
-		\hline
-		Hobbit	& ja	& nein	& nein	& nein \\
-		\hline
-		Ringträger	& am Finger	& nein	& am Finger	& in der Hand \\
-		\hline
-		Gemeinschaft des Ringes	& nein	& ja	& nein	& ja \\
-		\hline
-	\end{tabular}
-	\caption{Verschiedene Charaktere und Gruppierungen in \emph{Der Herr der Ringe}.}
-	\label{HdRTab}
-\end{table}
-
-\subsection{Formeln}
-Die bekannten Fibonacci-Zahlen $F_n$ sind wie folgt definiert.
-\newtheorem{defn}{Definition}
-\begin{defn}\label{fibonacci}
-	Es sei $F_1 = F_2 = 1$ und $F_n = F_{n-1} + F_{n-2}$ für $n \geq 3$.
-\end{defn}
-Fibonacci-Zahlen treten sowohl in der Natur als auch in vielen theoretischen Anwendungen auf. Die folgende Formel für die in Definition \ref{fibonacci} wurde von verschiedenen Mathematikern im 18. und 19. Jahrhundert entdeckt. Es sei $\phi = \frac{1 + \sqrt{5}}{2}$ (der goldene Schnitt) und $\psi = \frac{1 - \sqrt{5}}{2}$. Dann gilt
-\[ \forall n \in \mathbb{N}: \quad F_n = \frac{\phi^n - \psi^n}{\sqrt{5}}. \]
-
-\bibliographystyle{babplain-fl}
-\bibliography{literature}
+\printbibliography
 
 \end{document}
