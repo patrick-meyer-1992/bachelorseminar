@@ -9,6 +9,8 @@ document/Kubernetes.fdb_latexmk
 document/Kubernetes.fls
 document/Kubernetes.log
 document/Kubernetes.synctex.gz
+document/Kubernetes.bcf
+document/Kubernetes.run.xml
 simulation/test.py
 simulation/test.json
 *secret.yaml
