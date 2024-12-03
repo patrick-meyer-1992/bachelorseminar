@@ -1,7 +1,6 @@
-% TODO:
-% Referenzen für Kapitel und Abbildungen kontrollieren und überarbeiten
-% Beschriftungen für Abbildungen ergänzen
-
+% TODO: Initialisierung Cluster mit Minikube beschreiben
+% TODO: UML Diagramm zu den Klassen in der Simulation?
+% TODO: Gendern?
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -15,6 +14,8 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{biblatex}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily}
 \addbibresource{literature.bib}
 
 \begin{document}
@@ -307,7 +308,8 @@ bereitgestellt und können darüber ausgelesen werden.
 Eine ausführlichere Erläuterung und Beispiele der in diesem Kapitel aufgeführten Komponenten 
 kann bei Schmeling und Dargatz \cite{Schmeling_Dargatz_2022} gefunden werden.
 
-% \subsection{Namespaces?}
+\subsection{Namespaces}
+% TODO: Abschnitt ergänzen. Wichtig um klarzustellen, wie Pods über internes Netzwerk kommunizieren
 
 % Einführung in praktisches Beispiel, aber 
 % Erst Motivation für Simulationen 
@@ -318,6 +320,8 @@ kann bei Schmeling und Dargatz \cite{Schmeling_Dargatz_2022} gefunden werden.
 % Dann konkretes Beispiel
 
 \section{Flottensimulation}
+
+\subsection{Motivation und Prinzip}
 Für ein besseres Verständnis der grundlegedenden Konzepte von Kubernetes sollen diese anhand eines
 Anwendungsfalls vorgestellt werden.
 Vor der Implementierung des Anwendungsfalls muss aber die Motviation für diesen geklärt werden.
@@ -340,7 +344,13 @@ Ist die Instandsetzung abgeschlossen, verlässt das Fahrzeug die Instandsetzungs
 
 \begin{figure}
 	\label{fig:Simulationsmodell}
+	\centering
 	\includegraphics[width=\textwidth]{media/Simulationsmodell.png}
+	\caption{
+		Grundlegender Prozess innerhalb der Simulation. Fahrzeuge werden
+		genutzt, fallen nach einiger Zeit aus und müssen dann instandgesetzt
+		werden.
+	}
 \end{figure}
 
 Bereits in diesem vergleichsweise simplen Modell sind mehrere verschiedene Eingangsparameter (im Folgenden als \emph{Faktoren} bezeichnet)
@@ -362,6 +372,13 @@ Beispiele für KPI:
 	\item Auslastung der Instandsetzungseinrichtungen
 \end{enumerate}
 
+% TODO: Abwandeln falls Modell noch angepasst wird.
+Für die vorliegende Implementierung des Simulationsmodells das Python Paket \emph{mesa} \cite{python-mesa-2020} genutzt.
+Von den genannten Faktoren können die Anzahl der Fahrzeuge, die Höhe der Instandsetzungskapazitäten und die
+Reparaturrate beeinflusst werden. Von den genannten KPI ist für die Anzahl einsatzbereiter Fahrzeuge
+eine automatisierte Auswertung vorhanden.
+
+% TODO: Motivation sollte weiter oben schon auftauchen
 Ziel eines solchen Modells ist die Optimierung eines realen Systems mithilfe der Simulation.
 Dazu wird das reale System mit möglichst allen relevanten Eigenschaften in der Simulation nachgebildet.
 Dabei werden auch alle Faktoren bestimmt, von denen man im realen System erwartet, dass sie einen Einfluss auf die KPI
@@ -388,7 +405,13 @@ handelt es sich dabei um:
 
 \begin{figure}
 	\label{fig:gartner-modell}
+	\centering
 	\includegraphics[width=\textwidth]{media/analytic-maturity.png}
+	\caption{
+		Das Gartner Modell schlägt eine Klassifizierung von Analysemodellen vor.
+		Das hier dargestellte Simulationsmodell fällt in den Bereich der 
+		präskriptiven Analyse. 
+	}
 \end{figure}
 
 Ein Simulationsmodell der hier vorliegenden Art fällt grundsätzlich in den Bereich der präskriptiven Analyse, 
@@ -398,6 +421,8 @@ die verändert werden können, um einen bestimmten Zustand zu erreichen.
 Ein Beispiel für eventuelle Nutzer einer Simulation wie der hier genutzten, könnten 
 Betreiber größerer Fahrzeugflotten (z.B. LKW oder Busse) sein. 
 Fahrzeuge, die sich lange in Instandsetzung befinden, können in dieser Zeit keinen Mehrwert generieren.
+Gemäß Isermann \cite{Isermann_2011} belaufen sich bis zu 20\% der laufenden Kosten beim Betrieb von Maschinen auf
+die Instandhaltung bzw. Instandsetzung. % TODO: Dieser Satz muss sich noch besser in den Absatz einfügen.
 Es besteht also ein Interesse daran, immer ausreichende Instandsetzungskapazitäten vorhalten zu können.
 Da der Unterhalt derartiger Kapazitäten aber mit hohen Kosten verbunden ist, ist es von großem
 Interesse, die \emph{optimale} Instandsetzungskapazität für eine gegebene Flotte zu identifizieren.
@@ -416,29 +441,137 @@ Bei Modellen für realistische Szenarien ist natürlich von mehr Faktoren und au
 für einzelne Simulationsläufe auszugehen. Um einen vollständigen Simulationslauf möglichst schnell abzuschließen
 und folglich auswertbare Ergebnisse zu erhalten, bietet es sich an, die Rechenlast zu verteilen.  
 
+\subsection{Schritte zum Aufsetzen und zum Betrieb}
+Nachdem im vorangegangenen Abschnitt die Motivation und die Funktionsprinzipien der Simulation erklärt wurden,
+soll in diesem Abschnitt auf die für den Betrieb genutzte Microservice-Architektur Bezug genommen werden.
 
-
-
+Grundlegend besteht die Microservice-Architektur aus sechs verschiedenen Services, deren Zusammenwirken
+in Abbildung \ref{fig:microservice-architektur} dargestellt ist.
 
 \begin{figure}
+	\label{fig:microservice-architektur}
+	\centering
 	\includegraphics[width=\textwidth]{media/Microservice-Architektur.png}
+	\caption{
+		Eine Übersicht über die verwendete Microservice-Architektur.
+		Details können dem Text entnommen werden.
+	}
 \end{figure}
 
+Die Dateien, die zum Aufsetzen der Services verwendet wurden, sind unter
+(\lstinline|https://github.com/patrick-meyer-1992/bachelorseminar|) \cite{Meyer_bachelorseminar}
+verfügbar.
+
+\subsubsection{FastAPI}
+\label{sec:FastAPI}
+FastAPI ist ein modernes, performantes Web-Framework, das genutzt werden kann, um \emph{Application-Programming-Interfaces} (API)
+mit Python zu erstellen \cite{Ramirez_FastAPI}.
+
+In diesem Fall wird es als zentrale Schnittstelle der Microservice-Architektur genutzt.
+Anfragen an die Datenbanken (vgl. \ref{sec:Datenbanken})
+über das Frontend (vgl. \ref{sec:Angular}) oder vom Simulationsservice (vgl \ref{sec:Flottensimulation})
+werden durch diese Schnittstelle angenommen, validiert, bearbeitet und beantwortet.
+Gleiches gilt für die Befüllung der Job-Warteschlange (bzw. Message Queue) im Service
+RabbitMQ (vgl. \ref{sec:RabbitMQ}), die über eine Anfrage seitens des Frontends an
+FastAPI ausgelöst wird.
+
+In der erstellten Microservice-Architektur wird das FastAPI-Deployment nur einfach repliziert,
+da nicht zu erwarten ist, da in diesem Demonstrationsbeispiel (Proof-of-Concept) nicht von einer
+großen Anzahl an Anfragen auszugehen ist. Es genügt aber, den Wert für \emph{replicas} in der zugehörigen
+yaml-Datei (\lstinline|kubernetes/fastapi/fastapi-deployment.yaml|) zu verändern, um die Anzahl der Replikationen anzupassen, 
+falls das erforderlich sein sollte.
+
+\subsubsection{Angular}
+\label{sec:Angular}
+Grundsätzlich ist es möglich, die Simulation vollständig über die Kommandozeile zu bedienen.
+Da das Ziel einer solchen Simulation aber überlicherweise die Unterstützung von (nicht-technischen) 
+Entscheidungsträgern ist, wurde ein Frontend entworfen, das eine Idee davon bieten soll, wie man Simulationsservices
+einer breiteren Masse zur Verfügung stellen kann. Das Frontend basiert auf Angular,
+einer Entwicklungsplattform zum Erstellen von Handy- und Desktop-Webanwendungen \cite{jain2014angularjs},
+und ermöglicht das Konfigurieren, Starten und Auswerten von Simulationsläufen über eine interaktive Web-Oberfläche.
+
+% TODO: Screenshots ergänzen?
+
+\subsubsection{RabbitMQ}
+\label{sec:RabbitMQ}
+RabbitMQ ist ein Message- und Streaming-Broker \cite{RabbitMQ}. Es bildet eine Zwischenstation
+zwischen Sender und Empfänger einer Nachricht. Das vereinfacht beispielsweise die Verteilung auf 
+mehrere Empfänger, glättet Auslastungsspitzen und ermöglicht asynchrone Kommunikation zwischen
+Sender und Empfänger. 
+
+In der vorliegenden Microservice-Architektur wird RabbitMQ als Zwischenspeicher für
+Simulationsaufträge genutzt. Das Frontend sendet für jeden einzelnen Simulationslauf
+ein json-Objekt über FastAPI an RabbitMQ, wo jedes Objekt als ein Simulationsauftrag
+in der Message Queue vorgehalten wird. Der Simulationsservice abonniert diese Message Queue
+wenn er gestart wird und empfängt von dort einzeln seine Aufträge.
+
+Dieses Vorgehen hat den Vorteil, dass Simulationsaufträge unabhängig von der Existenz
+des Simulationsservices eingestellt werden können. Sobald der Simulationsservice gestartet
+oder um weitere Replikationen ergänzt wird, beginnt die Bearbeitung der Aufträge durch den
+bzw. die neuen Arbeiter.
+
+\subsubsection{Datenbanken}
+\label{sec:Datenbanken}
+Zur persistenten Speicherung von Daten werden sowohl MongoDB als auch PostgreSQL verwendet.
+
+MongoDB ist ein dokumentenorientiertes Datenbanksystem mit einem Fokus auf Skalierbarkeit und Flexibilität \cite{Bradshaw_2010}.
+Dokumentenorientiert heißt in diesem Fall, dass die Daten nicht wie in einem relationalen
+Datenbanksystem in Form von Tabellen gespeichert wird, sondern Objekte in json-Notation.
+
+In der Microservice-Architektur speichert MongoDB die Instandsetzungskonfigurationen,
+die über das Frontend erstellt werden.
+Eine Instandsetzungskonfigurationen ist ein json-Objekt, das eine Liste von Instandsetzungseinrichtungen,
+enthält. Diese enthalten wiederum eine Liste von Arbeitsplätzen, zu denen jeweils eine Liste
+von Arbeitern gehört. 
+Die Arbeiter enthalten Attribute, die ihre jeweilige Instandsetzungsgeschwindigkeit definieren.
+
+Da eine Instandsetzungskonfigurationen mitunter sehr komplex werden kann, war es wichtig,
+dass einmal erstellte Konfiguration persistent gespeichert und auch wieder abrufbar und veränderbar sind.
+
+Für die Speicherung der Simulationsergebnisse wird in diesem Szenario PostgreSQL als relationale Datenbank verwendet.
+
+\subsubsection{Flottensimulation}
+\label{sec:Flottensimulation}
+Der Simulationsservice ist der Anteil der Microservice-Architektur, der den größten Anteil
+der dort stattfindenden Berechnungen vornimmt und dementsprechend auch den größten Bedarf
+an Rechenressourcen hat. Das ist insbesondere dann der Fall, wenn die Pods des Simulationsservice,
+wie vorgesehen, vielfach repliziert werden.
+
+Bei seinem Start abonniert jeder Pod unabhängig von den anderen die Job-Warteschlange von RabbitMQ.
+Jeder Job enthält die konkreten Faktoren, mit denen der Simulationslauf durchgeführt werden soll.
+Dazu gehört auch der Name der zugehörigen Instandsetzungskonfiguration. Aufgrund
+dieses Namens wird die zu verwendende Instandsetzungskonfiguration über FastAPI
+aus der MongoDB abgerufen.
+
+Über einen Simulationszeitraum von einem Jahr wird für jeden Tag die Anzahl der Fahrzeuge
+in den möglichen Zuständen (Einsatzbereit, Ausgefallen, in Reparatur) als KPI gespeichert.
+Bei Abschluss der Simulation werden diese Ergebnisse ebenfalls über FastAPI in die 
+PostgreSQL Datenbank geschrieben.
 
 
 
-\subsection{Schritte zum Aufsetzen und zum Betrieb der Flottensimulation}
+% \lstinputlisting{../kubernetes/db/db-deployment.yaml}
+
+
+
 
 \section{Limitationen}
 % Begrenzte Hardware und hohe Kosten bei Cloud Providern 
-
+% Im Produktivumfeld müsste FastAPI besser gesichert werden
+% Autoscaling (oder noch als TODO implementieren)
+% Evtl. Flaschenhals durch Datenbankanwendungen (schwer replizierbar)
 \section{Fazit}
-
+% Beschreiben, wie das Setup funktioniert hat
+% Ist Kubernetes für den gedachten Einsatzweck geeignet?
+% Was sind die Vorteile (Einfache Skalierung, entkoppelt von propriäteren Anwendungen)?
+% Etwas Overhead durch Pods aber insgesamt gering.
 \section{Ausblick}
 % Nutzung einer anderen Cluster Engine als minikube (s. auch 10408202 für Rancher Alternative)
 % Erweiterung des Simulationsmodells um Condition based maintenance/digital twin (s. auch 10408594)
 % Erhöhung der Komplexität des Modells durch weitere Input-Faktoren
 % FastAPI um Authentisierung ergänzen
+% Testcases
+% CI/CD
 \section{Anhang}
 
 
