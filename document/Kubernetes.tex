@@ -1,6 +1,7 @@
 % TODO: Initialisierung Cluster mit Minikube beschreiben
 % TODO: UML Diagramm zu den Klassen in der Simulation?
 % TODO: Gendern?
+% TODO: Mockup der Secret Files
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -602,11 +603,62 @@ in den möglichen Zuständen (Einsatzbereit, Ausgefallen, in Reparatur) als KPI 
 Bei Abschluss der Simulation werden diese Ergebnisse ebenfalls über FastAPI in die 
 PostgreSQL Datenbank geschrieben.
 
+% TODO Screenshot from Frontend
 
 
 % \lstinputlisting{../kubernetes/db/db-deployment.yaml}
 
+\section{Fazit}
+Die erstellte Architektur konnte im Rahmen dieser Arbeit erfolgreich für die Konfiguration, Durchführung und grundsätzliche
+Auswertung der Simulation genutzt werden. 
+Insbesondere zeigte sich Kubernetes geeignet, um dem vorliegenden Anwendungsfall, nämlich die Skalierung des Simulationsservice,
+zu unterstützen. 
 
+Durch die Replikation der Pods kann die Rechenlast grundsätzlich effizient verteilt und 
+die Gesamtlaufzeit der Simulationen deutlich reduziert werden 
+(Auch wenn für diese Arbeit keine Hardware zur Verfügung stand, um das konkret zu testen).
+Die Entkopplung der einzelnen Services ermöglicht zusätzlich die unabhängige Skalierbarkeit dieser.
+
+Durch die Nutzung von FastAPI als zentrales Kommunikationselement ist es auch möglich, weitere Komponenten hinzuzufügen
+oder bestehende zu verändern ohne, dass dafür alle anderen Komponenten angepasst werden müssen.
+Es reicht stattdessen in der Regel, die Änderungen in FastAPI abzubilden.
+
+RabbitMQ stellte sich als zielführende Lösung für die Verteilung von Simulationsaufträgen hinaus.
+Eine Alternative, wie zum Beispiel die Verteilung der Simulationsaufträge nach dem Push-Prinzip an die Pods
+hätte verschiedene Nachteile mit sich gebracht. Darunter die Tatsache, dass nur gerade aktive Pods
+in der Lage gewesen wären, Aufträge entgegenzunehmen. Außerdem wären bei Fehler eines Pods alle
+ihm zugeordneten Aufträge verloren gegangen.
+
+Die Simulation an sich war zu Bestätigung des Funktionsprinzips gut geeignet,
+müsste für einen realitätsnahen Einsatzweck aber noch deutlich weiterentwickelt werden.
+Schmeling und Dargatz \cite{Schmeling_Dargatz_2022}, Kap. 3 geben einen guten Überblick,
+wie Kubernetes genutzt werden kann, um Anwendungsentwicklung zu unterstützen und zu beschleunigen.
+
+Die Speicherung der Konfiguration der Instandsetzungseinrichtungen im json-Format stellte sich als 
+angemessen für die Komplexität und Flexibilität eines derartigen Systems heraus. 
+Vergleichbare Daten in klassischen relationalen Tabellenstrukturen zu speichern, wäre auch
+möglich gewesen, könnte allerdings Limitationen bei der Flexibilität einbringen.
+MongoDB als eine Anwendung, die insbesondere für die Speicherung und den Abruf von
+Daten im json-Format gestaltet wurde, war für diesen Zweck dementsprechend gut geeignet.
+
+Die Speicherung der Simulationsergebnisse in einer relationalen\linebreak PostgreSQL-Datenbank
+erfolgte, da diese weniger komplex als die Konfigurationsdaten sind und weil
+gängige Werkzeuge zur Datenanalyse gut mit tabellarisch organisierten zusammenwirken.
+PostgreSQL als etabliertes Open-Source Werkzeug für relationale Datenbanken bot
+hierfür eine leicht einzubindende Grundlage.
+
+Angular als professionelles Werkzeug zur Erstellung von webbasierten Benutzeroberflächen,
+ist geeignet, um einen zentralen Zugang für Nutzer zur Bedienung und Auswertung der Simulation zu bieten.
+Für ein realistisches Einsatzszenario muss das Frontend noch um weitere Funktionen
+und um grafische Aufbereitungen ergänzt werden.
+
+Schließlich ist ein weiterer Vorteil die Unabhängigkeit von proprietären Anwendungen und die Möglichkeit, 
+die gesamte Infrastruktur auf verschiedenen Plattformen (lokal oder in der Cloud) zu betreiben. 
+Die Nutzung von Pods und Containern bringt zwar einen geringen Overhead mit sich,
+der aber durch die Vorteile der Skalierbarkeit und Flexibilität ausgeglichen werden können.
+
+Insgesamt hat sich Kubernetes als geeignetes Werkzeug für den gedachten Einsatzweck erwiesen 
+und bietet eine solide Grundlage für die weitere Entwicklung und den Betrieb der Simulationsanwendung.
 
 
 \section{Limitationen}
@@ -614,18 +666,17 @@ PostgreSQL Datenbank geschrieben.
 % Im Produktivumfeld müsste FastAPI besser gesichert werden
 % Autoscaling (oder noch als TODO implementieren)
 % Evtl. Flaschenhals durch Datenbankanwendungen (schwer replizierbar)
-\section{Fazit}
-% Beschreiben, wie das Setup funktioniert hat
-% Ist Kubernetes für den gedachten Einsatzweck geeignet?
-% Was sind die Vorteile (Einfache Skalierung, entkoppelt von propriäteren Anwendungen)?
-% Etwas Overhead durch Pods aber insgesamt gering.
+% Hohe Komplexität von Kubernetes --> Anwendung muss gerechtfertigt sein
 \section{Ausblick}
+% Frontend um weitere Funktionen ergänzen (z.B. Nutzerfeedback für Eingaben)
 % Nutzung einer anderen Cluster Engine als minikube (s. auch 10408202 für Rancher Alternative)
 % Erweiterung des Simulationsmodells um Condition based maintenance/digital twin (s. auch 10408594)
 % Erhöhung der Komplexität des Modells durch weitere Input-Faktoren
 % FastAPI um Authentisierung ergänzen
 % Testcases
-% CI/CD
+% CI/CD \cite{Schmeling_Dargatz_2022} Kap. 3 beschreibt, wie man Kubernetes verwenden kann, um die Entwicklung von Anwendungen zu beschleunigen
+% Generell Zukunft von Kubernetes
+% Speicherverwaltung über mehrere Nodes hinweg
 \section{Anhang}
 
 
