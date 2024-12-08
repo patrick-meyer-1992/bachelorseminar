@@ -2,6 +2,7 @@
 % TODO: UML Diagramm zu den Klassen in der Simulation?
 % TODO: Gendern?
 % TODO: Mockup der Secret Files
+% TODO: Bild Microservice Architektur um Ingress erweitern
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -662,11 +663,55 @@ und bietet eine solide Grundlage für die weitere Entwicklung und den Betrieb de
 
 
 \section{Limitationen}
-% Begrenzte Hardware und hohe Kosten bei Cloud Providern 
-% Im Produktivumfeld müsste FastAPI besser gesichert werden
-% Autoscaling (oder noch als TODO implementieren)
-% Evtl. Flaschenhals durch Datenbankanwendungen (schwer replizierbar)
-% Hohe Komplexität von Kubernetes --> Anwendung muss gerechtfertigt sein
+Obwohl der für diese Arbeit geplante Anwendungsfall erfolgreich umgesetzt werden konnte,
+gab es dennoch einige Limitationen in Bezug auf den Anwendungsfall an sich und auf
+Kubernetes im Allgemeinen. Diese sollen in diesem Abschnitt diskutiert werden.
+
+Die Skalierbarkeit des Simulationsservice mit Kubernetes auch über mehrere Rechner hinweg,
+konnte aufgrund begrenzter Hardware nur eingeschränkt gezeigt werden. Ein alternativer Ansatz,
+der mehrere virtuelle Maschinen verwendet, die jeweils einen Node abbilden, könnte 
+für zukünftige Anwendungsfälle genutzt werden. Das war hier allerdings nicht realistisch,
+da die zur Verfügung stehende Hardware nicht genug Rechen- und Speicherressourcen
+für mehrere virtuelle Maschinen hatte.
+
+Eine weitere Alternative wäre die Nutzung von kommerziellen Cloud Anbietern.
+Die wohl populärsten in diesem Zusammenhang sind Microsoft Azure,
+Amazin Webservices und Google Kubernetes Engine. Alle drei Anbieter,
+ermöglichen den Betrieb von Kubernetes Clustern auf den von 
+ihnen bereitgestellten Plattformen. Diese Dienstleistung
+besteht aber entweder aus stark begrenzten Testversionen oder
+ist mit hohen Kosten verbunden, weswegen sie für diese Arbeit nicht genutzt wurde.
+
+Der Mangel an verfügbaren Rechen- und Speicherressourcen sorgte auch dafür,
+dass die Microservice-Architektur keinem echten Stresstest unterzogen werden konnte.
+Gerade im Bereich der verwendeten relationalen Datenbank könnte es bei vielen
+parallelen Lese- und Schreibvorgängen schnell zu Leistungseinbußen kommen.
+Die Replizierung relationaler Datenbanken unter Einhaltung des ACID-Prinzips
+ist keine triviale Aufgabe und könnte für die weitere Ausgestaltung 
+größere Herausforderungen mit sich bringen.
+
+Da es sich in dieser Arbeit um das grundlegedende Funktionsprinzip der Microservice-Architektur drehte,
+wurde der Aspekt der Sicherheit an vielen Stellen vernachlässigt. Sollten die Services echten
+Nutzern über das Internet zur Verfügung gestellt werden, müssten weitere Maßnahmen ergriffen werden.
+Dazu gehört zunächst, dass die Kommunikation mit den http-Services verschlüsselt über https
+stattfinden sollte. Zudem müsste gegebenenfalls ein Nutzerkonzept mit entsprechender
+Authentisierung implementiert werden. Das gilt insbesondere dann, wenn sensible
+Daten verarbeitet werden.
+
+Die Skalierung des Simulationsservice fand in dieser Arbeit zwar mithilfe von Kubernetes
+aber schlussendlich immernoch manuell statt, indem Kubernetes über die Kommandozeile angewiesen wurde
+eine bestimmte Anzahl an Pods zu starten. Kubernetes bietet aber auch die Möglichkeit 
+Services je nach Nutzlast automatisch zu skalieren. Für den vorliegenden 
+Anwendungsfall war das nicht erforderlich, es könnte aber dennoch eine Verbesserung 
+der Nutzbarkeit bewirken.
+
+Abschließend bleibt zu erwähnen, dass Kubernetes zwar eine hohe Flexibilität bietet,
+aber damit fast automatisch auch eine hohe Komplexität hat. Für große Anbieter von Onlinediensten
+ist der Mehrwert durch diese Komplexität sicherlich vorhanden.
+Für kleinere Unternehmen, die überlegen, Kubernetes zu verwenden, kann es sinnvoller sein,
+alternative, simplere Methoden für die Serviceerbringung zu nutzen.
+%TODO: Hatte ich nicht mal eine Quelle um das zu unterstützen?
+
 \section{Ausblick}
 % Frontend um weitere Funktionen ergänzen (z.B. Nutzerfeedback für Eingaben)
 % Nutzung einer anderen Cluster Engine als minikube (s. auch 10408202 für Rancher Alternative)
