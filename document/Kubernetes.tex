@@ -50,7 +50,7 @@
 
 \begin{document}
 
-\lstinputlisting[language=Python]{../kubernetes/db/db-deployment.yaml}
+% \lstinputlisting[language=Python]{../kubernetes/db/db-deployment.yaml}
 
 \section{Deckblatt}
 \section{Inhaltsverzeichnis}
@@ -441,7 +441,7 @@ Dabei werden auch alle Faktoren bestimmt, von denen man im realen System erwarte
 haben könnten und die auch aktiv verändert werden können.
 Um eine möglichst optimale Konfiguration der Faktoren zu identifizieren, wird die Simulation 
 mit vielen verschiedenen Konfigurationen durchgeführt und die dazugehörigen KPI ausgewertet.
-Diese Methode ist auch unter dem Begriff \emph{Data Farming} bekannt. % Quelle?
+Diese Methode ist auch unter dem Begriff \emph{Data Farming} bekannt \cite{8632383}.
 
 In einer Simulation werden statt fester Werte oft Verteilungsfunktionen verwendet, aus denen Einflussgrößen abgeleitet werden. 
 Aufgrund dieser Eigenschaft wird ein Simulationsmodell in der Regel mehrfach
@@ -696,7 +696,10 @@ Nutzern über das Internet zur Verfügung gestellt werden, müssten weitere Maß
 Dazu gehört zunächst, dass die Kommunikation mit den http-Services verschlüsselt über https
 stattfinden sollte. Zudem müsste gegebenenfalls ein Nutzerkonzept mit entsprechender
 Authentisierung implementiert werden. Das gilt insbesondere dann, wenn sensible
-Daten verarbeitet werden.
+Daten verarbeitet werden. Zusätzlich wurde keine Ausnahmebehandlung für fehlerhafte
+Nutzereingaben und nur rudimentäres Eingabefeedback im Frontend integriert.
+Generell fehlen für ein produktiv nutzbares System automatisierte Tests
+aller Komponenten.
 
 Die Skalierung des Simulationsservice fand in dieser Arbeit zwar mithilfe von Kubernetes
 aber schlussendlich immernoch manuell statt, indem Kubernetes über die Kommandozeile angewiesen wurde
@@ -713,13 +716,25 @@ alternative, simplere Methoden für die Serviceerbringung zu nutzen.
 %TODO: Hatte ich nicht mal eine Quelle um das zu unterstützen?
 
 \section{Ausblick}
-% Frontend um weitere Funktionen ergänzen (z.B. Nutzerfeedback für Eingaben)
-% Nutzung einer anderen Cluster Engine als minikube (s. auch 10408202 für Rancher Alternative)
-% Erweiterung des Simulationsmodells um Condition based maintenance/digital twin (s. auch 10408594)
-% Erhöhung der Komplexität des Modells durch weitere Input-Faktoren
-% FastAPI um Authentisierung ergänzen
-% Testcases
-% CI/CD \cite{Schmeling_Dargatz_2022} Kap. 3 beschreibt, wie man Kubernetes verwenden kann, um die Entwicklung von Anwendungen zu beschleunigen
+Die hier beschriebene Microservice-Architektur war gedacht, um ein grundlegendes Prinzip
+zu verdeutlichen. Einige weitere Einsatzmöglichkeiten von Kubernetes sind damit aber noch nicht ausgeschöpft 
+und diese sollen in diesem Abschnitt diskutiert werden.
+
+Zunächst sei angemerkt, dass minikube zum Einrichten des Clusters für diesen Testfall
+zwar völlig ausreichend war, in realistischen Szenarien aber durch andere Werkzeuge ersetzt werden sollte.
+Für Kubernetes Cluster in Produktivumgebungen sind zum Beispiel \emph{Rancher}, \emph{OpenShift} oder \emph{Tanzu} als
+gängige Lösungen verfügbar \cite{rancher}. Darüber hinaus bietet Kubernetes noch viele andere 
+Anwendungsmöglichkeiten, wie zum Beispiel die Unterstützung von Entwicklern, um Software-Produkte
+schneller von der Entwicklung bis zum produktiven Einsatz zu bringen \cite{Schmeling_Dargatz_2022}.
+
+Bezüglich des Simulationsmodells sind je nach Anwendungsfall viele weitere Veränderungen denkbar.
+Dazu gehören unter anderem die Berücksichtigung von Wartungsplänen und Nutzungsmustern, aber auch
+die genauere Modellierung von Fahrzeugen und ihren Baugruppen. 
+Zusätzlich könnte die Realitätsnähe der Simulation verbessert werden, indem die Option
+implementiert wird, dass Faktoren sich auf der Zeitachse des Simulaionslaufs dynamisch verändern.
+Zum Beispiel ist es in einem realen Szenario sehr wahrscheinlich, dass Instandhaltungskapazitäten
+sich im Laufe der Zeit verändern und nicht so bleiben, wie zu Beginn der Simulationszeit konfiguriert.
+
 % Generell Zukunft von Kubernetes
 % Speicherverwaltung über mehrere Nodes hinweg
 \section{Anhang}
