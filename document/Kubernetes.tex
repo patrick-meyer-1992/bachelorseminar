@@ -98,7 +98,7 @@ um flexibel auf unterschiedliche Anfrageintensitäten zu reagieren und Ressource
 Einzelne Container führen in der Regel nur eine klar umgrenzte Aufgabe aus (z.B. Betrieb einer Datenbank oder eines Webservers). Da sie in sich geschlossen sind,
 können sie auch unabhängig von anderen Containern repliziert werden. Um eine vollständige Anwendung zu erhalten, betreibt man daher oft mehrere Container,
 die im Verbund zusammenwirken; eine sogenannte Microservice-Architektur. Um den hohen Anforderungen an Rechenleistung moderner Anwendungen gerecht zu werden,
-werden die Container dabei oft auf viele Rechner verteilt (sog. horizontale Skalierung). % Horizontale und vertikale Skalierung noch erklären?
+werden die Container dabei oft auf viele Rechner verteilt (sog. horizontale Skalierung). % TODO: Horizontale und vertikale Skalierung noch erklären?
 Die Verwaltung einer solchen verteilten Microservice-Architektur kann schnell komplex werden, weshalb verschiedene Werkzeuge zur Unterstützung entwickelt wurden.
 
 Eines der heute populärsten Werkzeuge dieser Art ist Kubernetes. Im Folgenden soll die Funktionsweise von Kubernetes beschrieben und schließlich anhand eines Beispiels 
@@ -365,15 +365,6 @@ aufgebaut sein, mit dem Unterschied, dass hier eine andere ConfigMap Ressource v
 So können Entwicklungs- und Produktivumgebung ohne großen Aufwand mit minimalen Unterschieden betrieben
 werden, was dazu beitragen kann, die Entwicklung und Bereitstellung von Anwendung zu beschleunigen.
 \cite{Schmeling_Dargatz_2022}
-% TODO: Abschnitt ergänzen. Wichtig um klarzustellen, wie Pods über internes Netzwerk kommunizieren
-
-% Einführung in praktisches Beispiel, aber 
-% Erst Motivation für Simulationen 
-	% Vorstellung der realen Problemstellung (Hohe Kosten für Betrieb (s. auch 10408594 S. 1), Vorhersage von effizientem Ressourceneinsatz)
-% Voraussetzung für Simulation (System- und Datenanalyse)
-% Herausforderungen bei Simulationen (Hohe Anzahl an möglichen Parameterkombinationen)
-
-% Dann konkretes Beispiel
 
 \section{Flottensimulation}
 
@@ -501,6 +492,7 @@ und folglich auswertbare Ergebnisse zu erhalten, bietet es sich an, die Rechenla
 Nachdem im vorangegangenen Abschnitt die Motivation und die Funktionsprinzipien der Simulation erklärt wurden,
 soll in diesem Abschnitt auf die für den Betrieb genutzte Microservice-Architektur Bezug genommen werden.
 
+
 Grundlegend besteht die Microservice-Architektur aus sechs verschiedenen Services, deren Zusammenwirken
 in Abbildung \ref{fig:microservice-architektur} dargestellt ist.
 
@@ -517,6 +509,10 @@ in Abbildung \ref{fig:microservice-architektur} dargestellt ist.
 Die Dateien, die zum Aufsetzen der Services verwendet wurden, sind unter
 (\lstinline|https://github.com/patrick-meyer-1992/bachelorseminar|) \cite{Meyer_bachelorseminar}
 verfügbar.
+
+\subsubsection{Minikube}
+% TODO: Abschnitt ergänzen. Was ist minikube, was ist das Einsatzgebiet, warum wird es hier verwendet?
+
 
 \subsubsection{FastAPI}
 \label{sec:FastAPI}
