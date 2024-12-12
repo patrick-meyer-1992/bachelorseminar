@@ -3,6 +3,7 @@
 % TODO: Gendern?
 % TODO: Mockup der Secret Files
 % TODO: Bild Microservice Architektur um Ingress erweitern
+% TODO: README.md schreiben (Sollte Details zu DNS config enthalten)
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -363,8 +364,8 @@ Entwicklungsumgebung sind. Ein anderer Namespace \emph{prod} könnte analog zu \
 aufgebaut sein, mit dem Unterschied, dass hier eine andere ConfigMap Ressource vorliegt.
 
 So können Entwicklungs- und Produktivumgebung ohne großen Aufwand mit minimalen Unterschieden betrieben
-werden, was dazu beitragen kann, die Entwicklung und Bereitstellung von Anwendung zu beschleunigen.
-\cite{Schmeling_Dargatz_2022}
+werden, was dazu beitragen kann, die Entwicklung und Bereitstellung von Anwendung zu beschleunigen
+\cite{Schmeling_Dargatz_2022}.
 
 \section{Flottensimulation}
 
@@ -511,6 +512,16 @@ Die Dateien, die zum Aufsetzen der Services verwendet wurden, sind unter
 verfügbar.
 
 \subsubsection{Minikube}
+Zum Aufsetzen des Clusters wurde \emph{Minikube} verwendet.
+Minikube ist eine Anwendung, die genutzt werden kann, um mit vergleichsweise wenig Aufwand ein lokales
+Kubernetes Cluster mit einem Node zu erstellen. Diese relativ einfache Konfiguration hat 
+den Nachteil, dass Minikube lediglich für Test- und Entwicklungsaufgaben geeignet ist.
+Für Produktivsysteme sollte eine andere Lösung gewählt werden (vgl. \ref{sec:Ausblick}). 
+
+Zum Betrieb des Clusters verwendet Minikube eine virtuelle Maschine, innerhalb derer
+alle Kubernetes Komponenten laufen. Dementsprechend ist eine der Voraussetzungen,
+um Minikube zu nutzen auch die vorherige Installation einer Virtualisierungsanwendung.
+Näheres kann der Minikube Dokumentation entnommen werden \cite{minikube}.
 % TODO: Abschnitt ergänzen. Was ist minikube, was ist das Einsatzgebiet, warum wird es hier verwendet?
 
 
@@ -712,6 +723,7 @@ alternative, simplere Methoden für die Serviceerbringung zu nutzen.
 %TODO: Hatte ich nicht mal eine Quelle um das zu unterstützen?
 
 \section{Ausblick}
+\label{sec:Ausblick}
 Die hier beschriebene Microservice-Architektur war gedacht, um ein grundlegendes Prinzip
 zu verdeutlichen. Einige weitere Einsatzmöglichkeiten von Kubernetes sind damit aber noch nicht ausgeschöpft 
 und diese sollen in diesem Abschnitt diskutiert werden.
