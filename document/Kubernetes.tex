@@ -1,8 +1,6 @@
-% TODO: Initialisierung Cluster mit Minikube beschreiben
 % TODO: UML Diagramm zu den Klassen in der Simulation?
 % TODO: Gendern?
 % TODO: Mockup der Secret Files
-% TODO: Bild Microservice Architektur um Ingress erweitern
 % TODO: README.md schreiben (Sollte Details zu DNS config enthalten)
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
@@ -48,6 +46,7 @@
 }
 
 \lstset{style=mystyle}
+\hyphenation{In-stand-setz-ungs-kon-fi-gu-ra-tio-nen}
 
 \begin{document}
 
@@ -300,15 +299,16 @@ einheitlich adressierbar zu machen, wird NodePort verwendet, um einen Service vo
 über die öffentlichen IP-Adressen der Nodes des Clusters an einem zufällig gewählten Port erreichbar zu machen.
 
 \subsection{Ingress}
+\label{sec:Ingress}
 Die Verwendung eines NodePort-Services wird meist nur zu Testzwecken verwendet. In einer Produktivumgebung
 ist die gängigere Lösung, um das Cluster von außerhalb erreichbar zu machen, die Verwendung eines \emph{Ingress}.
 In der Definition eines Ingress kann ein Hostname und ein dazugehöriger interner Service gesetzt werden.
-Anfragen an diesen Hostname werden dann an den zugehörigen Service weitergeleitet. Über unterschiedliche Hostnames
+Anfragen an diesen Hostname werden dann an den zugehörigen Service weitergeleitet. Über unterschiedliche Hostnamen
 oder Subdomains, die mit verschiedenen Services verknüpft werden, können Anfragen an den Ingress flexibel
 an die richtigen Services weitergeleitet werden. Das Verhalten eines Ingress kann mit dem eines \emph{Reverse Proxy}
 verglichen werden.
 
-Kubernetes stellt dabei natürlich nicht sicher, dass die entsprechenden Hostnames in öffentlichen DNS Services auch mit
+Kubernetes stellt dabei natürlich nicht sicher, dass die entsprechenden Hostnamen in öffentlichen DNS Services auch mit
 der öffentlichen IP-Adresse des Ingress verbunden sind.
 
 \subsection{Volumes}
@@ -592,6 +592,15 @@ Da eine Instandsetzungskonfigurationen mitunter sehr komplex werden kann, war es
 dass einmal erstellte Konfiguration persistent gespeichert und auch wieder abrufbar und veränderbar sind.
 
 Für die Speicherung der Simulationsergebnisse wird in diesem Szenario PostgreSQL als relationale Datenbank verwendet.
+
+\subsubsection{Ingress}
+Der Ingress-Controller hat die Aufgabe, Anfragen entsprechend des Hostnamens zu verteilen (vgl. \ref{sec:Ingress}).
+In diesem Fall werden http-Anfragen gemäß der Subdomains \emph{app}, \emph{api}, \emph{rmq} an das
+Frontend, den FastAPI-Service oder an den RabbitMQ-Service weitergeleitet. Um dieses Verhalten
+in einer lokalen Umgebung zu ermöglichen, muss zusätzlich zum Cluster ein Weg eingerichtet werden,
+um DNS-Anfragen an app.domain.com, api.domain.com und rmq.domain.com an die IP-Adresse des Clusters zu senden.
+Das kann entweder durch das Aufsetzen eines DNS-Servers geschehen oder durch Anpassen der Datei 
+\lstinline|/etc/hosts| unter Linux oder \lstinline|C:\Windows\system32\drivers\etc\hosts| unter Windows 11.
 
 \subsubsection{Flottensimulation}
 \label{sec:Flottensimulation}
