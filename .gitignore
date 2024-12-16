@@ -11,6 +11,7 @@ document/Kubernetes.log
 document/Kubernetes.synctex.gz
 document/Kubernetes.bcf
 document/Kubernetes.run.xml
+document/Kubernetes.toc
 simulation/test.py
 simulation/test.json
 *secret.yaml
