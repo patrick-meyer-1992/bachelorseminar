@@ -2,7 +2,6 @@
 % TODO: Gendern?
 % TODO: README.md schreiben (Sollte Details zu DNS config enthalten)
 % Zusammenfassung schreiben
-% Deckblatt erstellen
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -51,12 +50,7 @@
 
 \begin{document}
 
-% \lstinputlisting[language=Python]{../kubernetes/db/db-deployment.yaml}
-
-\section{Deckblatt}
-\section{Inhaltsverzeichnis}
-
-
+\tableofcontents
 
 \section{Zusammenfassung}
 
@@ -164,7 +158,7 @@ Der Nachteil dieser Methode ist die deutliche erhöhte Komplexität, die mit dem
 
 Im folgenden Abschnitt soll beschrieben werden, welche Werkzeuge Kubernetes anbietet, um mit dieser Komplexität umzugehen.
 
-\section{Grundlegende Kuberneteskonzepte}
+\section{Grundlegende Kubernetes-Konzepte}
 Ein durch Kubernetes verwaltetes System wird üblicherweise als \emph{Cluster} bezeichnet.
 Ein Cluster besteht aus einer oder mehreren physischen und/oder virtuellen Maschinen, die darin eingebunden sind.
 Jede Maschine wird dabei als ein \emph{Node} (deutsch: Knoten) bezeichnet. Diese Nodes werden wiederrum unterschieden in 
@@ -523,8 +517,6 @@ Zum Betrieb des Clusters verwendet Minikube eine virtuelle Maschine, innerhalb d
 alle Kubernetes Komponenten laufen. Dementsprechend ist eine der Voraussetzungen,
 um Minikube zu nutzen auch die vorherige Installation einer Virtualisierungsanwendung.
 Näheres kann der Minikube Dokumentation entnommen werden \cite{minikube}.
-% TODO: Abschnitt ergänzen. Was ist minikube, was ist das Einsatzgebiet, warum wird es hier verwendet?
-
 
 \subsubsection{FastAPI}
 \label{sec:FastAPI}
