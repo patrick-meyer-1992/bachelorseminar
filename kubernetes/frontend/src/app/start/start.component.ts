@@ -9,9 +9,9 @@ import { HttpClient } from '@angular/common/http';
 export class StartComponent implements OnInit {
   availableConfigs: String[] = [];
   experimentId: string = '';
-  selectedConfig: string = '';
-  numVehicles: number = 100;
-  iterations: number = 20;
+  selectedConfig: string = 'config1, config4';
+  numVehicles: string = '10, 15, 25';
+  iterations: string = '20';
 
   constructor(private http: HttpClient) {}
 
@@ -29,9 +29,9 @@ export class StartComponent implements OnInit {
       );
   }
 
-  onConfigChange(event: Event): void {
-    this.selectedConfig = (event.target as HTMLSelectElement).value;
-  }
+  // onConfigChange(event: Event): void {
+  //   this.selectedConfig = (event.target as HTMLSelectElement).value;
+  // }
 
   startSimulation(): void {
     const payload = {

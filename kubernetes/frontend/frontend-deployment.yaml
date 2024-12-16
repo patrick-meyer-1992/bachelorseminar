@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: patrickmeyer/frontend:1.0
+        image: patrickmeyer/frontend:1.14
         ports:
         - containerPort: 4200
         resources:

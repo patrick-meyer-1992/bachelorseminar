@@ -1,12 +1,40 @@
 <div>
-    <label for="configSelect">Select Configuration:</label>
+    <!-- <label for="configSelect">Select Configuration:</label>
     <select id="configSelect" (change)="onConfigChange($event)">
       <option *ngFor="let config of availableConfigs" [value]="config">
         {{ config }}
       </option>
     </select>
+</div> -->
+
+  <div>
+    <label for="selectedConfig">Configurations:</label>
+    <input
+    type="text"
+    id="configSelect"
+    [(ngModel)]="selectedConfig"
+    />
   </div>
 
+  <div>
+    <label for="numVehicles">Number of Vehicles:</label>
+    <input
+    type="text"
+    id="numVehicles"
+    [(ngModel)]="numVehicles"
+    />
+  </div>
+  
+  <div>
+    <label for="iterations">Iterations:</label>
+    <input
+    type="text"
+    id="iterations"
+    [(ngModel)]="iterations"
+    min="1"
+    />
+  </div>
+  
   <div>
     <label for="experimentId">Experiment ID:</label>
     <input
@@ -15,25 +43,6 @@
       [(ngModel)]="experimentId"
     />
   </div>
-  
-  <div>
-    <label for="numVehicles">Number of Vehicles:</label>
-    <input
-      type="number"
-      id="numVehicles"
-      [(ngModel)]="numVehicles"
-      min="1"
-    />
-  </div>
-  
-  <div>
-    <label for="iterations">Iterations:</label>
-    <input
-      type="number"
-      id="iterations"
-      [(ngModel)]="iterations"
-      min="1"
-    />
-  </div>
-  
+
   <button (click)="startSimulation()">Start</button>
+</div>

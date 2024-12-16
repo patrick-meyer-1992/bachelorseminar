@@ -1,6 +1,21 @@
-<select [(ngModel)]="selectedExperiment" (change)="onExperimentChange($event)">
+<select [(ngModel)]="selectedExperiment" (change)="updateDropdowns()">
     <option *ngFor="let experiment of availableExperiments" [value]="experiment">
       {{ experiment }}
     </option>
 </select>
+
+<select [(ngModel)]="selectedNumVehicles">
+  <option *ngFor="let num of availableNumVehicles" [value]="num">
+    {{ num }}
+  </option>
+</select>
+
+<select [(ngModel)]="selectedRepairConfig">
+  <option *ngFor="let config of availableRepairConfigs" [value]="config">
+    {{ config }}
+  </option>
+</select>
+
+<button (click)="fetchDataAndPlot()">Plot</button>
+
 <div id="plot"></div>

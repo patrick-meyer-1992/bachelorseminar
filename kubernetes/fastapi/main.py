@@ -93,15 +93,31 @@ def sim_jobs(message: dict):
     channel.exchange_declare(exchange=exchange_name, exchange_type='direct')
     channel.queue_declare(queue=queue_name, durable=True)
     channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key=routing_key)
-    num_iterations = message.pop("num_iterations")
+    num_iterations = int(message.pop("num_iterations"))
     # message = {
     #     "experiment_id": experiment_id,
     #     "config": config_name,
     #     "num_vehicles": num_vehicles,
     # }
-    message = json.dumps(message).encode('utf-8')
-    for _ in range(num_iterations):
-        channel.basic_publish(exchange=exchange_name, routing_key=routing_key, body=message)
+    repair_config_names = message.pop("repair_config_name")
+    repair_config_names = repair_config_names.replace(" ", "").split(",")
+
+    num_vehicles = message.pop("num_vehicles")
+    num_vehicles = num_vehicles.replace(" ", "").split(",")
+
+    # message = json.dumps(message).encode('utf-8')
+
+    for repair_config_name in repair_config_names:
+        for num_vehicle in num_vehicles:
+            for _ in range(num_iterations):
+                job = dict()
+                job["experiment_id"] = message["experiment_id"]
+                job["repair_config_name"] = repair_config_name
+                job["num_vehicles"] = int(num_vehicle)
+                job = json.dumps(job).encode('utf-8')
+                channel.basic_publish(exchange=exchange_name, routing_key=routing_key, body=job)
+    # for _ in range(num_iterations):
+    #     channel.basic_publish(exchange=exchange_name, routing_key=routing_key, body=message)
     connection.close()
     return {"status": "success"}
 
@@ -113,19 +129,34 @@ def result(result: dict, experiment_id: str):
     df.to_sql("vehicle_status", con=engine, if_exists="append", index=False)
     return {"status": "success"}
 
-@app.get("/plot_result/{experiment_id}")
-def plot_result(experiment_id: str):
-    query = text("SELECT * FROM vehicle_status WHERE experiment_id = :experiment_id")
-    params = {"experiment_id": experiment_id}    
+@app.get("/experiment_params/{experiment_id}")
+def experiment_params(experiment_id: str):
+    query = text(f"SELECT DISTINCT num_vehicles, repair_config_name FROM vehicle_status WHERE experiment_id = '{experiment_id}'")
+    df = pd.read_sql(query, con=engine)
+    num_vehicles = df["num_vehicles"].unique().tolist()
+    repair_config_name = df["repair_config_name"].unique().tolist()
+    return {
+        "num_vehicles": num_vehicles,
+        "repair_config_name" : repair_config_name
+    }
+
+@app.get("/plot_result/")
+def plot_result(experiment_id: str, num_vehicles: int, repair_config_name: str):
+    query = text("SELECT * FROM vehicle_status WHERE experiment_id = :experiment_id AND num_vehicles = :num_vehicles AND repair_config_name = :repair_config_name")
+    params = {"experiment_id": experiment_id, "num_vehicles": num_vehicles, "repair_config_name": repair_config_name}
     df = pd.read_sql(query, con=engine, params=params)
     df_mean = df.groupby("date")[["operational", "failed", "repairing"]].mean().reset_index()
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=df_mean["date"], y=df_mean["failed"], mode='lines', name='Failed'))
     fig.add_trace(go.Scatter(x=df_mean["date"], y=df_mean["operational"], mode='lines', name='Operational'))
     fig.add_trace(go.Scatter(x=df_mean["date"], y=df_mean["repairing"], mode='lines', name='Repairing'))
+    # fig.update_layout(
+    #     title=f"Anzahl Fahrzeuge pro Zustand",
+    #     xaxis_title='',
+    #     yaxis_title='Anzahl Fahrzeuge'
+    # )
     fig_json = fig.to_json(engine="json")
     fig_json = json.loads(fig_json)
-    print("Generated plot JSON:", fig_json)  
     return fig_json
 
 # @app.get("/health", status_code=status.HTTP_200_OK)

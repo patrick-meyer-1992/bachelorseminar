@@ -9,9 +9,12 @@ import * as Plotly from 'plotly.js-dist';
 })
 
 export class ResultsComponent implements OnInit {
-  experiment: string = '';
   selectedExperiment = '';
-  availableExperiments: string[] = [];
+  availableExperiments: string[] = [];  
+  selectedNumVehicles: number = 0;
+  availableNumVehicles: number[] = [];
+  selectedRepairConfig = '';
+  availableRepairConfigs: string[] = [];
 
   constructor(private http: HttpClient) {}
 
@@ -23,7 +26,8 @@ export class ResultsComponent implements OnInit {
         (data) => {
           this.availableExperiments = data.experiments;
           this.selectedExperiment = this.availableExperiments[0];
-          this.fetchDataAndPlot(this.selectedExperiment);
+          this.updateDropdowns()
+          // this.fetchDataAndPlot(this.selectedExperiment);
         },
         (error) => {
           console.error('Error fetching configurations', error);
@@ -31,15 +35,37 @@ export class ResultsComponent implements OnInit {
       );
   }
 
-  onExperimentChange(event: Event): void {
-    this.fetchDataAndPlot((event.target as HTMLSelectElement).value);
+  // onExperimentChange(): void {
+  //   this.updateDropdowns(this.selectedExperiment);
+  // }
+
+  updateDropdowns(): void {
+    this.http
+      .get<{ num_vehicles: number[], repair_config_name: string[] }>(
+      `http://api.quantumshoe.duckdns.org/experiment_params/${this.selectedExperiment}`)
+      .subscribe(
+      (data) => {
+        console.log("data:" + data)
+        this.availableNumVehicles = data.num_vehicles;
+        this.selectedNumVehicles = data.num_vehicles[0];
+        this.availableRepairConfigs = data.repair_config_name;
+        this.selectedRepairConfig = data.repair_config_name[0];
+      },
+      (error) => {
+        console.error('Error fetching experiment details', error);
+      }
+      );
   }
 
-  fetchDataAndPlot(experiment: string): void {
+  fetchDataAndPlot(): void {
     this.http
-    // .get('http://localhost:8000/plot_result/test2').subscribe((data: any) => {
-    .get(`http://api.quantumshoe.duckdns.org/plot_result/${experiment}`).subscribe((data: any) => {
-      
+    .get(`http://api.quantumshoe.duckdns.org/plot_result/`, {
+      params: {
+      num_vehicles: this.selectedNumVehicles,
+      repair_config_name: this.selectedRepairConfig,
+      experiment_id: this.selectedExperiment
+      }
+    }).subscribe((data: any) => {
       const plotData = data.data.map((item: any) => ({
         x: item.x,
         y: item.y,
@@ -49,9 +75,9 @@ export class ResultsComponent implements OnInit {
       }));
 
       const layout = {
-        title: 'Results Plot',
-        xaxis: { title: 'Date' },
-        yaxis: { title: 'Value' },
+        title: 'Anzahl Fahrzeuge pro Zustand',
+        xaxis: { title: '' },
+        yaxis: { title: '' },
       };
       Plotly.newPlot('plot', plotData, layout);
     });
