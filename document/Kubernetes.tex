@@ -1,7 +1,6 @@
 % TODO: UML Diagramm zu den Klassen in der Simulation?
 % TODO: Gendern?
 % TODO: README.md schreiben (Sollte Details zu DNS config enthalten)
-% Zusammenfassung schreiben
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -53,6 +52,22 @@
 \tableofcontents
 
 \section{Zusammenfassung}
+Kubernetes bietet als weit verbreitetes Container-Orchestrierungs-Tool vielfältige Möglichkeiten.
+Diese Arbeit ordnet Kubernetes und die zugrundeliegende Motivation in einen historischen Kontext ein. 
+Darauf aufbauend werden wichtige Komponenten und deren Verwendung beschrieben und erklärt.
+Zur Illustration wird ein Anwendungsfall aus dem Bereich des Data Farmings verwendet, 
+bei dem ein Simulationsmodell zur Optimierung der Einsatzbereitschaft einer Fahrzeugflotte mit den 
+durch Kubernetes zur Verfügung gestellten Komponenten skalierbar betrieben wird. Diese Simulationsmodell
+gliedert sich in eine Microservice-Architektur ein, die Bedienung und Auswertung der Simulation erlaubt, 
+sowie Mittel zur Speicherung von Konfigurationen und Ergebnissen bietet.
+Im Ergebnis zeigt sich Kubernetes als geeignet, um sowohl Simulation als auch die notwendigen 
+Stützservices skalierbar zu betreiben.
+Dennoch werden auch Limitationen diskutiert, die zum Teil durch fehlende 
+Hardware-Ressourcen aber auch durch die Komplexität von Kubernetes entstehen können.
+Abschließend folgt ein Ausblick über die mögliche Weiterentwicklung des Anwendungsfall
+an sich und der zu erwartenden Entwicklung von Kubernetes im Allgemeinen in den nächsten Jahren.
+
+
 
 \section{Einleitung}
 \label{sec:einleitung}
