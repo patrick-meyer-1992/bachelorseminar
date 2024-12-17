@@ -1,4 +1,3 @@
-% TODO: UML Diagramm zu den Klassen in der Simulation?
 % TODO: Gendern?
 % TODO: README.md schreiben (Sollte Details zu DNS config enthalten)
 \documentclass[11pt,a4paper]{article}
@@ -107,8 +106,11 @@ um flexibel auf unterschiedliche Anfrageintensitäten zu reagieren und Ressource
 
 Einzelne Container führen in der Regel nur eine klar umgrenzte Aufgabe aus (z.B. Betrieb einer Datenbank oder eines Webservers). Da sie in sich geschlossen sind,
 können sie auch unabhängig von anderen Containern repliziert werden. Um eine vollständige Anwendung zu erhalten, betreibt man daher oft mehrere Container,
-die im Verbund zusammenwirken; eine sogenannte Microservice-Architektur. Um den hohen Anforderungen an Rechenleistung moderner Anwendungen gerecht zu werden,
-werden die Container dabei oft auf viele Rechner verteilt (sog. horizontale Skalierung). % TODO: Horizontale und vertikale Skalierung noch erklären?
+die im Verbund zusammenwirken; eine sogenannte Microservice-Architektur. 
+Die sogenannte \emph{vertikale Skalierung} bei der ein einzelner Server um weitere Ressourcen (Rechenleistung, Speicher etc.)
+ergänzt wird, stößt schnell an Grenzen und wird daher den hohen Ressourcenanforderungen moderner Anwendungen oft nicht gerecht.
+Im Kontrast dazu steht die \emph{horizontale Skalierung}, bei der eine Anwendung über mehrere Rechner verteilt betrieben wird.
+Container haben sich dabei als eine wesentliche Grundlage für die horizontale Skalierung etabliert.
 Die Verwaltung einer solchen verteilten Microservice-Architektur kann schnell komplex werden, weshalb verschiedene Werkzeuge zur Unterstützung entwickelt wurden.
 
 Eines der heute populärsten Werkzeuge dieser Art ist Kubernetes. Im Folgenden soll die Funktionsweise von Kubernetes beschrieben und schließlich anhand eines Beispiels 
