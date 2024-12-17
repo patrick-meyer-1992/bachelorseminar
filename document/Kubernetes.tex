@@ -432,7 +432,6 @@ Beispiele für KPI:
 	\item Auslastung der Instandsetzungseinrichtungen
 \end{enumerate}
 
-% TODO: Abwandeln falls Modell noch angepasst wird.
 Für die vorliegende Implementierung des Simulationsmodells das Python Paket \emph{mesa} \cite{python-mesa-2020} genutzt.
 Von den genannten Faktoren können die Anzahl der Fahrzeuge, die Höhe der Instandsetzungskapazitäten und die
 Reparaturrate beeinflusst werden. Von den genannten KPI ist für die Anzahl einsatzbereiter Fahrzeuge
@@ -562,8 +561,18 @@ Entscheidungsträgern ist, wurde ein Frontend entworfen, das eine Idee davon bie
 einer breiteren Masse zur Verfügung stellen kann. Das Frontend basiert auf Angular,
 einer Entwicklungsplattform zum Erstellen von Handy- und Desktop-Webanwendungen \cite{jain2014angularjs},
 und ermöglicht das Konfigurieren, Starten und Auswerten von Simulationsläufen über eine interaktive Web-Oberfläche.
+Ein Eindruck einer möglichen visuellen Auswertung kann Abbildung \ref{fig:ergebnis-plot} entnommen werden.
 
-% TODO: Screenshots ergänzen?
+\begin{figure}
+	\label{fig:ergebnis-plot}
+	\centering
+	\includegraphics[width=\textwidth]{media/Ergebnisplot.png}
+	\caption{
+		Darstellung des Ergebnisses von einem Simulationslauf mit den eingestellten Faktoren.
+		Zu sehen sind die Anzahl Fahrzeuge in den Stati ``Ausgefallen'', ``Einsatzbereit'' und ``in Reparatur''
+		für jeden Tag des einjährigen Simulationszeitraums.
+	}
+\end{figure}
 
 \subsubsection{RabbitMQ}
 \label{sec:RabbitMQ}
@@ -629,11 +638,6 @@ aus der MongoDB abgerufen.
 in den möglichen Zuständen (Einsatzbereit, Ausgefallen, in Reparatur) als KPI gespeichert.
 Bei Abschluss der Simulation werden diese Ergebnisse ebenfalls über FastAPI in die 
 PostgreSQL Datenbank geschrieben.
-
-% TODO Screenshot from Frontend
-
-
-% \lstinputlisting{../kubernetes/db/db-deployment.yaml}
 
 \section{Fazit}
 Die erstellte Architektur konnte im Rahmen dieser Arbeit erfolgreich für die Konfiguration, Durchführung und grundsätzliche
