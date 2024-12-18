@@ -5,7 +5,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: rmq.quantumshoe.duckdns.org
+    - host: rmq.domain.com
       http:
         paths:
           - path: /
@@ -15,7 +15,7 @@ spec:
                 name: rabbitmq-service
                 port:
                   number: 15672
-    - host: api.quantumshoe.duckdns.org
+    - host: api.domain.com
       http:
         paths:
           - path: /
@@ -25,7 +25,7 @@ spec:
                 name: fastapi-service
                 port:
                   number: 8000
-    - host: app.quantumshoe.duckdns.org
+    - host: app.domain.com
       http:
         paths:
           - path: /

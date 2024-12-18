@@ -21,7 +21,7 @@ export class ResultsComponent implements OnInit {
   ngOnInit(): void {
     this.http
       // .get<{ experiments: string[] }>('http://localhost:8000/experiments/')
-      .get<{ experiments: string[] }>('http://api.quantumshoe.duckdns.org/experiments/')
+      .get<{ experiments: string[] }>('http://api.domain.com/experiments/')
       .subscribe(
         (data) => {
           this.availableExperiments = data.experiments;
@@ -42,7 +42,7 @@ export class ResultsComponent implements OnInit {
   updateDropdowns(): void {
     this.http
       .get<{ num_vehicles: number[], repair_config_name: string[] }>(
-      `http://api.quantumshoe.duckdns.org/experiment_params/${this.selectedExperiment}`)
+      `http://api.domain.com/experiment_params/${this.selectedExperiment}`)
       .subscribe(
       (data) => {
         console.log("data:" + data)
@@ -59,7 +59,7 @@ export class ResultsComponent implements OnInit {
 
   fetchDataAndPlot(): void {
     this.http
-    .get(`http://api.quantumshoe.duckdns.org/plot_result/`, {
+    .get(`http://api.domain.com/plot_result/`, {
       params: {
       num_vehicles: this.selectedNumVehicles,
       repair_config_name: this.selectedRepairConfig,

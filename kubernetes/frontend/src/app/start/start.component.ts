@@ -18,7 +18,7 @@ export class StartComponent implements OnInit {
   ngOnInit(): void {
     this.http
       // .get<{ configs: String[] }>('http://localhost:8000'+'/configs/')
-      .get<{ configs: String[] }>('http://api.quantumshoe.duckdns.org'+'/configs/')
+      .get<{ configs: String[] }>('http://api.domain.com'+'/configs/')
       .subscribe(
         (data) => {
           this.availableConfigs = data.configs;
@@ -42,7 +42,7 @@ export class StartComponent implements OnInit {
     };
 
     // this.http.post('http://localhost:8000'+'/sim_jobs', payload).subscribe(
-    this.http.post('http://api.quantumshoe.duckdns.org'+'/sim_jobs', payload).subscribe(
+    this.http.post('http://api.domain.com'+'/sim_jobs', payload).subscribe(
       (response) => {
       console.log('Simulation started successfully:', response);
       },

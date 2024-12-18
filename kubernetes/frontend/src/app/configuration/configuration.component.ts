@@ -37,7 +37,7 @@ export class ConfigurationComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.http.get<{ configs: string[] }>('http://api.quantumshoe.duckdns.org/configs/')
+    this.http.get<{ configs: string[] }>('http://api.domain.com/configs/')
       .subscribe(
         (data) => {
           this.availableConfigNames = data.configs;
@@ -52,7 +52,7 @@ export class ConfigurationComponent implements OnInit {
 
   initConfig(config_name: string): void {
     this.http.get<{ config: RepairFacility[] }>(
-        `http://api.quantumshoe.duckdns.org/config/${config_name}`
+        `http://api.domain.com/config/${config_name}`
       )
       .subscribe(
         (data) => {
@@ -68,7 +68,7 @@ export class ConfigurationComponent implements OnInit {
     const selectedName = (event.target as HTMLSelectElement).value;
 
     this.http.get<{ config: RepairFacility[] }>(
-        `http://api.quantumshoe.duckdns.org/config/${selectedName}`
+        `http://api.domain.com/config/${selectedName}`
       )
       .subscribe(
         (data) => {
@@ -133,7 +133,7 @@ export class ConfigurationComponent implements OnInit {
   }
 
   onSubmit() {
-    this.http.post(`http://api.quantumshoe.duckdns.org/add_config/${this.newConfigName}`, {
+    this.http.post(`http://api.domain.com/add_config/${this.newConfigName}`, {
         name: this.newConfigName,
         config: this.config,
         })
