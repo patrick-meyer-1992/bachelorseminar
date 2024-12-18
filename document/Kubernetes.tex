@@ -382,6 +382,7 @@ werden, was dazu beitragen kann, die Entwicklung und Bereitstellung von Anwendun
 \section{Flottensimulation}
 
 \subsection{Motivation und Prinzip}
+\label{sec:Motivation-und-Prinzip}
 Für ein besseres Verständnis der grundlegedenden Konzepte von Kubernetes sollen diese anhand eines
 Anwendungsfalls vorgestellt werden.
 Vor der Implementierung des Anwendungsfalls muss aber die Motviation für diesen geklärt werden.
@@ -410,14 +411,14 @@ Falls gerade keine freien Kapazitäten vorhanden sind, verbleibt das Fahrzeug in
 Ist die Instandsetzung abgeschlossen, verlässt das Fahrzeug die Instandsetzungseinrichtung und wird weiter genutzt.
 
 \begin{figure}
-	\label{fig:Simulationsmodell}
 	\centering
 	\includegraphics[width=\textwidth]{media/Simulationsmodell.png}
 	\caption{
 		Grundlegender Prozess innerhalb der Simulation. Fahrzeuge werden
 		genutzt, fallen nach einiger Zeit aus und müssen dann instandgesetzt
 		werden.
-	}
+		}
+	\label{fig:Simulationsmodell}
 \end{figure}
 
 Bereits in diesem vergleichsweise simplen Modell sind mehrere verschiedene Faktoren und KPI denkbar.
@@ -464,14 +465,14 @@ handelt es sich dabei um:
 \end{enumerate}
 
 \begin{figure}
-	\label{fig:gartner-modell}
 	\centering
 	\includegraphics[width=\textwidth]{media/analytic-maturity.png}
 	\caption{
 		Das Gartner Modell schlägt eine Klassifizierung von Analysemodellen vor.
 		Das hier dargestellte Simulationsmodell fällt in den Bereich der 
 		präskriptiven Analyse. 
-	}
+		}
+	\label{fig:gartner-modell}
 \end{figure}
 
 Ein Simulationsmodell der hier vorliegenden Art fällt grundsätzlich in den Bereich der präskriptiven Analyse, 
@@ -510,13 +511,13 @@ Grundlegend besteht die Microservice-Architektur aus sechs verschiedenen Service
 in Abbildung \ref{fig:microservice-architektur} dargestellt ist.
 
 \begin{figure}
-	\label{fig:microservice-architektur}
 	\centering
 	\includegraphics[width=\textwidth]{media/Microservice-Architektur.png}
 	\caption{
 		Eine Übersicht über die verwendete Microservice-Architektur.
 		Details können dem Text entnommen werden.
-	}
+		}
+	\label{fig:microservice-architektur}
 \end{figure}
 
 Die Dateien, die zum Aufsetzen der Services verwendet wurden, sind unter
@@ -565,14 +566,14 @@ und ermöglicht das Konfigurieren, Starten und Auswerten von Simulationsläufen 
 Ein Eindruck einer möglichen visuellen Auswertung kann Abbildung \ref{fig:ergebnis-plot} entnommen werden.
 
 \begin{figure}
-	\label{fig:ergebnis-plot}
 	\centering
 	\includegraphics[width=\textwidth]{media/Ergebnisplot.png}
 	\caption{
 		Darstellung des Ergebnisses von einem Simulationslauf mit den eingestellten Faktoren.
 		Zu sehen sind die Anzahl Fahrzeuge in den Stati ``Ausgefallen'', ``Einsatzbereit'' und ``in Reparatur''
 		für jeden Tag des einjährigen Simulationszeitraums.
-	}
+		}
+	\label{fig:ergebnis-plot}
 \end{figure}
 
 \subsubsection{RabbitMQ}
@@ -779,8 +780,10 @@ zu machen, während letztes einen wesentlichen Beitrag zur Flexibilität und Int
 leisten kann.
 
 \section{Anhang}
-\subsection{Nutzung von generativer KI}
-Zur Erstellung dieser Arbeit wurde generative künstliche Intelligenz\linebreak (ChatGPT und GitHub Copilot) in folgendem Umfang verwendet:
+\subsection{Selbstständigkeitserklärung}
+Ich erkläre, dass ich die vorliegende Arbeit selbstständig und ohne fremde Hilfe verfasst habe.
+Zitate aus anderen Quellen sind entsprechend gekennzeichnet.
+Generative Künstliche Intelligenz (ChatGPT und GitHub Copilot) wurde in folgendem Umfang verwendet:
 \begin{itemize}
 	\item Suchen von Literatur
 	\item Prüfung der Arbeit auf Rechtschreib- und Grammatikfehler
