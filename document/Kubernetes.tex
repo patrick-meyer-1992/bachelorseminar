@@ -392,6 +392,13 @@ Im Kern handelt es hier um eine Abwandlung eines Warteschlangenmodells \cite{Leo
 und dort bedient (hier: instandgesetzt) werden.
 Wenn die Kapazitäten des Dienstleistungspunkts voll ausgelastet sind und trotzdem neue Kunden ankommen, entsteht eine Warteschlange.
 
+Ziel eines solchen Modells ist die Optimierung eines realen Systems mithilfe der Simulation.
+Dazu wird das reale System mit möglichst allen relevanten Eigenschaften in der Simulation nachgebildet.
+Dabei werden auch alle Eingangsparameter (im Folgenden als \emph{Faktoren} bezeichnet) bestimmt, 
+von denen man im realen System erwartet, dass sie einen Einfluss auf die zu optimierenden
+Ausgangsvariablen (im Folgenden als \emph{Key-Performance-Indicators bzw. KPI} bezeichnet)
+haben könnten und die auch aktiv verändert werden können.
+
 Der grundlegende Ablauf in dem verwendeten Modell ist in Abbildung \ref{fig:Simulationsmodell} dargestellt.
 Die Simulation enthält eine Menge an Fahrzeugen, die einer nicht näher definierten Nutzung unterliegen. 
 Für jeden Iterationsschritt besteht eine Wahrscheinlichkeit von $\lambda$, dass das Fahrzeug ausfällt.
@@ -413,35 +420,29 @@ Ist die Instandsetzung abgeschlossen, verlässt das Fahrzeug die Instandsetzungs
 	}
 \end{figure}
 
-Bereits in diesem vergleichsweise simplen Modell sind mehrere verschiedene Eingangsparameter (im Folgenden als \emph{Faktoren} bezeichnet)
-und Ausgangsvariablen (im Folgenden als \emph{Key-Performance-Indicators bzw. KPI} bezeichnet) denkbar.
+Bereits in diesem vergleichsweise simplen Modell sind mehrere verschiedene Faktoren und KPI denkbar.
 
 Beispiele für Faktoren:
-\begin{enumerate}
+\begin{itemize}
 	\item Anzahl der Fahrzeuge
 	\item Ausfallwahrscheinlichkeit der Fahrzeuge $\lambda$
 	\item Höhe der Instandsetzungskapazitäten
 	\item Reparaturrate der Fahrzeuge
-\end{enumerate}
+\end{itemize}
 Beispiele für KPI:
-\begin{enumerate}
+\begin{itemize}
 	\item Anzahl einsatzbereiter Fahrzeuge
 	\item Dauer von Reparaturen
 	\item Länge der Warteschlangen
 	\item Höhe der Wartezeiten
 	\item Auslastung der Instandsetzungseinrichtungen
-\end{enumerate}
+\end{itemize}
 
-Für die vorliegende Implementierung des Simulationsmodells das Python Paket \emph{mesa} \cite{python-mesa-2020} genutzt.
+Für die vorliegende Implementierung des Simulationsmodells wurde das Python Paket \emph{mesa} \cite{python-mesa-2020} genutzt.
 Von den genannten Faktoren können die Anzahl der Fahrzeuge, die Höhe der Instandsetzungskapazitäten und die
 Reparaturrate beeinflusst werden. Von den genannten KPI ist für die Anzahl einsatzbereiter Fahrzeuge
 eine automatisierte Auswertung vorhanden.
 
-% TODO: Motivation sollte weiter oben schon auftauchen
-Ziel eines solchen Modells ist die Optimierung eines realen Systems mithilfe der Simulation.
-Dazu wird das reale System mit möglichst allen relevanten Eigenschaften in der Simulation nachgebildet.
-Dabei werden auch alle Faktoren bestimmt, von denen man im realen System erwartet, dass sie einen Einfluss auf die KPI
-haben könnten und die auch aktiv verändert werden können.
 Um eine möglichst optimale Konfiguration der Faktoren zu identifizieren, wird die Simulation 
 mit vielen verschiedenen Konfigurationen durchgeführt und die dazugehörigen KPI ausgewertet.
 Diese Methode ist auch unter dem Begriff \emph{Data Farming} bekannt \cite{8632383}.
