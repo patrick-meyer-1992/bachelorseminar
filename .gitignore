@@ -16,6 +16,7 @@ simulation/test.py
 simulation/test.json
 *secret.yaml
 document/pdf.py
+.vscode
 
 
 # Angular
