@@ -1,5 +1,3 @@
-% TODO: Gendern?
-% TODO: README.md schreiben (Sollte Details zu DNS config enthalten)
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -85,7 +83,7 @@ Ist eine Applikation darauf angewiesen eine bestimmte Abhängigkeit in der Versi
 benötigt eine Version \(\geq 1.4\) derselben Abhängigkeit, lässt sich das nur schwer vereinbaren.
 Zum anderen erschwert dieser Aufbau eine effiziente Ressourcenverteilung. Selbst wenn eine Applikation alleine auf einem Rechner betrieben wird (z.B. um Konflikte zu anderen
 Applikationen zu vermeiden), muss dieser Rechner ausreichende Kapazitäten haben, um die höchsten Anfragespitzen an diese Applikation zu verarbeiten.
-Selbst dann, wenn diese Anfragespitzen nur äußerst selten erreicht werden.
+Selbst dann, wenn diese Anfragespitzen nur äußerst selten erreicht werden \cite{Pagani_2019}.
 
 Eine Weiterentwicklung dieser Bare-Metal-Architektur waren virtuelle Maschinen. Virtuelle Maschinen erlauben es, auf derselben Hardware mehrere virtuelle Instanzen eines
 Systems zu nutzen. Die Instanzen nutzen dabei nicht direkt die physischen Ressourcen, sondern lediglich virtuelle, die durch Software nachgebildet werden \cite{kofler2021docker}.
@@ -98,20 +96,18 @@ Obwohl das schon einige Verbesserungen im Vergleich zu Bare-Metal-Lösungen sind
 Da virtuelle Maschinen jeweils Ressourcen für ein eigenes Betriebssystem beanspruchen, geht vergleichsweise viel Leistung verloren, 
 die besser in der Applikation genutzt werden könnte.
 
-Die nächste Stufe der Weiterentwicklung waren (Software-)Container. Container haben einige Gemeinsamkeiten mit virtuellen Maschinen, doch der wesentliche Unterschied ist,
-dass Container deutlich leichtgewichtiger sind. Das wird unter anderem dadurch erreicht, dass sie statt ein komplett eigenes Betriebssystem zu verwenden, 
+Die nächste Stufe der Weiterentwicklung waren (Software-)\emph{Container}. Container haben einige Gemeinsamkeiten mit virtuellen Maschinen, doch der wesentliche Unterschied ist,
+dass Container deutlich leichtgewichtiger sind. Das wird unter anderem dadurch erreicht, dass sie, statt ein komplett eigenes Betriebssystem zu verwenden, 
 Anteile des Host-Betriebssystems mitnutzen. Dadurch sind die „Baupläne“ (sog. Images) für Container im Allgemeinen kleiner als für klassische virtuelle Maschinen.
 Durch den verringerten Overhead können auf gleicher Hardware auch mehr Container parallel betrieben werden, als es mit virtuellen Maschinen möglich wäre.
 Durch diesen Umstand und dadurch, dass Container meist innerhalb weniger Sekunden gestartet werden können, sind diese besonders geeignet,
 um flexibel auf unterschiedliche Anfrageintensitäten zu reagieren und Ressourcen effizient zu verteilen \cite{kofler2021docker}.
 
 Einzelne Container führen in der Regel nur eine klar umgrenzte Aufgabe aus (z.B. Betrieb einer Datenbank oder eines Webservers). Da sie in sich geschlossen sind,
-können sie auch unabhängig von anderen Containern repliziert werden. Um eine vollständige Anwendung zu erhalten, betreibt man daher oft mehrere Container,
-die im Verbund zusammenwirken; eine sogenannte Microservice-Architektur. 
-Die sogenannte \emph{vertikale Skalierung} bei der ein einzelner Server um weitere Ressourcen (Rechenleistung, Speicher etc.)
-ergänzt wird, stößt schnell an Grenzen und wird daher den hohen Ressourcenanforderungen moderner Anwendungen oft nicht gerecht.
-Im Kontrast dazu steht die \emph{horizontale Skalierung}, bei der eine Anwendung über mehrere Rechner verteilt betrieben wird.
-Container haben sich dabei als eine wesentliche Grundlage für die horizontale Skalierung etabliert.
+können sie auch unabhängig von anderen Containern repliziert werden. Näheres zu Containern wird im Abschnitt
+\ref{sec:Container} behandelt.
+
+Um eine vollständige Anwendung zu erhalten, betreibt man  oft mehrere Container, die im Verbund zusammenwirken; eine sogenannte Microservice-Architektur. 
 Die Verwaltung einer solchen verteilten Microservice-Architektur kann schnell komplex werden, weshalb verschiedene Werkzeuge zur Unterstützung entwickelt wurden.
 
 Eines der heute populärsten Werkzeuge dieser Art ist Kubernetes. Im Folgenden soll die Funktionsweise von Kubernetes beschrieben und schließlich anhand eines Beispiels 
@@ -119,7 +115,7 @@ verdeutlicht werden.
 
 \section{Historie von Kubernetes}
 Kubernetes ist eine Software, die sich der Ausbringung (Deployment), der Skalierung und der Steuerung (Management) von Containern widmet.
-Dieser Vorgang wird auch als Container-Orchestrierung oder auch Container-Management bezeichnet \cite{Bisong2019}.
+Dieser Vorgang wird auch als Container-Orchestrierung oder als Container-Management bezeichnet \cite{Bisong2019}.
 In diesem Zusammenhang wird Kubernetes auch als \emph{Betriebssystem der Cloud} bezeichnet \cite{Schmeling_Dargatz_2022}. 
 Entwickelt wurde Kubernetes von Google. Dort wurde seit den frühen 2000er Jahren ein selbst entwickeltes Container-Management-System namens \emph{Borg} genutzt,
 um Googles Services möglichst performant zu betreiben. 
@@ -131,7 +127,7 @@ die bei \emph{Borg} und \emph{Omega} gemachten Erfahrungen zu nutzen, um ein lei
 mit nutzerfreundlicher Schnittstelle zu entwickeln.
 
 2014 wurde Kubernetes als eine Open-Source-Variante von \emph{Borg} veröffentlicht und schließlich 2015 mit der Veröffentlichung von Kubernetes 1.0
-von Google an die Cloud Native Computing Foundation (CNCF, https://www.cncf.io/) gespendet. In den folgenden Jahren wuchs der Nutzerkreis von Kubernetes
+von Google an die Cloud Native Computing Foundation (CNCF, \lstinline|https://www.cncf.io/|) gespendet. In den folgenden Jahren wuchs der Nutzerkreis von Kubernetes
 rasch an und es konnte sich deutlich gegen konkurrierende Anwendungen durchsetzen.
 
 Heutzutage ist Kubernetes, nach Linux, das zweitgrößte Open-Source-Projekt der Welt und wird von 71 \% der Fortune 100 Unternehmen genutzt
@@ -146,33 +142,39 @@ Es stellt ein read-only Dateisystem als Basis für den Container zur Verfügung.
 keine Änderungen vor. Stattdessen wird jedes Hinzufügen und jede Änderung während der Laufzeit des Containers in einem
 getrennten Overlay-System behandelt. Dadurch können beliebig viele Container von demselben Image abgeleitet werden \cite{kofler2021docker}. 
 
-Für viele populäre Anwendungen (z.B. nginx, ubuntu oder nodejs) gibt es vorgefertigte Images, die kostenfrei vom DockerHub % Quelle ergänzen
+Für viele populäre Anwendungen (z.B. nginx, Ubuntu oder Node.js) gibt es vorgefertigte Images, die kostenfrei vom DockerHub % Quelle ergänzen
 heruntergeladen werden können.
 Für einen konkreten Anwendungsfall kann es sinnvoll sein, ein bestehendes Basis-Image für die eigenen Zwecke anzupassen.
-Dies ist mit Hilfe eines sogenannten \emph{Dockerfile}s möglich. Darin wird definiert, wie ein Base-Image z.B. durch das Hinzufügen von Dateien,
+Dies ist mithilfe eines sogenannten \emph{Dockerfile}s möglich. Darin wird definiert, wie ein Base-Image z.B. durch das Hinzufügen von Dateien,
 oder dem Ändern von Umgebungsvariablen angepasst werden soll. Dieses \emph{Dockerfile} wird dann für den \emph{build}
 eines neuen Images verwendet.
-% Bild von Workflow einbinden?
 
-Aus dem erstellten Image können dann Container abgeleitet werden. Ein Container ist insofern ``flüchtig'' als dass er nach seiner
+Aus dem erstellten Image können dann Container abgeleitet werden. Ein Container ist insofern „flüchtig“ als dass er nach seiner
 Beendigung restlos gelöscht wird. Bei einem Neustart enthält er wieder nur die Daten, die vorher durch das Image definiert wurden.
 Natürlich gibt es Anwendungsfälle, in denen die persistente Speicherung von Daten durch einen Container gewünscht ist, z.B. wenn
 eine Datenbank in einem Container betrieben wird. Für diesen Fall gibt es das Konzept der \emph{Volumes}.
 Ein Volume spiegelt einen definierten Speicherbereich aus dem Dateisystem des Containers auf das Host-System. 
-Wird ein Container beendet und durch einen neuen ersetzt, bindet dieser das Volume in sein Dateisystem ein übernimmt dabei die Daten seines beendeten Vorgängers.
+Wird ein Container beendet und durch einen neuen ersetzt, bindet dieser das Volume in sein Dateisystem ein übernimmt 
+dabei die Daten seines beendeten Vorgängers \cite{kofler2021docker}.
 
 Die in diesem Abschnitt beschriebenen Konzepte sind ausreichend, um Container zu betreiben.
 Nutzt man aber lediglich diese Konzepte, verhalten sich die Container im Prinzip wie leichtgewichtige virtuelle Maschinen.
 Der eigentliche Vorteil von Containern, nämlich die horizontale Skalierbarkeit, wird damit noch nicht ausgenutzt.
 
-Bie horizontale Skalierbarkeit ist abzugrenzen von der vertikalen Skalierbarkeit. Bei letzterer geht es darum, den Computer, der eine Anwendung betreibt,
-um weitere Rechen- oder Speicherressourcen zu erweitern. Dieser Ansatz ist zwar leichter zu administrieren, da keine Änderungen an der Anwendung selbst
-erforderlich sind, aber er stößt auch bald an seine physikalischen Grenzen. Horizontale Skalierung sieht im Gegensatz dazu vor, dass eine Anwendung
+Die \emph{horizontale} Skalierbarkeit ist abzugrenzen von der \emph{vertikalen} Skalierbarkeit. 
+Bei letzterer geht es darum, einen einzelnen Server um weitere Ressourcen (Rechenleistung, Speicher etc.) zu ergänzen.
+Da hierbei keine Änderungen an der Anwendung selbst erforderlich sind, ist dieser Ansatz vergleichsweise leicht
+zu administrieren. Er stößt jedoch schnell an seine physikalischen Grenzen und wird daher den hohen 
+Ressourcenanforderungen moderner Anwendungen oft nicht gerecht.
+
+Horizontale Skalierung sieht im Gegensatz dazu vor, dass eine Anwendung
 auf mehrere Rechner verteilt wird. Durch Hinzufügen weiterer Rechner können die zur Verfügung stehenden Ressourcen nahezu beliebig erweitert werden.
 Zusätzlich ist auch eine geografische Optimierung möglich, indem zum Beispiel Server in der Nähe der erwarteten Clients platziert werden. 
 Letztendlich trägt horizontale Skalierung auch zur Ausfallsicherheit einer Anwendung bei, da der Ausfall einzelner Instanzen durch andere Instanzen
 aufgefangen werden kann.
-Der Nachteil dieser Methode ist die deutliche erhöhte Komplexität, die mit dem Betrieb einer verteilten Anwendung einhergeht.
+Container haben sich als eine wesentliche Grundlage für die horizontale Skalierung etabliert. 
+Der Nachteil dieser Methode ist die deutliche erhöhte Komplexität, 
+die mit dem Betrieb einer verteilten Anwendung einhergeht \cite{Schmeling_Dargatz_2022}.
 
 Im folgenden Abschnitt soll beschrieben werden, welche Werkzeuge Kubernetes anbietet, um mit dieser Komplexität umzugehen.
 
@@ -183,10 +185,11 @@ Jede Maschine wird dabei als ein \emph{Node} (deutsch: Knoten) bezeichnet. Diese
 \emph{Master Nodes} und \emph{Worker Nodes}.
 Für die meisten Cluster reicht ein Master Node aus. In Hochverfügbarkeitsszenarien oder bei mehreren
 tausend Worker Nodes kann es jedoch auch mehrere Master Nodes geben \cite{Schmeling_Dargatz_2022}.
-Wie die Namen vermuten lassen, ist der Master Node dafür verantwortlich für die Orchestrierung
+Wie die Namen vermuten lassen, ist der Master Node für die Orchestrierung
 des Systems verantwortlich während die Worker Nodes bestimmte Aufgaben ausführen \cite{Bentaleb_Belloum_Sebaa_El-Maouhab_2021}.
 Für den Spezialfall eines \emph{Single-Node-Clusters} kann dieser einzelne Node auch die Rolle von sowohl
 Master als auch Worker übernehmen.
+
 Master und Worker Nodes bestehen zur Erfüllung ihrer Aufgaben aus unterschiedlichen Komponenten,
 die im Folgenden beschrieben werden.
 
@@ -215,7 +218,7 @@ dies zu erkennen und über eine Anfrage an den Kube-apiserver den gewünschten Z
 \subsubsection{Kube-Scheduler}
 \label{sec:Kube-Scheduler}
 Der Kube-Scheduler entscheidet, welche Container auf welchem Node betrieben werden.
-Er verwaltet dazu Informationen über verfügbare Rechen- und Speicherressourcen sowie weiterer Eigenschaften
+Er verwaltet dazu Informationen über verfügbare Rechen- und Speicherressourcen sowie über weitere Eigenschaften
 der Nodes. 
 \subsection{Worker Node Komponenten}
 
@@ -234,7 +237,6 @@ flüchtig, als das der Container jederzeit auf einem anderen Node neu ausgebrach
 Um trotzdem einen Überblick zu behalten, welcher Container wo verortet ist, gibt es die Komponente
 \emph{Kube-Proxy}. Auf jedem Node läuft genau eine Instanz des Kube-Proxy.
 
-
 \subsection{Pods}
 \emph{Pods} sind die kleinste adressierbare Einheit in einem Kubernetes Cluster. 
 Sie sind die Entitäten, innerhalb derer der Anwendungscode ausgeführt wird.
@@ -247,8 +249,9 @@ Das bietet sich in der Regel dann an, wenn die Funktionen dieser Container eng g
 Containers nur dann sinnvoll zu betreiben ist, wenn auch ihr „Partner-“Container vorhanden ist.
 Ein gängiges Beispiel ist der Betrieb eines Webservers in einem Container, dessen wesentliche Aufgabe es ist,
 Anfragen an den eigentlichen Anwendungscontainer im gleichen Pod weiterzuleiten. 
+
 \subsection{ReplicaSets}
-Die gerade beschriebenen Pods können über \emph{kubectl} gestartet, gelöscht oder verändert werden.
+Die gerade beschriebenen Pods können individuell gestartet, gelöscht oder verändert werden.
 Soweit betrachtet das aber nur einzelne Pods. Das Ziel von Kubernetes ist es jedoch, 
 Pods zu replizieren und gegebenenfalls auf mehreren Nodes gleichzeitig zu betreiben.
 Dazu stehen \emph{ReplicaSets} zur Verfügung. 
@@ -257,6 +260,7 @@ in welcher Konfiguration betrieben werden sollen. Zusätzlich wird hier festgele
 dieses Pods gleichzeitig vorhanden sein sollen.
 Kubernetes versucht nun die geforderte Anzahl an Pods zu starten und aufrechtzuerhalten. 
 Wird ein Pod des ReplicaSets gelöscht, wird automatisch einer neuer Pod gestartet, um diesen zu ersetzen.
+
 \subsection{Deployments}
 Ein \emph{Deployment} ist ein Konzept, das im Schwerpunkt genutzt wird, um Änderungen an Anwendungen auszubringen.
 Das Szenario, das ein Deployment notwendig macht, kann wie folgt beschrieben werden:
@@ -268,7 +272,7 @@ Da die Pods aber bereits laufen, wird an diesen keine Änderung mehr vorgenommen
 einzelne Pods zu löschen, die dann automatisch durch neue Pods, basierend auf dem neuen Image, ersetzt würden.
 Gerade mit steigender Anzahl an Pods ist dieser Prozess allerdings höchst 
 fehleranfällig, da es schwer zu überblicken ist, welche Pods noch mit dem alten und welche schon mit dem
-neuen Image laufen. Alternativ könnten auch das gesamte ReplicaSet und damit alle zugehörigen Pods gelöscht werden.
+neuen Image laufen. Alternativ könnte auch das gesamte ReplicaSet und damit alle zugehörigen Pods gelöscht werden.
 Das kann in einer Testumgebung problemlos möglich sein. In einer Produktivumgebung möchte man derartige
 Ausfälle aber in der Regel vermeiden.
 
@@ -325,7 +329,7 @@ Kubernetes stellt dabei natürlich nicht sicher, dass die entsprechenden Hostnam
 der öffentlichen IP-Adresse des Ingress verbunden sind.
 
 \subsection{Volumes}
-Das Konzept der \emph{Volumes} und deren Notwendigkeit wurde bereits in Kapitel \ref{sec:Container} eingeführt.
+Das Konzept der \emph{Volumes} und deren Notwendigkeit wurde bereits in Abschnitt \ref{sec:Container} eingeführt.
 Kubernetes unterscheidet in diesem Zusammenhang zwischen \emph{PersistentVolumes} (PV) und \emph{PersistentVolumesClaims} (PVC).
 Bei PV handelt es sich um eine Abstraktion eines Speicherbereichs des Hostsystems.
 Ein PVC beansprucht ein derartiges PersistentVolume und spiegelt es in einen
@@ -351,9 +355,6 @@ unverschlüsselt im Etcd gespeichert werden.
 Die Daten aus ConfigMaps und Secrets werden den Anwendungen innerhalb der Pods als Umgebungsvariablen
 bereitgestellt und können darüber ausgelesen werden.
 
-Eine ausführlichere Erläuterung und Beispiele der in diesem Kapitel aufgeführten Komponenten 
-kann bei Schmeling und Dargatz \cite{Schmeling_Dargatz_2022} gefunden werden.
-
 \subsection{Namespaces}
 Namespaces (dt. Namensräume) bietet eine ordnende Funktion innerhalb eines Kubernetes Clusters.
 Bis auf wenige Ausnahmen (z.B. PersistentVolumes) sind die meisten Ressourcen in Kubernetes einem 
@@ -377,8 +378,10 @@ Entwicklungsumgebung sind. Ein anderer Namespace \emph{prod} könnte analog zu \
 aufgebaut sein, mit dem Unterschied, dass hier eine andere ConfigMap Ressource vorliegt.
 
 So können Entwicklungs- und Produktivumgebung ohne großen Aufwand mit minimalen Unterschieden betrieben
-werden, was dazu beitragen kann, die Entwicklung und Bereitstellung von Anwendung zu beschleunigen
-\cite{Schmeling_Dargatz_2022}.
+werden, was dazu beitragen kann, die Entwicklung und Bereitstellung von Anwendung zu beschleunigen.
+
+Eine ausführlichere Erläuterung und Beispiele der in diesem Abschnitt aufgeführten Komponenten 
+kann bei Schmeling und Dargatz \cite{Schmeling_Dargatz_2022} gefunden werden.
 
 \section{Flottensimulation}
 
@@ -424,19 +427,20 @@ Ist die Instandsetzung abgeschlossen, verlässt das Fahrzeug die Instandsetzungs
 
 Bereits in diesem vergleichsweise simplen Modell sind mehrere verschiedene Faktoren und KPI denkbar.
 
-Beispiele für Faktoren:
+\textbf{Beispiele für Faktoren:}
 \begin{itemize}
 	\item Anzahl der Fahrzeuge
 	\item Ausfallwahrscheinlichkeit der Fahrzeuge $\lambda$
 	\item Höhe der Instandsetzungskapazitäten
 	\item Reparaturrate der Fahrzeuge
 \end{itemize}
-Beispiele für KPI:
+
+\textbf{Beispiele für KPI:}
 \begin{itemize}
 	\item Anzahl einsatzbereiter Fahrzeuge
 	\item Dauer von Reparaturen
 	\item Länge der Warteschlangen
-	\item Höhe der Wartezeiten
+	\item Länge der Wartezeiten
 	\item Auslastung der Instandsetzungseinrichtungen
 \end{itemize}
 
@@ -471,7 +475,7 @@ handelt es sich dabei um:
 	\caption{
 		Das Gartner Modell schlägt eine Klassifizierung von Analysemodellen vor.
 		Das hier dargestellte Simulationsmodell fällt in den Bereich der 
-		präskriptiven Analyse. 
+		präskriptiven Analyse \cite{Gartner}. 
 		}
 	\label{fig:gartner-modell}
 \end{figure}
@@ -489,17 +493,17 @@ Es besteht also ein Interesse daran, immer ausreichende Instandsetzungskapazitä
 Da der Unterhalt derartiger Kapazitäten aber mit hohen Kosten verbunden ist, ist es von großem
 Interesse, die \emph{optimale} Instandsetzungskapazität für eine gegebene Flotte zu identifizieren.
 
-Der Bedarf an skalierbarer Infrastruktur zum Betrieb der Simulation ergibt sich daher wie folgt:
+Der Bedarf an skalierbarer Infrastruktur zum Betrieb der Simulation ergibt sich wie folgt:
 Bereits bei den vier oben aufgeführten Faktoren, mit denen das vorliegende Simulationsmodell betrieben werden könnte,
 ergibt sich eine große Anzahl an Faktorkombinationen.
 Angenommen jeder Faktor soll um fünf Stufen variiert werden. Dann ergeben sich daraus
 $5^4 = 625$ Kombinationen. Aufgrund stochastischer Effekte empfiehlt es sich, jede einzelne
 Kombination mehrfach zu wiederholen. Davon ausgehend, dass jede Kombination 20-mal wiederholt wird,
-ergeben sich daraus schon $625 * 20 = 12.500$ Simulationsläufe. Bei einer angenommenen Laufzeit von ca. 10 Sekunden
-pro Simulationslauf und rein serieller Ausführung ergibt sich daraus bereits eine Gesamtlaufzeit von
+ergeben sich daraus $625 * 20 = 12.500$ Simulationsläufe. Bei einer angenommenen Laufzeit von ca. 10 Sekunden
+pro Simulationslauf und rein serieller Ausführung ergibt sich daraus eine Gesamtlaufzeit von
 knapp 35 Stunden.
 
-Bei Modellen für realistische Szenarien ist natürlich von mehr Faktoren und auch von einer höheren Zeit 
+Bei Modellen für realistische Szenarien ist natürlich von mehr Faktoren und auch von mehr Zeit 
 für einzelne Simulationsläufe auszugehen. Um einen vollständigen Simulationslauf möglichst schnell abzuschließen
 und folglich auswertbare Ergebnisse zu erhalten, bietet es sich an, die Rechenlast zu verteilen.  
 
@@ -530,7 +534,7 @@ Zum Aufsetzen des Clusters wurde \emph{Minikube} verwendet.
 Minikube ist eine Anwendung, die genutzt werden kann, um mit vergleichsweise wenig Aufwand ein lokales
 Kubernetes Cluster mit einem Node zu erstellen. Diese relativ einfache Konfiguration hat 
 den Nachteil, dass Minikube lediglich für Test- und Entwicklungsaufgaben geeignet ist.
-Für Produktivsysteme sollte eine andere Lösung gewählt werden (vgl. \ref{sec:Ausblick}). 
+Für Produktivsysteme sollte eine andere Lösung gewählt werden (vgl. Abschnitt \ref{sec:Ausblick}). 
 
 Zum Betrieb des Clusters verwendet Minikube eine virtuelle Maschine, innerhalb derer
 alle Kubernetes Komponenten laufen. Dementsprechend ist eine der Voraussetzungen,
@@ -553,8 +557,7 @@ FastAPI ausgelöst wird.
 In der erstellten Microservice-Architektur wird das FastAPI-Deployment nur einfach repliziert,
 da nicht zu erwarten ist, da in diesem Demonstrationsbeispiel (Proof-of-Concept) nicht von einer
 großen Anzahl an Anfragen auszugehen ist. 
-Die Anzahl der Replicas kann aber über ein einfaches Kommandozeilenargument angepasst werden, z.B.
-(\lstinline|kubectl scale deployment fastapi-deployment --replicas=4|) 
+Die Anzahl der Replicas kann aber über ein einfaches Kommandozeilenargument angepasst werden, %, z.B. (\lstinline|kubectl scale deployment fastapi-deployment --replicas=4|) 
 falls das erforderlich sein sollte.
 
 \subsubsection{Angular}
@@ -698,11 +701,11 @@ und bietet eine solide Grundlage für die weitere Entwicklung und den Betrieb de
 
 \section{Limitationen}
 Obwohl der für diese Arbeit geplante Anwendungsfall erfolgreich umgesetzt werden konnte,
-gab es dennoch einige Limitationen in Bezug auf den Anwendungsfall an sich und auf
+gab es einige Limitationen in Bezug auf den Anwendungsfall an sich und auf
 Kubernetes im Allgemeinen. Diese sollen in diesem Abschnitt diskutiert werden.
 
 Die Skalierbarkeit des Simulationsservice mit Kubernetes auch über mehrere Rechner hinweg,
-konnte aufgrund begrenzter Hardware nur eingeschränkt gezeigt werden. Ein alternativer Ansatz,
+konnte aufgrund begrenzter Hardware nur eingeschränkt getestet werden. Ein alternativer Ansatz,
 der mehrere virtuelle Maschinen verwendet, die jeweils einen Node abbilden, könnte 
 für zukünftige Anwendungsfälle genutzt werden. Das war hier allerdings nicht realistisch,
 da die zur Verfügung stehende Hardware nicht genug Rechen- und Speicherressourcen
