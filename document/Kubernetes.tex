@@ -49,21 +49,21 @@
 
 \tableofcontents
 
-\section{Zusammenfassung}
-Kubernetes bietet als weit verbreitetes Container-Orchestrierungs-Tool vielfältige Möglichkeiten.
-Diese Arbeit ordnet Kubernetes und die zugrundeliegende Motivation in einen historischen Kontext ein. 
-Darauf aufbauend werden wichtige Komponenten und deren Verwendung beschrieben und erklärt.
-Zur Illustration wird ein Anwendungsfall aus dem Bereich des Data Farmings verwendet, 
-bei dem ein Simulationsmodell zur Optimierung der Einsatzbereitschaft einer Fahrzeugflotte mit den 
-durch Kubernetes zur Verfügung gestellten Komponenten skalierbar betrieben wird. Dieses Simulationsmodell
-gliedert sich in eine Microservice-Architektur ein, die Bedienung und Auswertung der Simulation erlaubt, 
-sowie Mittel zur Speicherung von Konfigurationen und Ergebnissen bietet.
-Im Ergebnis zeigt sich Kubernetes als geeignet, um sowohl die Simulation als auch die notwendigen 
-Stützservices skalierbar zu betreiben.
-Dennoch werden auch Limitationen diskutiert, die zum Teil durch fehlende 
-Hardware-Ressourcen aber auch durch die Komplexität von Kubernetes entstehen können.
-Abschließend folgt ein Ausblick über die mögliche Weiterentwicklung des Anwendungsfalls
-an sich und die zu erwartende Entwicklung von Kubernetes im Allgemeinen in den nächsten Jahren.
+% \section{Zusammenfassung}
+% Kubernetes bietet als weit verbreitetes Container-Orchestrierungs-Tool vielfältige Möglichkeiten.
+% Diese Arbeit ordnet Kubernetes und die zugrundeliegende Motivation in einen historischen Kontext ein. 
+% Darauf aufbauend werden wichtige Komponenten und deren Verwendung beschrieben und erklärt.
+% Zur Illustration wird ein Anwendungsfall aus dem Bereich des Data Farmings verwendet, 
+% bei dem ein Simulationsmodell zur Optimierung der Einsatzbereitschaft einer Fahrzeugflotte mit den 
+% durch Kubernetes zur Verfügung gestellten Komponenten skalierbar betrieben wird. Dieses Simulationsmodell
+% gliedert sich in eine Microservice-Architektur ein, die Bedienung und Auswertung der Simulation erlaubt, 
+% sowie Mittel zur Speicherung von Konfigurationen und Ergebnissen bietet.
+% Im Ergebnis zeigt sich Kubernetes als geeignet, um sowohl die Simulation als auch die notwendigen 
+% Stützservices skalierbar zu betreiben.
+% Dennoch werden auch Limitationen diskutiert, die zum Teil durch fehlende 
+% Hardware-Ressourcen aber auch durch die Komplexität von Kubernetes entstehen können.
+% Abschließend folgt ein Ausblick über die mögliche Weiterentwicklung des Anwendungsfalls
+% an sich und die zu erwartende Entwicklung von Kubernetes im Allgemeinen in den nächsten Jahren.
 
 
 
@@ -74,7 +74,7 @@ Dazu werden zunächst Historie und grundlegende Funktionsprinzipien von Kubernet
 anhand einer beispielhaften Anwendung aus dem Bereich verteilter, agentenbasierter Simulationen demonstriert werden.
 
 Zunächst soll die Historie betrachtet werden, vor deren Hintergrund Kubernetes entstanden ist.
-Das stetige Ziel, das in sich durch diese Historie zieht, ist das Bereitstellen von Applikationen.
+Das stetige Ziel, das sich durch diese Historie zieht, ist das Bereitstellen von Applikationen.
 Kominos et al. \cite{7899247} beschreiben die 1960er Jahre als Ursprung des Cloud-Computings.
 Zu dieser Zeit liefen Applikationen oft auf einer gemeinsamen Hardware und die Ressourcenverteilung erfolgte unmittelbar durch das zugrundeliegende Betriebssystem.
 Ein derartiges Szenario (auch als „Bare-Metal“ bezeichnet) bringt in der Regel mehrere Herausforderungen mit sich.
@@ -104,13 +104,21 @@ Durch diesen Umstand und dadurch, dass Container meist innerhalb weniger Sekunde
 um flexibel auf unterschiedliche Anfrageintensitäten zu reagieren und Ressourcen effizient zu verteilen \cite{kofler2021docker}.
 
 Einzelne Container führen in der Regel nur eine klar umgrenzte Aufgabe aus (z.B. Betrieb einer Datenbank oder eines Webservers). Da sie in sich geschlossen sind,
-können sie auch unabhängig von anderen Containern repliziert werden. Näheres zu Containern wird im Abschnitt
-\ref{sec:Container} behandelt.
+können sie auch unabhängig von anderen Containern repliziert werden. Das verbessert nicht nur die Skalierbarkeit, sondern
+vereinfacht auch die Entwicklung und das Testen der umgrenzten Aufgaben.
+% Dies hat allerdings auch zur Folge, dass ursprünglich große, monolithische Anwendungen in kleinere Teilanwendungen zerlegt werden müssen.
+Im Gegenzug muss die potenziell sehr große Menge an Containern effizient orchestriert werden, um einen echten Mehrwert zu erhalten.
+Kubernetes übernimmt als eines der heute populärsten Container-Orchestrierungs-Tool diese Aufgabe. 
+Es abstrahiert dazu von allen beteiligten Rechnern und deren Ressourcen und bietet zentrale Steuerungsmöglichkeiten.
+\cite{Pagani_2019}
+% Näheres zu Containern wird im Abschnitt \ref{sec:Container} behandelt.
 
-Um eine vollständige Anwendung zu erhalten, betreibt man  oft mehrere Container, die im Verbund zusammenwirken; eine sogenannte Microservice-Architektur. 
-Die Verwaltung einer solchen verteilten Microservice-Architektur kann schnell komplex werden, weshalb verschiedene Werkzeuge zur Unterstützung entwickelt wurden.
 
-Eines der heute populärsten Werkzeuge dieser Art ist Kubernetes. Im Folgenden soll die Funktionsweise von Kubernetes beschrieben und schließlich anhand eines Beispiels 
+% Um eine vollständige Anwendung zu erhalten, betreibt man  oft mehrere Container, die im Verbund zusammenwirken; eine sogenannte \emph{Microservice-Architektur}. 
+% Die Verwaltung einer solchen verteilten Microservice-Architektur kann schnell komplex werden, weshalb verschiedene Werkzeuge zur Unterstützung entwickelt wurden.
+
+% Eines der heute populärsten Werkzeuge dieser Art ist Kubernetes. 
+Im Folgenden soll die Funktionsweise von Kubernetes beschrieben und schließlich anhand eines Beispiels 
 verdeutlicht werden.
 
 \section{Historie von Kubernetes}
@@ -140,14 +148,16 @@ Um den Begriff des (Docker-)Containers zu verstehen, wird zunächst der Begriff 
 Ein Image kann wie in der Einleitung bereits beschrieben als eine Art Bauplan für einen Container gesehen werden.
 Es stellt ein read-only Dateisystem als Basis für den Container zur Verfügung. Der Container nimmt an seinem Image
 keine Änderungen vor. Stattdessen wird jedes Hinzufügen und jede Änderung während der Laufzeit des Containers in einem
-getrennten Overlay-System behandelt. Dadurch können beliebig viele Container von demselben Image abgeleitet werden \cite{kofler2021docker}. 
+getrennten Overlay-System behandelt. 
+Das heißt, dass diese Änderungen in einem Verzeichnis auf dem Host-System abgebildet werden.
+Dadurch können beliebig viele Container von demselben Image abgeleitet werden \cite{kofler2021docker}. 
 
-Für viele populäre Anwendungen (z.B. nginx, Ubuntu oder Node.js) gibt es vorgefertigte Images, die kostenfrei vom DockerHub % Quelle ergänzen
+Für viele populäre Anwendungen (z.B. nginx, Ubuntu oder Node.js) gibt es vorgefertigte Images, die kostenfrei vom DockerHub %  TODO: Quelle ergänzen (Dockerhub, nginx, ubuntu, node.js)
 heruntergeladen werden können.
 Für einen konkreten Anwendungsfall kann es sinnvoll sein, ein bestehendes Basis-Image für die eigenen Zwecke anzupassen.
 Dies ist mithilfe eines sogenannten \emph{Dockerfile}s möglich. Darin wird definiert, wie ein Base-Image z.B. durch das Hinzufügen von Dateien,
 oder dem Ändern von Umgebungsvariablen angepasst werden soll. Dieses \emph{Dockerfile} wird dann für den \emph{build}
-eines neuen Images verwendet.
+eines neuen Images verwendet. \cite{kofler2021docker}
 
 Aus dem erstellten Image können dann Container abgeleitet werden. Ein Container ist insofern „flüchtig“ als dass er nach seiner
 Beendigung restlos gelöscht wird. Bei einem Neustart enthält er wieder nur die Daten, die vorher durch das Image definiert wurden.
@@ -179,6 +189,7 @@ die mit dem Betrieb einer verteilten Anwendung einhergeht \cite{Schmeling_Dargat
 Im folgenden Abschnitt soll beschrieben werden, welche Werkzeuge Kubernetes anbietet, um mit dieser Komplexität umzugehen.
 
 \section{Grundlegende Kubernetes-Konzepte}
+\label{sec:Grundlegende_Kubernetes-Konzepte}
 Ein durch Kubernetes verwaltetes System wird üblicherweise als \emph{Cluster} bezeichnet.
 Ein Cluster besteht aus einer oder mehreren physischen und/oder virtuellen Maschinen, die darin eingebunden sind.
 Jede Maschine wird dabei als ein \emph{Node} (deutsch: Knoten) bezeichnet. Diese Nodes werden wiederum unterschieden in 
@@ -296,14 +307,14 @@ Auf diese Weise können Anwendungen innerhalb des Clusters über Pod-Grenzen hin
 Die Herausforderung in diesem Kontext ergibt sich daraus, dass Pods jederzeit beliebig gelöscht
 und wieder neu gestartet werden können. Da dabei auch jedes Mal eine neue IP-Adresse vergeben wird,
 ist die direkte Pod-Adressierung wenig zuverlässig. Außerdem muss davon ausgegangen werden, dass
-ein in einem ReplicaSet mehrere Replikationen eines Pods vom gleichen Typ vorliegt, wodurch unklar wird
-an welcher der gleichartigen Pods eine Anfrage gesendet werden sollte. Im schlimmsten Fall gehen alle Anfragen
+in einem ReplicaSet mehrere Replikationen eines Pods vom gleichen Typ vorliegen, wodurch unklar ist
+an welchen der gleichartigen Pods eine Anfrage gesendet werden sollte. Im schlimmsten Fall gehen alle Anfragen
 an denselben Pod des ReplicaSets, wodurch dieser überlastet wäre, während alle anderen Pods im Leerlauf sind.
 
 Diesem Umstand wird mit \emph{Services} begegnet. Ein Service hat eine eigene IP-Adresse und ihm ist eine Menge
 von Pods zugeordnet. Anfragen können nun an den Service gestellt werden und dieser entscheidet selbstständig,
-an welchen seiner zugehörigen Pods diese Anfrage weitergegeben wird. Der Service übernimmt damit also 
-nicht nur die Aufgabe der einfachen Adressierbarkeit, sondern auch die der Lastverteilung (sog. \emph{Load Balancing}).
+an welchen seiner zugehörigen Pods diese Anfrage weitergegeben wird. Der Service vereinfacht also die
+Adressierbarkeit und ermöglicht gleichzeitig eine effiziente Lastverteilung (sog. \emph{Load Balancing}).
 
 Natürlich kann auch ein Service gelöscht und neu gestartet werden, wodurch ihm auch eine neue IP-Adresse zugewiesen wird.
 Es ist also in der Regel nicht zielführend einen Service anhand seiner IP-Adresse anzusprechen.
@@ -311,7 +322,7 @@ Damit das nicht notwendig ist, verwaltet Kubernetes ein internes Domain-Name-Sys
 der Name des Services automatisch registriert wird.
 
 Kubernetes unterscheidet zwischen den Service-Typen \emph{ClusterIP} und \emph{NodePort}.
-Während ClusterIP genutzt wird, um einen Services (und die zugehörigen Pods) \emph{innerhalb} eines Clusters
+Während ClusterIP genutzt wird, um einen Service (und die zugehörigen Pods) \emph{innerhalb} eines Clusters
 einheitlich adressierbar zu machen, wird NodePort verwendet, um einen Service von \emph{außerhalb}
 über die öffentlichen IP-Adressen der Nodes des Clusters an einem zufällig gewählten Port erreichbar zu machen.
 
@@ -325,8 +336,8 @@ oder Subdomains, die mit verschiedenen Services verknüpft werden, können Anfra
 an die richtigen Services weitergeleitet werden. Das Verhalten eines Ingress kann mit dem eines \emph{Reverse Proxy}
 verglichen werden.
 
-Kubernetes stellt dabei natürlich nicht sicher, dass die entsprechenden Hostnamen in öffentlichen DNS Services auch mit
-der öffentlichen IP-Adresse des Ingress verbunden sind.
+% Kubernetes stellt dabei natürlich nicht sicher, dass die entsprechenden Hostnamen in öffentlichen DNS Services auch mit
+% der öffentlichen IP-Adresse des Ingress verbunden sind.
 
 \subsection{Volumes}
 Das Konzept der \emph{Volumes} und deren Notwendigkeit wurde bereits in Abschnitt \ref{sec:Container} eingeführt.
@@ -380,409 +391,415 @@ aufgebaut sein, mit dem Unterschied, dass hier eine andere ConfigMap Ressource v
 So können Entwicklungs- und Produktivumgebung ohne großen Aufwand mit minimalen Unterschieden betrieben
 werden, was dazu beitragen kann, die Entwicklung und Bereitstellung von Anwendung zu beschleunigen.
 
+Schließlich können Namespaces auch genutzt werden, um verschiedene Nutzergruppen innerhalb eines Clusters 
+zu trennen. Innerhalb einer Nutzergruppe können so Änderungen an den zugehörigen Ressourcen vorgenommen werden,
+ohne Gefahr zu laufen, Ressourcen anderers Namespaces zu beeinflussen.
+
+% TODO: "StatefulSets, DaemonSets, and Jobs" Kapitel ergänzen
+
 Eine ausführlichere Erläuterung und Beispiele der in diesem Abschnitt aufgeführten Komponenten 
 kann bei Schmeling und Dargatz \cite{Schmeling_Dargatz_2022} gefunden werden.
 
-\section{Flottensimulation}
+% \section{Flottensimulation}
 
-\subsection{Motivation und Prinzip}
-\label{sec:Motivation-und-Prinzip}
-Für ein besseres Verständnis der grundlegenden Konzepte von Kubernetes sollen diese anhand eines
-Anwendungsfalls vorgestellt werden.
-Vor der Implementierung des Anwendungsfalls muss aber die Motivation für diesen geklärt werden.
+% \subsection{Motivation und Prinzip}
+% \label{sec:Motivation-und-Prinzip}
+% Für ein besseres Verständnis der grundlegenden Konzepte von Kubernetes sollen diese anhand eines
+% Anwendungsfalls vorgestellt werden.
+% Vor der Implementierung des Anwendungsfalls muss aber die Motivation für diesen geklärt werden.
 
-Konkret soll der Anwendungsfall die simulationsgestützte Analyse einer Fahrzeugflotte behandeln.
-Im Kern handelt es hier um eine Abwandlung eines Warteschlangenmodells \cite{Leonelli2021}, bei dem 
-„Kunden“ (hier: Fahrzeuge) an einem „Dienstleistungspunkt“ (hier: Instandsetzungseinrichtung) ankommen 
-und dort bedient (hier: instandgesetzt) werden.
-Wenn die Kapazitäten des Dienstleistungspunkts voll ausgelastet sind und trotzdem neue Kunden ankommen, entsteht eine Warteschlange.
+% Konkret soll der Anwendungsfall die simulationsgestützte Analyse einer Fahrzeugflotte behandeln.
+% Im Kern handelt es hier um eine Abwandlung eines Warteschlangenmodells \cite{Leonelli2021}, bei dem 
+% „Kunden“ (hier: Fahrzeuge) an einem „Dienstleistungspunkt“ (hier: Instandsetzungseinrichtung) ankommen 
+% und dort bedient (hier: instandgesetzt) werden.
+% Wenn die Kapazitäten des Dienstleistungspunkts voll ausgelastet sind und trotzdem neue Kunden ankommen, entsteht eine Warteschlange.
 
-Ziel eines solchen Modells ist die Optimierung eines realen Systems mithilfe der Simulation.
-Dazu wird das reale System mit möglichst allen relevanten Eigenschaften in der Simulation nachgebildet.
-Dabei werden auch alle Eingangsparameter (im Folgenden als \emph{Faktoren} bezeichnet) bestimmt, 
-von denen man im realen System erwartet, dass sie einen Einfluss auf die zu optimierenden
-Ausgangsvariablen (im Folgenden als \emph{Key-Performance-Indicators bzw. KPI} bezeichnet)
-haben könnten und die auch aktiv verändert werden können.
+% Ziel eines solchen Modells ist die Optimierung eines realen Systems mithilfe der Simulation.
+% Dazu wird das reale System mit möglichst allen relevanten Eigenschaften in der Simulation nachgebildet.
+% Dabei werden auch alle Eingangsparameter (im Folgenden als \emph{Faktoren} bezeichnet) bestimmt, 
+% von denen man im realen System erwartet, dass sie einen Einfluss auf die zu optimierenden
+% Ausgangsvariablen (im Folgenden als \emph{Key-Performance-Indicators bzw. KPI} bezeichnet)
+% haben könnten und die auch aktiv verändert werden können.
 
-Der grundlegende Ablauf in dem verwendeten Modell ist in Abbildung \ref{fig:Simulationsmodell} dargestellt.
-Die Simulation enthält eine Menge an Fahrzeugen, die einer nicht näher definierten Nutzung unterliegen. 
-Für jeden Iterationsschritt besteht eine Wahrscheinlichkeit von $\lambda$, dass das Fahrzeug ausfällt.
-Tritt dieser Fall ein, wird das Fahrzeug einer Instandsetzungseinrichtung zugewiesen. 
-Eine Instandsetzungseinrichtung hat einen oder mehrere Arbeitsplätze und diese enthalten wiederum Arbeiter.
-Hat die Instandsetzungseinrichtung einen freien Arbeitsplatz, wird das defekte Fahrzeug diesem zugewiesen und
-dort mit einer Rate instandgesetzt, die abhängig von der Anzahl und Fertigkeit der zugehörigen Arbeiter ist.
-Falls gerade keine freien Kapazitäten vorhanden sind, verbleibt das Fahrzeug in der Warteschlange der jeweiligen Einrichtung.
-Ist die Instandsetzung abgeschlossen, verlässt das Fahrzeug die Instandsetzungseinrichtung und wird weiter genutzt.
+% Der grundlegende Ablauf in dem verwendeten Modell ist in Abbildung \ref{fig:Simulationsmodell} dargestellt.
+% Die Simulation enthält eine Menge an Fahrzeugen, die einer nicht näher definierten Nutzung unterliegen. 
+% Für jeden Iterationsschritt besteht für jedes Fahrzeug eine Wahrscheinlichkeit von $\lambda$, dass dieses ausfällt.
+% Tritt dieser Fall ein, wird das Fahrzeug einer Instandsetzungseinrichtung zugewiesen. 
+% Eine Instandsetzungseinrichtung hat einen oder mehrere Arbeitsplätze und diese enthalten wiederum Arbeiter.
+% Hat die Instandsetzungseinrichtung einen freien Arbeitsplatz, wird das defekte Fahrzeug diesem zugewiesen und
+% dort mit einer Rate instandgesetzt, die abhängig von der Anzahl und Fertigkeit der zugehörigen Arbeiter ist.
+% Falls gerade keine freien Kapazitäten vorhanden sind, verbleibt das Fahrzeug in der Warteschlange der jeweiligen Einrichtung.
+% Ist die Instandsetzung abgeschlossen, verlässt das Fahrzeug die Instandsetzungseinrichtung und wird weiter genutzt.
 
-\begin{figure}
-	\centering
-	\includegraphics[width=\textwidth]{media/Simulationsmodell.png}
-	\caption{
-		Grundlegender Prozess innerhalb der Simulation. Fahrzeuge werden
-		genutzt, fallen nach einiger Zeit aus und müssen dann instandgesetzt
-		werden.
-		}
-	\label{fig:Simulationsmodell}
-\end{figure}
+% \begin{figure}
+% 	\centering
+% 	\includegraphics[width=\textwidth]{media/Simulationsmodell.png}
+% 	\caption{
+% 		Grundlegender Prozess innerhalb der Simulation. Fahrzeuge werden
+% 		genutzt, fallen nach einiger Zeit aus und müssen dann instandgesetzt
+% 		werden.
+% 		}
+% 	\label{fig:Simulationsmodell}
+% \end{figure}
 
-Bereits in diesem vergleichsweise simplen Modell sind mehrere verschiedene Faktoren und KPI denkbar.
+% Bereits in diesem vergleichsweise simplen Modell sind mehrere verschiedene Faktoren und KPI denkbar.
 
-\textbf{Beispiele für Faktoren:}
-\begin{itemize}
-	\item Anzahl der Fahrzeuge
-	\item Ausfallwahrscheinlichkeit der Fahrzeuge $\lambda$
-	\item Höhe der Instandsetzungskapazitäten
-	\item Reparaturrate der Fahrzeuge
-\end{itemize}
+% \textbf{Beispiele für Faktoren:}
+% \begin{itemize}
+% 	\item Anzahl der Fahrzeuge
+% 	\item Ausfallwahrscheinlichkeit der Fahrzeuge $\lambda$
+% 	\item Höhe der Instandsetzungskapazitäten
+% 	\item Reparaturrate der Fahrzeuge
+% \end{itemize}
 
-\textbf{Beispiele für KPI:}
-\begin{itemize}
-	\item Anzahl einsatzbereiter Fahrzeuge
-	\item Dauer von Reparaturen
-	\item Länge der Warteschlangen
-	\item Länge der Wartezeiten
-	\item Auslastung der Instandsetzungseinrichtungen
-\end{itemize}
+% \textbf{Beispiele für KPI:}
+% \begin{itemize}
+% 	\item Anzahl einsatzbereiter Fahrzeuge
+% 	\item Dauer von Reparaturen
+% 	\item Länge der Warteschlangen
+% 	\item Länge der Wartezeiten
+% 	\item Auslastung der Instandsetzungseinrichtungen
+% \end{itemize}
 
-Für die vorliegende Implementierung des Simulationsmodells wurde das Python-Paket \emph{mesa} \cite{python-mesa-2020} genutzt.
-Von den genannten Faktoren können die Anzahl der Fahrzeuge, die Höhe der Instandsetzungskapazitäten und die
-Reparaturrate beeinflusst werden. Von den genannten KPI ist für die Anzahl einsatzbereiter Fahrzeuge
-eine automatisierte Auswertung vorhanden.
+% Für die vorliegende Implementierung des Simulationsmodells wurde das Python-Paket \emph{mesa} \cite{python-mesa-2020} genutzt.
+% Von den genannten Faktoren können die Anzahl der Fahrzeuge, die Höhe der Instandsetzungskapazitäten und die
+% Reparaturrate beeinflusst werden. Von den genannten KPI ist für die Anzahl einsatzbereiter Fahrzeuge
+% eine automatisierte Auswertung vorhanden.
 
-Um eine möglichst optimale Konfiguration der Faktoren zu identifizieren, wird die Simulation 
-mit vielen verschiedenen Konfigurationen durchgeführt und die dazugehörigen KPI ausgewertet.
-Diese Methode ist auch unter dem Begriff \emph{Data Farming} bekannt \cite{8632383}.
+% Um eine möglichst optimale Konfiguration der Faktoren zu identifizieren, wird die Simulation 
+% mit vielen verschiedenen Konfigurationen durchgeführt und die dazugehörigen KPI ausgewertet.
+% Diese Methode ist auch unter dem Begriff \emph{Data Farming} bekannt \cite{8632383}.
 
-In einer Simulation werden statt fester Werte oft Verteilungsfunktionen verwendet, aus denen Einflussgrößen abgeleitet werden. 
-Aufgrund dieser Eigenschaft wird ein Simulationsmodell in der Regel mehrfach
-mit gleichen Faktoren ausgeführt, um die stochastischen Effekte in den KPI zu beobachten und
-um einzelne Ausreißer auszuschließen. 
+% In einer Simulation werden statt fester Werte oft Verteilungsfunktionen verwendet, aus denen Einflussgrößen abgeleitet werden. 
+% Aufgrund dieser Eigenschaft wird ein Simulationsmodell in der Regel mehrfach
+% mit gleichen Faktoren ausgeführt, um die stochastischen Effekte in den KPI zu beobachten und
+% um einzelne Ausreißer auszuschließen. 
 
-Eine populäre Klassifizierung von Analysemodellen erfolgte durch Gartner \cite{Gartner} (vgl. Abbildung \ref{fig:gartner-modell}).
-Diese Klassifizierung geht von vier Stufen von Analysemethoden aus, die anhand der Skalen \emph{Schwierigkeit} und \emph{Mehrwert} sortiert werden.
-Beginnend bei niedriger Schwierigkeit und bei niedrigem Mehrwert bis hin zu hoher Schwierigkeit und hohem Mehrwert
-handelt es sich dabei um:
-\begin{enumerate}
-	\item Deskriptive Analyse
-	\item Diagnostische Analyse
-	\item Prädiktive Analyse
-	\item Präskriptive Analyse
-\end{enumerate}
+% Eine populäre Klassifizierung von Analysemodellen erfolgte durch Gartner \cite{Gartner} (vgl. Abbildung \ref{fig:gartner-modell}).
+% Diese Klassifizierung geht von vier Stufen von Analysemethoden aus, die anhand der Skalen \emph{Schwierigkeit} und \emph{Mehrwert} sortiert werden.
+% Beginnend bei niedriger Schwierigkeit und bei niedrigem Mehrwert bis hin zu hoher Schwierigkeit und hohem Mehrwert
+% handelt es sich dabei um:
+% \begin{enumerate}
+% 	\item Deskriptive Analyse
+% 	\item Diagnostische Analyse
+% 	\item Prädiktive Analyse
+% 	\item Präskriptive Analyse
+% \end{enumerate}
 
-\begin{figure}
-	\centering
-	\includegraphics[width=\textwidth]{media/analytic-maturity.png}
-	\caption{
-		Das Gartner Modell schlägt eine Klassifizierung von Analysemodellen vor.
-		Das hier dargestellte Simulationsmodell fällt in den Bereich der 
-		präskriptiven Analyse \cite{Gartner}. 
-		}
-	\label{fig:gartner-modell}
-\end{figure}
+% \begin{figure}
+% 	\centering
+% 	\includegraphics[width=\textwidth]{media/analytic-maturity.png}
+% 	\caption{
+% 		Das Gartner Modell schlägt eine Klassifizierung von Analysemodellen vor.
+% 		Das hier dargestellte Simulationsmodell fällt in den Bereich der 
+% 		präskriptiven Analyse \cite{Gartner}. 
+% 		}
+% 	\label{fig:gartner-modell}
+% \end{figure}
 
-Ein Simulationsmodell der hier vorliegenden Art fällt grundsätzlich in den Bereich der präskriptiven Analyse, 
-da es nicht nur die Vorhersage zukünftiger Systemzustände erlaubt, sondern auch Faktoren identifiziert,
-die verändert werden können, um einen bestimmten Zustand zu erreichen.
+% Ein Simulationsmodell der hier vorliegenden Art fällt grundsätzlich in den Bereich der präskriptiven Analyse, 
+% da es nicht nur die Vorhersage zukünftiger Systemzustände erlaubt, sondern auch Faktoren identifiziert,
+% die verändert werden können, um einen bestimmten Zustand zu erreichen.
 
-Ein Beispiel für eventuelle Nutzer einer Simulation wie der hier verwendeten, könnten 
-Betreiber größerer Fahrzeugflotten (z.B. LKW oder Busse) sein. 
-Gemäß Isermann \cite{Isermann_2011} belaufen sich bis zu 20 \% der laufenden Kosten beim Betrieb von Maschinen auf
-die Instandhaltung bzw. Instandsetzung.
-Fahrzeuge, die sich lange in Instandsetzung befinden, können in dieser Zeit keinen Mehrwert generieren.
-Es besteht also ein Interesse daran, immer ausreichende Instandsetzungskapazitäten vorhalten zu können.
-Da der Unterhalt derartiger Kapazitäten aber mit hohen Kosten verbunden ist, ist es von großem
-Interesse, die \emph{optimale} Instandsetzungskapazität für eine gegebene Flotte zu identifizieren.
+% Ein Beispiel für eventuelle Nutzer einer Simulation wie der hier verwendeten, könnten 
+% Betreiber größerer Fahrzeugflotten (z.B. LKW oder Busse) sein. 
+% Gemäß Isermann \cite{Isermann_2011} belaufen sich bis zu 20 \% der laufenden Kosten beim Betrieb von Maschinen auf
+% die Instandhaltung bzw. Instandsetzung.
+% Fahrzeuge, die sich lange in Instandsetzung befinden, können in dieser Zeit keinen Mehrwert generieren.
+% Es besteht also ein Interesse daran, immer ausreichende Instandsetzungskapazitäten vorhalten zu können.
+% Da der Unterhalt derartiger Kapazitäten aber mit hohen Kosten verbunden ist, ist es von großem
+% Interesse, die \emph{optimale} Instandsetzungskapazität für eine gegebene Flotte zu identifizieren.
 
-Der Bedarf an skalierbarer Infrastruktur zum Betrieb der Simulation ergibt sich wie folgt:
-Bereits bei den vier oben aufgeführten Faktoren, mit denen das vorliegende Simulationsmodell betrieben werden könnte,
-ergibt sich eine große Anzahl an Faktorkombinationen.
-Angenommen jeder Faktor soll um fünf Stufen variiert werden. Dann ergeben sich daraus
-$5^4 = 625$ Kombinationen. Aufgrund stochastischer Effekte empfiehlt es sich, jede einzelne
-Kombination mehrfach zu wiederholen. Davon ausgehend, dass jede Kombination 20-mal wiederholt wird,
-ergeben sich daraus $625 * 20 = 12.500$ Simulationsläufe. Bei einer angenommenen Laufzeit von ca. 10 Sekunden
-pro Simulationslauf und rein serieller Ausführung ergibt sich daraus eine Gesamtlaufzeit von
-knapp 35 Stunden.
+% Der Bedarf an skalierbarer Infrastruktur zum Betrieb der Simulation ergibt sich wie folgt:
+% Bereits bei den vier oben aufgeführten Faktoren, mit denen das vorliegende Simulationsmodell betrieben werden könnte,
+% ergibt sich eine große Anzahl an Faktorkombinationen.
+% Angenommen jeder Faktor soll um fünf Stufen variiert werden. Dann ergeben sich daraus
+% $5^4 = 625$ Kombinationen. Aufgrund stochastischer Effekte empfiehlt es sich, jede einzelne
+% Kombination mehrfach zu wiederholen. Davon ausgehend, dass jede Kombination 20-mal wiederholt wird,
+% ergeben sich daraus $625 * 20 = 12.500$ Simulationsläufe. Bei einer angenommenen Laufzeit von ca. 10 Sekunden
+% pro Simulationslauf und rein serieller Ausführung ergibt sich daraus eine Gesamtlaufzeit von
+% knapp 35 Stunden.
 
-Bei Modellen für realistische Szenarien ist natürlich von mehr Faktoren und auch von mehr Zeit 
-für einzelne Simulationsläufe auszugehen. Um einen vollständigen Simulationslauf möglichst schnell abzuschließen
-und folglich auswertbare Ergebnisse zu erhalten, bietet es sich an, die Rechenlast zu verteilen.  
+% Bei Modellen für realistische Szenarien ist natürlich von mehr Faktoren und auch von mehr Zeit 
+% für einzelne Simulationsläufe auszugehen. Um einen vollständigen Simulationslauf möglichst schnell abzuschließen
+% und folglich auswertbare Ergebnisse zu erhalten, bietet es sich an, die Rechenlast zu verteilen.  
 
-\subsection{Die Microservice-Architektur}
-Nachdem im vorangegangenen Abschnitt die Motivation und die Funktionsprinzipien der Simulation erklärt wurden,
-soll in diesem Abschnitt auf die für den Betrieb genutzte Microservice-Architektur Bezug genommen werden.
-
-
-Grundlegend besteht die Microservice-Architektur aus sechs verschiedenen Services, deren Zusammenwirken
-in Abbildung \ref{fig:microservice-architektur} dargestellt ist.
-
-\begin{figure}
-	\centering
-	\includegraphics[width=\textwidth]{media/Microservice-Architektur.png}
-	\caption{
-		Eine Übersicht über die verwendete Microservice-Architektur.
-		Details können dem Text entnommen werden.
-		}
-	\label{fig:microservice-architektur}
-\end{figure}
-
-Die Dateien, die zum Aufsetzen der Services verwendet wurden, sind unter
-(\lstinline|https://github.com/patrick-meyer-1992/bachelorseminar|) \cite{Meyer_bachelorseminar}
-verfügbar.
-
-\subsubsection{Minikube}
-Zum Aufsetzen des Clusters wurde \emph{Minikube} verwendet.
-Minikube ist eine Anwendung, die genutzt werden kann, um mit vergleichsweise wenig Aufwand ein lokales
-Kubernetes Cluster mit einem Node zu erstellen. Diese relativ einfache Konfiguration hat 
-den Nachteil, dass Minikube lediglich für Test- und Entwicklungsaufgaben geeignet ist.
-Für Produktivsysteme sollte eine andere Lösung gewählt werden (vgl. Abschnitt \ref{sec:Ausblick}). 
-
-Zum Betrieb des Clusters verwendet Minikube eine virtuelle Maschine, innerhalb derer
-alle Kubernetes Komponenten laufen. Dementsprechend ist eine der Voraussetzungen,
-um Minikube zu nutzen auch die vorherige Installation einer Virtualisierungsanwendung.
-Näheres kann der Minikube Dokumentation entnommen werden \cite{minikube}.
-
-\subsubsection{FastAPI}
-\label{sec:FastAPI}
-FastAPI ist ein modernes, performantes Web-Framework, das genutzt werden kann, um \emph{Application-Programming-Interfaces} (API)
-mit Python zu erstellen \cite{Ramirez_FastAPI}.
-
-In diesem Fall wird es als zentrale Schnittstelle der Microservice-Architektur genutzt.
-Anfragen an die Datenbanken (vgl. \ref{sec:Datenbanken})
-über das Frontend (vgl. \ref{sec:Angular}) oder vom Simulationsservice (vgl. \ref{sec:Flottensimulation})
-werden durch diese Schnittstelle angenommen, validiert, bearbeitet und beantwortet.
-Gleiches gilt für die Befüllung der Job-Warteschlange (bzw. Message Queue) im Service
-RabbitMQ (vgl. \ref{sec:RabbitMQ}), die über eine Anfrage seitens des Frontends an
-FastAPI ausgelöst wird.
-
-In der erstellten Microservice-Architektur wird das FastAPI-Deployment nur einfach repliziert,
-da nicht zu erwarten ist, da in diesem Demonstrationsbeispiel (Proof-of-Concept) nicht von einer
-großen Anzahl an Anfragen auszugehen ist. 
-Die Anzahl der Replicas kann aber über ein einfaches Kommandozeilenargument angepasst werden, %, z.B. (\lstinline|kubectl scale deployment fastapi-deployment --replicas=4|) 
-falls das erforderlich sein sollte.
-
-\subsubsection{Angular}
-\label{sec:Angular}
-Grundsätzlich ist es möglich, die Simulation vollständig über die Kommandozeile zu bedienen.
-Da das Ziel einer solchen Simulation aber üblicherweise die Unterstützung von (nicht-technischen) 
-Entscheidungsträgern ist, wurde ein Frontend entworfen, das eine Idee davon bieten soll, wie man Simulationsservices
-einer breiteren Masse zur Verfügung stellen kann. Das Frontend basiert auf Angular,
-einer Entwicklungsplattform zum Erstellen von Handy- und Desktop-Webanwendungen \cite{jain2014angularjs},
-und ermöglicht das Konfigurieren, Starten und Auswerten von Simulationsläufen über eine interaktive Web-Oberfläche.
-Ein Eindruck einer möglichen visuellen Auswertung kann Abbildung \ref{fig:ergebnis-plot} entnommen werden.
-
-\begin{figure}
-	\centering
-	\includegraphics[width=\textwidth]{media/Ergebnisplot.png}
-	\caption{
-		Darstellung des Ergebnisses von einem Simulationslauf mit den eingestellten Faktoren.
-		Zu sehen sind die Anzahl Fahrzeuge in den Zuständen „Ausgefallen“, „Einsatzbereit“ und „in Reparatur“	
-		für jeden Tag des einjährigen Simulationszeitraums.
-		}
-	\label{fig:ergebnis-plot}
-\end{figure}
-
-\subsubsection{RabbitMQ}
-\label{sec:RabbitMQ}
-RabbitMQ ist ein Message- und Streaming-Broker \cite{RabbitMQ}. Es bildet eine Zwischenstation
-zwischen Sender und Empfänger einer Nachricht. Das vereinfacht beispielsweise die Verteilung auf 
-mehrere Empfänger, glättet Auslastungsspitzen und ermöglicht asynchrone Kommunikation zwischen
-Sender und Empfänger. 
-
-In der vorliegenden Microservice-Architektur wird RabbitMQ als Zwischenspeicher für
-Simulationsaufträge genutzt. Das Frontend sendet für jeden einzelnen Simulationslauf
-ein json-Objekt über FastAPI an RabbitMQ, wo jedes Objekt als ein Simulationsauftrag
-in der Message Queue vorgehalten wird. Der Simulationsservice abonniert diese Message Queue,
-wenn er gestartet wird und empfängt von dort einzeln seine Aufträge.
-
-Dieses Vorgehen hat den Vorteil, dass Simulationsaufträge unabhängig von der Existenz
-des Simulationsservices eingestellt werden können. Sobald der Simulationsservice gestartet
-oder um weitere Replikationen ergänzt wird, beginnt die Bearbeitung der Aufträge durch den
-bzw. die neuen Arbeiter.
-
-\subsubsection{Datenbanken}
-\label{sec:Datenbanken}
-Zur persistenten Speicherung von Daten werden sowohl MongoDB als auch PostgreSQL verwendet.
-
-MongoDB ist ein dokumentenorientiertes Datenbanksystem mit einem Fokus auf Skalierbarkeit und Flexibilität \cite{Bradshaw_2010}.
-Dokumentenorientiert heißt in diesem Fall, dass die Daten nicht wie in einem relationalen
-Datenbanksystem in Form von Tabellen gespeichert wird, sondern als Objekte in json-Notation.
-
-In der Microservice-Architektur speichert MongoDB die Instandsetzungskonfigurationen,
-die über das Frontend erstellt werden.
-Eine Instandsetzungskonfiguration ist ein json-Objekt, das eine Liste von Instandsetzungseinrichtungen,
-enthält. Diese enthalten wiederum eine Liste von Arbeitsplätzen, zu denen jeweils eine Liste
-von Arbeitern gehört. 
-Die Arbeiter enthalten Attribute, die ihre jeweilige Instandsetzungsgeschwindigkeit definieren.
-
-Da eine Instandsetzungskonfiguration mitunter sehr komplex werden kann, war es wichtig,
-dass einmal erstellte Konfiguration persistent gespeichert und auch wieder abrufbar und veränderbar sind.
-
-Für die Speicherung der Simulationsergebnisse wird in diesem Szenario PostgreSQL als relationale Datenbank verwendet.
-
-\subsubsection{Ingress}
-Der Ingress-Controller hat die Aufgabe, Anfragen entsprechend des Hostnamens zu verteilen (vgl. \ref{sec:Ingress}).
-In diesem Fall werden http-Anfragen gemäß der Subdomains \emph{app}, \emph{api}, \emph{rmq} an das
-Frontend, den FastAPI-Service oder an den RabbitMQ-Service weitergeleitet. Um dieses Verhalten
-in einer lokalen Umgebung zu ermöglichen, muss zusätzlich zum Cluster ein Weg eingerichtet werden,
-um DNS-Anfragen an app.domain.com, api.domain.com und rmq.domain.com an die IP-Adresse des Clusters zu senden.
-Das kann entweder durch das Aufsetzen eines DNS-Servers geschehen oder durch Anpassen der Datei 
-\lstinline|/etc/hosts| unter Linux oder \lstinline|C:\Windows\system32\drivers\etc\hosts| unter Windows 11.
-
-\subsubsection{Flottensimulation}
-\label{sec:Flottensimulation}
-Der Simulationsservice ist der Anteil der Microservice-Architektur, der den größten Anteil
-der dort stattfindenden Berechnungen vornimmt und dementsprechend auch den größten Bedarf
-an Rechenressourcen hat. Das ist insbesondere dann der Fall, wenn die Pods des Simulationsservice,
-wie vorgesehen, vielfach repliziert werden.
-
-Bei seinem Start abonniert jeder Pod unabhängig von den anderen die Job-Warteschlange von RabbitMQ.
-Jeder Job enthält die konkreten Faktoren, mit denen der Simulationslauf durchgeführt werden soll.
-Dazu gehört auch der Name der zugehörigen Instandsetzungskonfiguration. Aufgrund
-dieses Namens wird die zu verwendende Instandsetzungskonfiguration über FastAPI
-aus der MongoDB abgerufen.
-
-Über einen Simulationszeitraum von einem Jahr wird für jeden Tag die Anzahl der Fahrzeuge
-in den möglichen Zuständen (Einsatzbereit, Ausgefallen, in Reparatur) als KPI gespeichert.
-Bei Abschluss der Simulation werden diese Ergebnisse ebenfalls über FastAPI in die 
-PostgreSQL Datenbank geschrieben.
-
-\section{Fazit}
-Die erstellte Architektur konnte im Rahmen dieser Arbeit erfolgreich für die Konfiguration, Durchführung und grundsätzliche
-Auswertung der Simulation genutzt werden. 
-Kubernetes zeigte sich auch geeignet, um dem vorliegenden Anwendungsfall, nämlich die Skalierung des Simulationsservice,
-zu unterstützen. 
-
-Durch die Replikation der Pods kann die Rechenlast grundsätzlich effizient verteilt und 
-die Gesamtlaufzeit der Simulationen deutlich reduziert werden 
-(Auch wenn für diese Arbeit keine Hardware zur Verfügung stand, um das konkret zu testen).
-Die Entkopplung der einzelnen Services ermöglicht zusätzlich die unabhängige Skalierbarkeit dieser.
-
-Durch die Nutzung von FastAPI als zentrales Kommunikationselement ist es auch möglich, weitere Komponenten hinzuzufügen
-oder bestehende zu verändern ohne, dass dafür alle anderen Komponenten angepasst werden müssen.
-Es reicht stattdessen in der Regel, die Änderungen in FastAPI abzubilden.
-
-RabbitMQ stellte sich als zielführende Lösung für die Verteilung von Simulationsaufträgen hinaus.
-Eine Alternative, wie zum Beispiel die Verteilung der Simulationsaufträge nach dem Push-Prinzip an die Pods
-hätte verschiedene Nachteile mit sich gebracht. Darunter die Tatsache, dass nur gerade aktive Pods
-in der Lage gewesen wären, Aufträge entgegenzunehmen. Außerdem wären bei Fehler eines Pods alle
-ihm zugeordneten Aufträge verloren gegangen.
-
-Die Simulation an sich war zu Bestätigung des Funktionsprinzips gut geeignet,
-müsste für einen realitätsnahen Einsatzzweck aber noch deutlich weiterentwickelt werden.
-Schmeling und Dargatz \cite{Schmeling_Dargatz_2022}, Kap. 3 geben einen guten Überblick,
-wie Kubernetes genutzt werden kann, um Anwendungsentwicklung zu unterstützen und zu beschleunigen.
-
-Die Speicherung der Konfiguration der Instandsetzungseinrichtungen im json-Format stellte sich als 
-angemessen für die Komplexität und Flexibilität eines derartigen Systems heraus. 
-Vergleichbare Daten in klassischen relationalen Tabellenstrukturen zu speichern, wäre auch
-möglich gewesen, könnte allerdings Limitationen bei der Flexibilität einbringen.
-MongoDB als eine Anwendung, die insbesondere für die Speicherung und den Abruf von
-Daten im json-Format gestaltet wurde, war für diesen Zweck dementsprechend gut geeignet.
-
-Die Speicherung der Simulationsergebnisse in einer relationalen\linebreak PostgreSQL-Datenbank
-erfolgte, da diese weniger komplex als die Konfigurationsdaten sind und weil
-gängige Werkzeuge zur Datenanalyse gut mit tabellarisch organisierten zusammenwirken.
-PostgreSQL als etabliertes Open-Source Werkzeug für relationale Datenbanken bot
-hierfür eine leicht einzubindende Grundlage.
-
-Angular als professionelles Werkzeug zur Erstellung von webbasierten Benutzeroberflächen,
-ist geeignet, um einen zentralen Zugang für Nutzer zur Bedienung und Auswertung der Simulation zu bieten.
-Für ein realistisches Einsatzszenario muss das Frontend noch um weitere Funktionen
-und um grafische Aufbereitungen ergänzt werden.
-
-Schließlich ist ein weiterer Vorteil die Unabhängigkeit von proprietären Anwendungen und die Möglichkeit, 
-die gesamte Infrastruktur auf verschiedenen Plattformen (lokal oder in der Cloud) zu betreiben. 
-Die Nutzung von Pods und Containern bringt zwar einen geringen Overhead mit sich,
-der aber durch die Vorteile der Skalierbarkeit und Flexibilität ausgeglichen werden können.
-
-Insgesamt hat sich Kubernetes als geeignetes Werkzeug für den gedachten Einsatzzweck erwiesen 
-und bietet eine solide Grundlage für die weitere Entwicklung und den Betrieb der Simulationsanwendung.
+% \subsection{Die Microservice-Architektur}
+% Nachdem im vorangegangenen Abschnitt die Motivation und die Funktionsprinzipien der Simulation erklärt wurden,
+% soll in diesem Abschnitt auf die für den Betrieb genutzte Microservice-Architektur Bezug genommen werden.
 
 
-\section{Limitationen}
-Obwohl der für diese Arbeit geplante Anwendungsfall erfolgreich umgesetzt werden konnte,
-gab es einige Limitationen in Bezug auf den Anwendungsfall an sich und auf
-Kubernetes im Allgemeinen. Diese sollen in diesem Abschnitt diskutiert werden.
+% Grundlegend besteht die Microservice-Architektur aus sechs verschiedenen Services, deren Zusammenwirken
+% in Abbildung \ref{fig:microservice-architektur} dargestellt ist.
 
-Die Skalierbarkeit des Simulationsservice mit Kubernetes auch über mehrere Rechner hinweg,
-konnte aufgrund begrenzter Hardware nur eingeschränkt getestet werden. Ein alternativer Ansatz,
-der mehrere virtuelle Maschinen verwendet, die jeweils einen Node abbilden, könnte 
-für zukünftige Anwendungsfälle genutzt werden. Das war hier allerdings nicht realistisch,
-da die zur Verfügung stehende Hardware nicht genug Rechen- und Speicherressourcen
-für mehrere virtuelle Maschinen hatte.
+% \begin{figure}
+% 	\centering
+% 	\includegraphics[width=\textwidth]{media/Microservice-Architektur.png}
+% 	\caption{
+% 		Eine Übersicht über die verwendete Microservice-Architektur.
+% 		Details können dem Text entnommen werden.
+% 		}
+% 	\label{fig:microservice-architektur}
+% \end{figure}
 
-Eine weitere Alternative wäre die Nutzung von kommerziellen Cloud-Anbietern.
-Die wohl populärsten in diesem Zusammenhang sind Microsoft Azure,
-Amazon Webservices und Google Kubernetes Engine. Alle drei Anbieter
-ermöglichen den Betrieb von Kubernetes Clustern auf den von 
-ihnen bereitgestellten Plattformen. Diese Dienstleistung
-besteht aber entweder aus stark begrenzten Testversionen oder
-ist mit hohen Kosten verbunden, weswegen sie für diese Arbeit nicht genutzt wurde.
+% Die Dateien, die zum Aufsetzen der Services verwendet wurden, sind unter
+% \lstinline|https://github.com/patrick-meyer-1992/bachelorseminar| \cite{Meyer_bachelorseminar}
+% verfügbar.
 
-Der Mangel an verfügbaren Rechen- und Speicherressourcen sorgte auch dafür,
-dass die Microservice-Architektur keinem echten Stresstest unterzogen werden konnte.
-Gerade im Bereich der verwendeten relationalen Datenbank könnte es bei vielen
-parallelen Lese- und Schreibvorgängen schnell zu Leistungseinbußen kommen.
-Die Replizierung relationaler Datenbanken unter Einhaltung des ACID-Prinzips
-ist keine triviale Aufgabe und könnte für die weitere Ausgestaltung 
-größere Herausforderungen mit sich bringen.
+% \subsubsection{Minikube}
+% Zum Aufsetzen des Clusters wurde \emph{Minikube} verwendet.
+% Minikube ist eine Anwendung, die genutzt werden kann, um mit vergleichsweise wenig Aufwand ein lokales
+% Kubernetes Cluster mit einem Node zu erstellen. Diese relativ einfache Konfiguration hat 
+% den Nachteil, dass Minikube lediglich für Test- und Entwicklungsaufgaben geeignet ist.
+% Für Produktivsysteme sollte eine andere Lösung gewählt werden (vgl. Abschnitt \ref{sec:Ausblick}). 
 
-Da es sich in dieser Arbeit um das grundlegende Funktionsprinzip der Microservice-Architektur drehte,
-wurde der Aspekt der Sicherheit an vielen Stellen vernachlässigt. Sollten die Services echten
-Nutzern über das Internet zur Verfügung gestellt werden, müssten weitere Maßnahmen ergriffen werden.
-Dazu gehört zunächst, dass die Kommunikation mit den http-Services verschlüsselt über https
-stattfinden sollte. Zudem müsste gegebenenfalls ein Nutzerkonzept mit entsprechender
-Authentisierung implementiert werden. Das gilt insbesondere dann, wenn sensible
-Daten verarbeitet werden. Zusätzlich wurde keine Ausnahmebehandlung für fehlerhafte
-Nutzereingaben und nur rudimentäres Eingabefeedback im Frontend integriert.
-Generell fehlen für ein produktiv nutzbares System automatisierte Tests
-aller Komponenten.
+% Zum Betrieb des Clusters verwendet Minikube eine virtuelle Maschine, innerhalb derer
+% alle Kubernetes Komponenten laufen. Dementsprechend ist eine der Voraussetzungen,
+% um Minikube zu nutzen auch die vorherige Installation einer Virtualisierungsanwendung.
+% Näheres kann der Minikube Dokumentation entnommen werden \cite{minikube}.
 
-Die Skalierung des Simulationsservice fand in dieser Arbeit zwar mithilfe von Kubernetes
-aber schlussendlich immer noch manuell statt, indem Kubernetes über die Kommandozeile angewiesen wurde
-eine bestimmte Anzahl an Pods zu starten. Kubernetes bietet aber auch die Möglichkeit 
-Services je nach Nutzlast automatisch zu skalieren. Für den vorliegenden 
-Anwendungsfall war das nicht erforderlich, es könnte aber dennoch eine Verbesserung 
-der Nutzbarkeit bewirken.
+% \subsubsection{FastAPI}
+% \label{sec:FastAPI}
+% FastAPI ist ein modernes, performantes Web-Framework, das genutzt werden kann, um \emph{Application-Programming-Interfaces} (API)
+% mit Python zu erstellen \cite{Ramirez_FastAPI}.
 
-Abschließend bleibt zu erwähnen, dass Kubernetes zwar eine hohe Flexibilität bietet,
-aber damit fast automatisch auch eine hohe Komplexität hat. Für große Anbieter von Onlinediensten
-ist der Mehrwert durch diese Komplexität sicherlich vorhanden.
-Für kleinere Unternehmen, die überlegen, Kubernetes zu verwenden, kann es sinnvoller sein,
-alternative, simplere Methoden für die Serviceerbringung zu nutzen \cite{Pagani_2019}.
+% In diesem Fall wird es als zentrale Schnittstelle der Microservice-Architektur genutzt.
+% Anfragen an die Datenbanken (vgl. \ref{sec:Datenbanken})
+% über das Frontend (vgl. \ref{sec:Angular}) oder vom Simulationsservice (vgl. \ref{sec:Flottensimulation})
+% werden durch diese Schnittstelle angenommen, validiert, bearbeitet und beantwortet.
+% Gleiches gilt für die Befüllung der Job-Warteschlange (bzw. Message Queue) im Service
+% RabbitMQ (vgl. \ref{sec:RabbitMQ}), die über eine Anfrage seitens des Frontends an
+% FastAPI ausgelöst wird.
 
-\section{Ausblick}
-\label{sec:Ausblick}
-Die hier beschriebene Microservice-Architektur war gedacht, um ein grundlegendes Prinzip
-zu verdeutlichen. Einige weitere Einsatzmöglichkeiten von Kubernetes sind damit aber noch nicht ausgeschöpft 
-und diese sollen in diesem Abschnitt diskutiert werden.
+% In der erstellten Microservice-Architektur wird das FastAPI-Deployment nur einfach repliziert,
+% da nicht zu erwarten ist, da in diesem Demonstrationsbeispiel (Proof-of-Concept) nicht von einer
+% großen Anzahl an Anfragen auszugehen ist. 
+% Die Anzahl der Replicas kann aber über ein einfaches Kommandozeilenargument angepasst werden, %, z.B. (\lstinline|kubectl scale deployment fastapi-deployment --replicas=4|) 
+% falls das erforderlich sein sollte.
 
-Zunächst sei angemerkt, dass Minikube zum Einrichten des Clusters für diesen Testfall
-zwar völlig ausreichend war, in realistischen Szenarien aber durch andere Werkzeuge ersetzt werden sollte.
-Für Kubernetes Cluster in Produktivumgebungen sind zum Beispiel \emph{Rancher}, \emph{OpenShift} oder \emph{Tanzu} als
-gängige Lösungen verfügbar \cite{rancher}. Darüber hinaus bietet Kubernetes noch viele andere 
-Anwendungsmöglichkeiten, wie zum Beispiel die Unterstützung von Entwicklern, um Software-Produkte
-schneller von der Entwicklung bis zum produktiven Einsatz zu bringen \cite{Schmeling_Dargatz_2022}.
+% \subsubsection{Angular}
+% \label{sec:Angular}
+% Grundsätzlich ist es möglich, die Simulation vollständig über die Kommandozeile zu bedienen.
+% Da das Ziel einer solchen Simulation aber üblicherweise die Unterstützung von (nicht-technischen) 
+% Entscheidungsträgern ist, wurde ein Frontend entworfen, das eine Idee davon bieten soll, wie man Simulationsservices
+% einer breiteren Masse zur Verfügung stellen kann. Das Frontend basiert auf Angular,
+% einer Entwicklungsplattform zum Erstellen von Handy- und Desktop-Webanwendungen \cite{jain2014angularjs},
+% und ermöglicht das Konfigurieren, Starten und Auswerten von Simulationsläufen über eine interaktive Web-Oberfläche.
+% Ein Eindruck einer möglichen visuellen Auswertung kann Abbildung \ref{fig:ergebnis-plot} entnommen werden.
 
-Bezüglich des Simulationsmodells sind je nach Anwendungsfall viele weitere Veränderungen denkbar.
-Dazu gehören unter anderem die Berücksichtigung von Wartungsplänen und Nutzungsmustern, aber auch
-die genauere Modellierung von Fahrzeugen und ihren Baugruppen. 
-Zusätzlich könnte die Realitätsnähe der Simulation verbessert werden, indem die Option
-implementiert wird, dass Faktoren sich auf der Zeitachse des Simulationslaufs dynamisch verändern.
-Zum Beispiel ist es in einem realen Szenario sehr wahrscheinlich, dass Instandhaltungskapazitäten
-sich im Laufe der Zeit verändern und nicht so bleiben, wie zu Beginn der Simulationszeit konfiguriert.
+% \begin{figure}
+% 	\centering
+% 	\includegraphics[width=\textwidth]{media/Ergebnisplot.png}
+% 	\caption{
+% 		Darstellung des Ergebnisses von einem Simulationslauf mit den eingestellten Faktoren.
+% 		Zu sehen sind die Anzahl Fahrzeuge in den Zuständen „Ausgefallen“, „Einsatzbereit“ und „in Reparatur“	
+% 		für jeden Tag des einjährigen Simulationszeitraums.
+% 		}
+% 	\label{fig:ergebnis-plot}
+% \end{figure}
 
-Abschließend bleibt festzuhalten, dass es sich bei Kubernetes zum Zeitpunkt des Erstellens dieser
-Arbeit keineswegs um eine sich entwickelnde Technologie handelt, sondern um eine, die bereits
-in vielen Bereichen von Forschung und Wirtschaft etabliert ist. In einer Umfrage der 
-Cloud Native Computing Foundation von 2024 \cite{cncf} gaben 41 \% der befragten Unternehmen an,
-bereits jetzt die meisten oder alle ihrer Anwendungen in einem Cloud-Umfeld zu betreiben und
-80 \% gaben an, in den nächsten fünf Jahren die meisten oder alle ihrer neu entwickelten Anwendungen
-auf der Cloud betreiben zu wollen. Durch den wachsenden Nutzerkreis wird auch mit Weiterentwicklungen
-von Kubernetes in Bereichen der Bedienbarkeit und Standardisierung gerechnet \cite{emerging_trends}.
-Erstere ist von großer Bedeutung, um Kubernetes einem größeren Feld an Entwicklern zugänglich
-zu machen, während letztes einen wesentlichen Beitrag zur Flexibilität und Interoperabilität
-leisten kann.
+% \subsubsection{RabbitMQ}
+% \label{sec:RabbitMQ}
+% RabbitMQ ist ein Message- und Streaming-Broker \cite{RabbitMQ}. Es bildet eine Zwischenstation
+% zwischen Sender und Empfänger einer Nachricht. Das vereinfacht beispielsweise die Verteilung auf 
+% mehrere Empfänger, glättet Auslastungsspitzen und ermöglicht asynchrone Kommunikation zwischen
+% Sender und Empfänger. 
+
+% In der vorliegenden Microservice-Architektur wird RabbitMQ als Zwischenspeicher für
+% Simulationsaufträge genutzt. Das Frontend sendet für jeden einzelnen Simulationslauf
+% ein json-Objekt über FastAPI an RabbitMQ, wo jedes Objekt als ein Simulationsauftrag
+% in der Message Queue vorgehalten wird. Der Simulationsservice abonniert diese Message Queue,
+% wenn er gestartet wird und empfängt von dort einzeln seine Aufträge.
+
+% Dieses Vorgehen hat den Vorteil, dass Simulationsaufträge unabhängig von der Existenz
+% des Simulationsservices eingestellt werden können. Sobald der Simulationsservice gestartet
+% oder um weitere Replikationen ergänzt wird, beginnt die Bearbeitung der Aufträge durch den
+% bzw. die neuen Arbeiter.
+
+% \subsubsection{Datenbanken}
+% \label{sec:Datenbanken}
+% Zur persistenten Speicherung von Daten werden sowohl MongoDB als auch PostgreSQL verwendet.
+
+% MongoDB ist ein dokumentenorientiertes Datenbanksystem mit einem Fokus auf Skalierbarkeit und Flexibilität \cite{Bradshaw_2010}.
+% Dokumentenorientiert heißt in diesem Fall, dass die Daten nicht wie in einem relationalen
+% Datenbanksystem in Form von Tabellen gespeichert wird, sondern als Objekte in json-Notation.
+
+% In der Microservice-Architektur speichert MongoDB die Instandsetzungskonfigurationen,
+% die über das Frontend erstellt werden.
+% Eine Instandsetzungskonfiguration ist ein json-Objekt, das eine Liste von Instandsetzungseinrichtungen,
+% enthält. Diese enthalten wiederum eine Liste von Arbeitsplätzen, zu denen jeweils eine Liste
+% von Arbeitern gehört. 
+% Die Arbeiter enthalten Attribute, die ihre jeweilige Instandsetzungsgeschwindigkeit definieren.
+
+% Da eine Instandsetzungskonfiguration mitunter sehr komplex werden kann, war es wichtig,
+% dass einmal erstellte Konfiguration persistent gespeichert und auch wieder abrufbar und veränderbar sind.
+
+% Für die Speicherung der Simulationsergebnisse wird in diesem Szenario PostgreSQL als relationale Datenbank verwendet.
+
+% \subsubsection{Ingress}
+% Der Ingress-Controller hat die Aufgabe, Anfragen entsprechend des Hostnamens zu verteilen (vgl. \ref{sec:Ingress}).
+% In diesem Fall werden http-Anfragen gemäß der Subdomains \emph{app}, \emph{api}, \emph{rmq} an das
+% Frontend, den FastAPI-Service oder an den RabbitMQ-Service weitergeleitet. Um dieses Verhalten
+% in einer lokalen Umgebung zu ermöglichen, muss zusätzlich zum Cluster ein Weg eingerichtet werden,
+% um DNS-Anfragen an app.domain.com, api.domain.com und rmq.domain.com an die IP-Adresse des Clusters zu senden.
+% Das kann entweder durch das Aufsetzen eines DNS-Servers geschehen oder durch Anpassen der Datei 
+% \lstinline|/etc/hosts| unter Linux oder \lstinline|C:\Windows\system32\drivers\etc\hosts| unter Windows 11.
+
+% \subsubsection{Flottensimulation}
+% \label{sec:Flottensimulation}
+% Der Simulationsservice ist der Anteil der Microservice-Architektur, der den größten Anteil
+% der dort stattfindenden Berechnungen vornimmt und dementsprechend auch den größten Bedarf
+% an Rechenressourcen hat. Das ist insbesondere dann der Fall, wenn die Pods des Simulationsservice,
+% wie vorgesehen, vielfach repliziert werden.
+
+% Bei seinem Start abonniert jeder Pod unabhängig von den anderen die Job-Warteschlange von RabbitMQ.
+% Jeder Job enthält die konkreten Faktoren, mit denen der Simulationslauf durchgeführt werden soll.
+% Dazu gehört auch der Name der zugehörigen Instandsetzungskonfiguration. Aufgrund
+% dieses Namens wird die zu verwendende Instandsetzungskonfiguration über FastAPI
+% aus der MongoDB abgerufen.
+
+% Über einen Simulationszeitraum von einem Jahr wird für jeden Tag die Anzahl der Fahrzeuge
+% in den möglichen Zuständen (Einsatzbereit, Ausgefallen, in Reparatur) als KPI gespeichert.
+% Bei Abschluss der Simulation werden diese Ergebnisse ebenfalls über FastAPI in die 
+% PostgreSQL Datenbank geschrieben.
+
+% \section{Fazit}
+% Die erstellte Architektur konnte im Rahmen dieser Arbeit erfolgreich für die Konfiguration, Durchführung und grundsätzliche
+% Auswertung der Simulation genutzt werden. 
+% Kubernetes zeigte sich auch geeignet, um dem vorliegenden Anwendungsfall, nämlich die Skalierung des Simulationsservice,
+% zu unterstützen. 
+
+% Durch die Replikation der Pods kann die Rechenlast grundsätzlich effizient verteilt und 
+% die Gesamtlaufzeit der Simulationen deutlich reduziert werden 
+% (auch wenn für diese Arbeit keine Hardware zur Verfügung stand, um das konkret zu testen).
+% Die Entkopplung der einzelnen Services ermöglicht zusätzlich die unabhängige Skalierbarkeit dieser.
+
+% Durch die Nutzung von FastAPI als zentrales Kommunikationselement ist es auch möglich, weitere Komponenten hinzuzufügen
+% oder bestehende zu verändern ohne, dass dafür alle anderen Komponenten angepasst werden müssen.
+% Es reicht stattdessen in der Regel, die Änderungen in FastAPI abzubilden.
+
+% RabbitMQ stellte sich als zielführende Lösung für die Verteilung von Simulationsaufträgen hinaus.
+% Eine Alternative, wie zum Beispiel die Verteilung der Simulationsaufträge nach dem Push-Prinzip an die Pods
+% hätte verschiedene Nachteile mit sich gebracht. Darunter die Tatsache, dass nur gerade aktive Pods
+% in der Lage gewesen wären, Aufträge entgegenzunehmen. Außerdem wären bei Fehler eines Pods alle
+% ihm zugeordneten Aufträge verloren gegangen.
+
+% Die Simulation an sich war zu Bestätigung des Funktionsprinzips gut geeignet,
+% müsste für einen realitätsnahen Einsatzzweck aber noch deutlich weiterentwickelt werden.
+% Schmeling und Dargatz \cite{Schmeling_Dargatz_2022}, Kap. 3 geben einen guten Überblick,
+% wie Kubernetes genutzt werden kann, um Anwendungsentwicklung zu unterstützen und zu beschleunigen.
+
+% Die Speicherung der Konfiguration der Instandsetzungseinrichtungen im json-Format stellte sich als 
+% angemessen für die Komplexität und Flexibilität eines derartigen Systems heraus. 
+% Vergleichbare Daten in klassischen relationalen Tabellenstrukturen zu speichern, wäre auch
+% möglich gewesen, könnte allerdings Limitationen bei der Flexibilität einbringen.
+% MongoDB als eine Anwendung, die insbesondere für die Speicherung und den Abruf von
+% Daten im json-Format gestaltet wurde, war für diesen Zweck dementsprechend gut geeignet.
+
+% Die Speicherung der Simulationsergebnisse in einer relationalen\linebreak PostgreSQL-Datenbank
+% erfolgte, da diese weniger komplex als die Konfigurationsdaten sind und weil
+% gängige Werkzeuge zur Datenanalyse gut mit tabellarisch organisierten zusammenwirken.
+% PostgreSQL als etabliertes Open-Source Werkzeug für relationale Datenbanken bot
+% hierfür eine leicht einzubindende Grundlage.
+
+% Angular als professionelles Werkzeug zur Erstellung von webbasierten Benutzeroberflächen,
+% ist geeignet, um einen zentralen Zugang für Nutzer zur Bedienung und Auswertung der Simulation zu bieten.
+% Für ein realistisches Einsatzszenario muss das Frontend noch um weitere Funktionen
+% und um grafische Aufbereitungen ergänzt werden.
+
+% Schließlich ist ein weiterer Vorteil die Unabhängigkeit von proprietären Anwendungen und die Möglichkeit, 
+% die gesamte Infrastruktur auf verschiedenen Plattformen (lokal oder in der Cloud) zu betreiben. 
+% Die Nutzung von Pods und Containern bringt zwar einen geringen Overhead mit sich,
+% der aber durch die Vorteile der Skalierbarkeit und Flexibilität ausgeglichen werden können.
+
+% Insgesamt hat sich Kubernetes als geeignetes Werkzeug für den gedachten Einsatzzweck erwiesen 
+% und bietet eine solide Grundlage für die weitere Entwicklung und den Betrieb der Simulationsanwendung.
+
+
+% \section{Limitationen}
+% Obwohl der für diese Arbeit geplante Anwendungsfall erfolgreich umgesetzt werden konnte,
+% gab es einige Limitationen in Bezug auf den Anwendungsfall an sich und auf
+% Kubernetes im Allgemeinen. Diese sollen in diesem Abschnitt diskutiert werden.
+
+% Die Skalierbarkeit des Simulationsservice mit Kubernetes auch über mehrere Rechner hinweg,
+% konnte aufgrund begrenzter Hardware nur eingeschränkt getestet werden. Ein alternativer Ansatz,
+% der mehrere virtuelle Maschinen verwendet, die jeweils einen Node abbilden, könnte 
+% für zukünftige Anwendungsfälle genutzt werden. Das war hier allerdings nicht realistisch,
+% da die zur Verfügung stehende Hardware nicht genug Rechen- und Speicherressourcen
+% für mehrere virtuelle Maschinen hatte.
+
+% Eine weitere Alternative wäre die Nutzung von kommerziellen Cloud-Anbietern.
+% Die wohl populärsten in diesem Zusammenhang sind Microsoft Azure,
+% Amazon Webservices und Google Kubernetes Engine. Alle drei Anbieter
+% ermöglichen den Betrieb von Kubernetes Clustern auf den von 
+% ihnen bereitgestellten Plattformen. Diese Dienstleistung
+% besteht aber entweder aus stark begrenzten Testversionen oder
+% ist mit hohen Kosten verbunden, weswegen sie für diese Arbeit nicht genutzt wurde.
+
+% Der Mangel an verfügbaren Rechen- und Speicherressourcen sorgte auch dafür,
+% dass die Microservice-Architektur keinem echten Stresstest unterzogen werden konnte.
+% Gerade im Bereich der verwendeten relationalen Datenbank könnte es bei vielen
+% parallelen Lese- und Schreibvorgängen schnell zu Leistungseinbußen kommen.
+% Die Replizierung relationaler Datenbanken unter Einhaltung des ACID-Prinzips
+% ist keine triviale Aufgabe und könnte für die weitere Ausgestaltung 
+% größere Herausforderungen mit sich bringen.
+
+% Da es sich in dieser Arbeit um das grundlegende Funktionsprinzip der Microservice-Architektur drehte,
+% wurde der Aspekt der Sicherheit an vielen Stellen vernachlässigt. Sollten die Services echten
+% Nutzern über das Internet zur Verfügung gestellt werden, müssten weitere Maßnahmen ergriffen werden.
+% Dazu gehört zunächst, dass die Kommunikation mit den http-Services verschlüsselt über https
+% stattfinden sollte. Zudem müsste gegebenenfalls ein Nutzerkonzept mit entsprechender
+% Authentisierung implementiert werden. Das gilt insbesondere dann, wenn sensible
+% Daten verarbeitet werden. Zusätzlich wurde keine Ausnahmebehandlung für fehlerhafte
+% Nutzereingaben und nur rudimentäres Eingabefeedback im Frontend integriert.
+% Generell fehlen für ein produktiv nutzbares System automatisierte Tests
+% aller Komponenten.
+
+% Die Skalierung des Simulationsservice fand in dieser Arbeit zwar mithilfe von Kubernetes
+% aber schlussendlich immer noch manuell statt, indem Kubernetes über die Kommandozeile angewiesen wurde
+% eine bestimmte Anzahl an Pods zu starten. Kubernetes bietet aber auch die Möglichkeit 
+% Services je nach Nutzlast automatisch zu skalieren. Für den vorliegenden 
+% Anwendungsfall war das nicht erforderlich, es könnte aber dennoch eine Verbesserung 
+% der Nutzbarkeit bewirken.
+
+% Abschließend bleibt zu erwähnen, dass Kubernetes zwar eine hohe Flexibilität bietet,
+% aber damit fast automatisch auch eine hohe Komplexität hat. Für große Anbieter von Onlinediensten
+% ist der Mehrwert durch diese Komplexität sicherlich vorhanden.
+% Für kleinere Unternehmen, die überlegen, Kubernetes zu verwenden, kann es sinnvoller sein,
+% alternative, simplere Methoden für die Serviceerbringung zu nutzen \cite{Pagani_2019}.
+
+% \section{Ausblick}
+% \label{sec:Ausblick}
+% Die hier beschriebene Microservice-Architektur war gedacht, um ein grundlegendes Prinzip
+% zu verdeutlichen. Einige weitere Einsatzmöglichkeiten von Kubernetes sind damit aber noch nicht ausgeschöpft 
+% und diese sollen in diesem Abschnitt diskutiert werden.
+
+% Zunächst sei angemerkt, dass Minikube zum Einrichten des Clusters für diesen Testfall
+% zwar völlig ausreichend war, in realistischen Szenarien aber durch andere Werkzeuge ersetzt werden sollte.
+% Für Kubernetes Cluster in Produktivumgebungen sind zum Beispiel \emph{Rancher}, \emph{OpenShift} oder \emph{Tanzu} als
+% gängige Lösungen verfügbar \cite{rancher}. Darüber hinaus bietet Kubernetes noch viele andere 
+% Anwendungsmöglichkeiten, wie zum Beispiel die Unterstützung von Entwicklern, um Software-Produkte
+% schneller von der Entwicklung bis zum produktiven Einsatz zu bringen \cite{Schmeling_Dargatz_2022}.
+
+% Bezüglich des Simulationsmodells sind je nach Anwendungsfall viele weitere Veränderungen denkbar.
+% Dazu gehören unter anderem die Berücksichtigung von Wartungsplänen und Nutzungsmustern, aber auch
+% die genauere Modellierung von Fahrzeugen und ihren Baugruppen. 
+% Zusätzlich könnte die Realitätsnähe der Simulation verbessert werden, indem die Option
+% implementiert wird, dass Faktoren sich auf der Zeitachse des Simulationslaufs dynamisch verändern.
+% Zum Beispiel ist es in einem realen Szenario sehr wahrscheinlich, dass Instandhaltungskapazitäten
+% sich im Laufe der Zeit verändern und nicht so bleiben, wie zu Beginn der Simulationszeit konfiguriert.
+
+% Abschließend bleibt festzuhalten, dass es sich bei Kubernetes zum Zeitpunkt des Erstellens dieser
+% Arbeit keineswegs um eine sich entwickelnde Technologie handelt, sondern um eine, die bereits
+% in vielen Bereichen von Forschung und Wirtschaft etabliert ist. In einer Umfrage der 
+% Cloud Native Computing Foundation von 2024 \cite{cncf} gaben 41 \% der befragten Unternehmen an,
+% bereits jetzt die meisten oder alle ihrer Anwendungen in einem Cloud-Umfeld zu betreiben und
+% 80 \% gaben an, in den nächsten fünf Jahren die meisten oder alle ihrer neu entwickelten Anwendungen
+% auf der Cloud betreiben zu wollen. Durch den wachsenden Nutzerkreis wird auch mit Weiterentwicklungen
+% von Kubernetes in Bereichen der Bedienbarkeit und Standardisierung gerechnet \cite{emerging_trends}.
+% Erstere ist von großer Bedeutung, um Kubernetes einem größeren Feld an Entwicklern zugänglich
+% zu machen, während letztes einen wesentlichen Beitrag zur Flexibilität und Interoperabilität
+% leisten kann.
 
 \section{Anhang}
 \subsection{Selbstständigkeitserklärung}
