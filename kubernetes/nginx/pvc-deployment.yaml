@@ -1,0 +1,12 @@
+...
+    spec:
+      volumes:
+        - name: html
+          persistentVolumeClaim:
+            claimName: ws-claim
+      containers:
+        - name: webserver
+          ...
+          volumeMounts:
+            - mountPath: "/usr/share/nginx/html"
+              name: html
