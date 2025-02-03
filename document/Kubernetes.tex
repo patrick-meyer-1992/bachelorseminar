@@ -79,7 +79,7 @@
 \label{sec:einleitung}
 Die vorliegende Arbeit soll einen Überblick über das Container-\linebreak Orchestrierungs-Tool \emph{Kubernetes} geben.
 Dazu werden zunächst Historie und grundlegende Funktionsprinzipien von Kubernetes beschrieben, die anschließend
-anhand einer beispielhaften Anwendung aus dem Bereich verteilter, agentenbasierter Simulationen demonstriert werden.
+anhand einer beispielhaften Anwendung aus dem Bereich verteilter, agentenbasierter Simulationen demonstriert werden. % TODO: Simulation rausnehmen
 
 Zunächst soll die Historie betrachtet werden, vor deren Hintergrund Kubernetes entstanden ist.
 Das stetige Ziel, das sich durch diese Historie zieht, ist das Bereitstellen von Applikationen.
@@ -108,17 +108,19 @@ Die nächste Stufe der Weiterentwicklung waren (Software-)\emph{Container}. Cont
 dass Container deutlich leichtgewichtiger sind. Das wird unter anderem dadurch erreicht, dass sie, statt ein komplett eigenes Betriebssystem zu verwenden,
 Anteile des Host-Betriebssystems mitnutzen. Dadurch sind die „Baupläne“ (sog. Images) für Container im Allgemeinen kleiner als für klassische virtuelle Maschinen.
 Durch den verringerten Overhead können auf gleicher Hardware auch mehr Container parallel betrieben werden, als es mit virtuellen Maschinen möglich wäre.
+% TODO: Containerperformance nahezu so gut wie Baremetal. Quelle: ISSN 0163–5980. https://doi.org/10.1145/1272998.1273025 bzw. Bentaleb_Belloum_Sebaa_El S.6
 Durch diesen Umstand und dadurch, dass Container meist innerhalb weniger Sekunden gestartet werden können, sind diese besonders geeignet,
 um flexibel auf unterschiedliche Anfrageintensitäten zu reagieren und Ressourcen effizient zu verteilen \cite{kofler2021docker}.
 
 Einzelne Container führen in der Regel nur eine klar umgrenzte Aufgabe aus (z.B. Betrieb einer Datenbank oder eines Webservers). Da sie in sich geschlossen sind,
-können sie auch unabhängig von anderen Containern repliziert werden. Das verbessert nicht nur die Skalierbarkeit, sondern
+können sie unabhängig von anderen Containern repliziert werden. Das verbessert nicht nur die Skalierbarkeit, sondern
 vereinfacht auch die Entwicklung und das Testen der umgrenzten Aufgaben.
 % Dies hat allerdings auch zur Folge, dass ursprünglich große, monolithische Anwendungen in kleinere Teilanwendungen zerlegt werden müssen.
 Im Gegenzug muss die potenziell sehr große Menge an Containern effizient orchestriert werden, um einen echten Mehrwert zu erhalten.
 Kubernetes übernimmt als eines der heute populärsten Container-Orchestrierungs-Tool diese Aufgabe.
 Es abstrahiert dazu von allen beteiligten Rechnern und deren Ressourcen und bietet zentrale Steuerungsmöglichkeiten.
 \cite{Pagani_2019}
+% TODO: Kurzer Vergleich verschiedener Containtertechnologien Bentaleb_Belloum_Sebaa_El S.7ff, insbesondere Tabelle 1
 % Näheres zu Containern wird im Abschnitt \ref{sec:Container} behandelt.
 
 
@@ -148,6 +150,8 @@ rasch an und es konnte sich deutlich gegen konkurrierende Anwendungen durchsetze
 
 Heutzutage ist Kubernetes, nach Linux, das zweitgrößte Open-Source-Projekt der Welt und wird von 71 \% der Fortune 100 Unternehmen genutzt
 \cite{ibm_history} \cite{kubernetes_journey}.
+
+% TODO: Was sind eigentlich die Ziele von Kubernetes? Skalierbarkeit, Schnelleres Deployment? Ausfallsicherheit? etc?
 
 \section{Container}
 \label{sec:Container}
@@ -292,12 +296,13 @@ Containers nur dann sinnvoll zu betreiben ist, wenn auch ihr „Partner-“Conta
 Ein Beispiel für die Nutzung mehrerer Container innerhalb eines Pods ist die Verwendung
 eines zusätzlichen "Sidecar-Containers", der den Pod einer Anwendung um ein Netzwerkmanagement erweitert \cite{9783969109625}.
 
-Ressourcen werden in Kubernetes meist in Form von \emph{.YAML-Dateien} definiert.
+Ressourcen werden in Kubernetes meist in Form von \emph{.YAML-Dateien} definiert, 
+die auch als \emph{Kubernetes Manifeste} bezeichnet werden.
 Eine mögliche minimale Konfiguration könnte beispielsweise wie in Listing \ref{lst:pod-config} aussehen.
 
-\lstinputlisting[caption={Beispielhafte Konfiguration eines Pods in YAML.}, label=lst:pod-config]{../kubernetes/nginx/pod.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Pods.}, label=lst:pod-config]{../kubernetes/nginx/pod.yaml}
 
-Eine Kubernetes .YAML-Datei ist hierarchisch aufgebaut
+Ein Kubernetes Manifest ist hierarchisch aufgebaut
 und enthält stets die gleichen vier übergeordneten Schlüssel.
 Die \emph{apiVersion} gibt an welche Version der Endpunkte des Kube-apiservers für diese Ressource
 verwendet werden soll (vgl. \ref{sec:Kube-apiverver}).
@@ -313,7 +318,7 @@ Einschränkungen gemacht werden, wird standardmäßig \linebreak \lstinline|http
 verwendet. Abschließend wird der Container über den Port 80 erreichbar gemacht. \cite{Schmeling_Dargatz_2022}
 
 Vorausgesetzt das Cluster ist bereits initialisiert, kann mit dem Kommandozeilenbefehl
-\lstinline|kubectl create -f <Pfad/zur/.YAML-Datei>|
+\lstinline|kubectl create -f <Pfad/zum/Manifest>|
 ein Pod mit dem Namen \emph{webserver} gestartet werden.
 
 Über das Kommando \lstinline|kubectl get pod webserver| kann kontrolliert werden,
@@ -356,9 +361,9 @@ des Pods in Listing \ref{lst:pod-config} ist.
 Die Spezifikationen welche Art von Pods in diesem ReplicaSet gestartet werden sollen,
 erfolgt unter dem Schlüssel \emph{template} \cite{Schmeling_Dargatz_2022}.
 Wie auch schon bei den Pods kann dieses ReplicaSet mit dem Befehl
-\lstinline|kubectl create -f <Pfad/zur/.YAML-Datei>| erstellt werden \cite{Schmeling_Dargatz_2022}.
+\lstinline|kubectl create -f <Pfad/zum/Manifest>| erstellt werden \cite{Schmeling_Dargatz_2022}.
 
-\lstinputlisting[caption={Beispielhafte Konfiguration eines ReplicaSets mit drei Pods in YAML}, label=lst:rs-config]{../kubernetes/nginx/replicaset.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines ReplicaSets mit drei Pods.}, label=lst:rs-config]{../kubernetes/nginx/replicaset.yaml}
 
 Das Kommando \lstinline|kubectl get pods| erzeugt eine mit Listing \ref{lst:rs-pods}
 vergleichbare Ausgabe. Dabei ist anzumerken, dass jeder Pod den Namen des ReplicaSets,
@@ -386,6 +391,8 @@ webserver   3         3         3       8s
 \end{lstlisting}
 
 \subsection{Deployments}
+% TODO: Deployment mit kubectl scale skalieren vs. yaml ändern. Quelle: 9783960102403 S.122
+% TODO: Rollout + History 9783960102403, S. 124ff (evtl. auch in eigenen Abschnitt)
 Ein \emph{Deployment} ist ein Konzept, das im Schwerpunkt genutzt wird, um Änderungen an Anwendungen auszubringen.
 Das Szenario, das ein Deployment notwendig macht, kann wie folgt beschrieben werden:
 
@@ -413,14 +420,14 @@ zurückgesetzt werden können (sog. \emph{Rollback}). Das kann hilfreich sein, w
 Updates herausstellt, dass dieses doch nicht den Erwartungen entspricht und man stattdessen bei der vorherigen
 Version bleiben möchte \cite{Schmeling_Dargatz_2022}.
 
-Die .YAML-Datei für ein Deployment ist genauso aufgebaut, wie bereits beim ReplicaSet in
+Das Kubernetes Manifest für ein Deployment ist genauso aufgebaut, wie bereits beim ReplicaSet in
 Listing \ref{lst:rs-config}, mit der Ausnahme, dass der Schlüssel \emph{kind} den Wert
 \emph{Deployment} statt \emph{ReplicaSet} hat. Es kann auch ebenfalls mit dem Befehl
-\lstinline|kubectl create -f <Pfad/zur/.YAML-Datei>| gestartet werden.
+\lstinline|kubectl create -f <Pfad/zum/Manifest>| gestartet werden.
 Dadurch wird ein Deployment erstellt, das wiederum ein ReplicaSet enthält.
 Möchte man nun eine Änderung an dem Webserver vornehmen, beispielsweise indem
-man ein aktuelleres Image verwendet, reicht es, den zugehörigen Wert in der .YAML-Datei
-zu verändern und anschließend mit \lstinline|kubectl apply -f <Pfad/zur/.YAML-Datei>| anzuwenden.
+man ein aktuelleres Image verwendet, reicht es, den zugehörigen Wert im Manifest
+zu verändern und anschließend mit \lstinline|kubectl apply -f <Pfad/zum/Manifest>| anzuwenden.
 Listing \ref{lst:deploy-rollout} stellt dar wie durch mehrfaches Aufrufen
 von \lstinline|kubectl get rs| sichtbar wird, wie das alte
 ReplicaSet schrittweise abgebaut und das neue schrittweise aufgebaut wird \cite{Schmeling_Dargatz_2022}.
@@ -455,7 +462,7 @@ webserver-vccrb   1/1     Running   6s   ...   10.244.0.17
 
 Abgesehen davon, dass es recht umständlich ist, die IP-Adressen der einzelnen Pods herauszufinden,
 ergibt sich die eigentliche Herausforderung daraus, dass Pods jederzeit beliebig gelöscht
-und wieder neu gestartet werden können. Da dabei auch jedes Mal eine neue IP-Adresse vergeben wird,
+und wieder neu gestartet werden können. Da dabei jedes Mal eine neue IP-Adresse vergeben wird,
 ist die direkte Pod-Adressierung wenig zuverlässig. Außerdem muss davon ausgegangen werden, dass
 in einem ReplicaSet mehrere Replikationen eines Pods vom gleichen Typ vorliegen, wodurch unklar ist
 an welchen der gleichartigen Pods eine Anfrage gesendet werden sollte. Im schlimmsten Fall gehen alle Anfragen
@@ -464,14 +471,14 @@ Diesem Umstand wird mit \emph{Services} begegnet. Ein Service hat eine eigene IP
 von Pods zugeordnet. Anfragen können nun an den Service gestellt werden und dieser entscheidet selbstständig,
 an welchen seiner zugehörigen Pods diese Anfrage weitergegeben wird. Der Service vereinfacht also die
 Adressierbarkeit und ermöglicht gleichzeitig eine effiziente Lastverteilung (sog. \emph{Load Balancing}).
-Natürlich kann auch ein Service gelöscht und neu gestartet werden, wodurch ihm auch eine neue IP-Adresse zugewiesen wird.
+Natürlich kann auch ein Service gelöscht und neu gestartet werden, wodurch ihm eine neue IP-Adresse zugewiesen wird.
 Es ist also in der Regel nicht zielführend einen Service anhand seiner IP-Adresse anzusprechen.
 Damit das nicht notwendig ist, verwaltet Kubernetes ein internes Domain-Name-System (DNS), in dem
 der Services beim Start automatisch registriert wird und anschließend unter seinem Namen
 erreichbar ist. \cite{Schmeling_Dargatz_2022}.
 
-Listing \ref{lst:svc-config} zeigt ein Beispiel für eine .YAML-Datei,
-mit der ein Service konfiguriert werden kann.
+Listing \ref{lst:svc-config} zeigt ein Beispiel für ein Kubernetes Manifest,
+mit dem ein Service konfiguriert werden kann.
 Unter dem Schlüssel \emph{selector} können Schlüssel-Wert-Paare definiert werden,
 anhand derer die zum Service zugehörigen Pods identifiziert werden. Alle Pods, die
 die gleichen Schlüssel-Wert-Paare unter \emph{labels} aufweisen, gehören zum Service.
@@ -480,7 +487,7 @@ Während der in Listing \ref{lst:svc-config} verwendete Wert ClusterIP genutzt w
 (und die zugehörigen Pods) \emph{innerhalb} eines Clusters
 einheitlich adressierbar zu machen, wird NodePort verwendet, um einen Service von \emph{außerhalb}
 über die öffentlichen IP-Adressen der Nodes des Clusters an einem zufällig gewählten Port erreichbar zu machen \cite{Schmeling_Dargatz_2022}.
-\lstinputlisting[caption={Beispielhafte Konfiguration eines Service in YAML.}, label=lst:svc-config]{../kubernetes/nginx/service.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Service.}, label=lst:svc-config]{../kubernetes/nginx/service.yaml}
 
 \subsection{Ingress}
 \label{sec:Ingress}
@@ -496,7 +503,7 @@ Für die Anwendung muss lediglich der Part in den spitzen Klammern durch die IP-
 oder durch einen Domain-Namen, der auf die IP-Adresse eines Nodes verweist, ersetzt werden.
 Alle Anfragen an die eingetragene Adresse werden dann an den webserver-Service
 und von dort an die webserver-Pods weitergeleitet. \cite{Schmeling_Dargatz_2022}.
-\lstinputlisting[caption={Beispielhafte Konfiguration eines Ingress in YAML.}, label=lst:ingress-config]{../kubernetes/nginx/ingress.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Ingress.}, label=lst:ingress-config]{../kubernetes/nginx/ingress.yaml}
 
 
 \subsection{Volumes}
@@ -524,9 +531,9 @@ Listing \ref{lst:deploy-pvc} dargestellt. In diesem wird unter anderem festgeleg
 welches PVC zu nutzen ist (Wert zum Schlüssel \emph{claimName}) und auf welchen Pfad
 welcher Container innerhalb des Pods das PV abgebildet werden soll.
 
-\lstinputlisting[caption={Beispielhafte Konfiguration eines Persistent Volume in YAML.}, label=lst:pv]{../kubernetes/nginx/pv.yaml}
-\lstinputlisting[caption={Beispielhafte Konfiguration eines Persistent Volume Claims in YAML.}, label=lst:pvc]{../kubernetes/nginx/pvc.yaml}
-\lstinputlisting[caption={Auszug aus einer beispielhaften Konfiguration eines Deployments, das ein Persistent Volume Claims einbindet.}, label=lst:deploy-pvc]{../kubernetes/nginx/pvc-deployment.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Persistent Volume.}, label=lst:pv]{../kubernetes/nginx/pv.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Persistent Volume Claims.}, label=lst:pvc]{../kubernetes/nginx/pvc.yaml}
+\lstinputlisting[caption={Auszug aus einem beispielhaften Kubernetes Manifest für ein Deployment, das ein Persistent Volume Claim einbindet.}, label=lst:deploy-pvc]{../kubernetes/nginx/pvc-deployment.yaml}
 
 \subsection{ConfigMaps und Secrets}
 Die Daten, die von einer Anwendung in Volumes gespeichert werden, unterliegen oft regelmäßigen Veränderungen
@@ -539,7 +546,7 @@ Unter dem Schlüssel \emph{data} sind Host und Port einer Datenbankanwendung ang
 die von anderen Anwendungen genutzt werden können. Dazu müssen sie in der Konfiguration des
 Deployments eingebunden werden. Ein Beispiel dazu ist in Listing \ref{lst:deploy-with-conf} dargestellt \cite{Schmeling_Dargatz_2022}.
 
-\lstinputlisting[caption={Beispielhafte Konfiguration einer ConfigMap in YAML.}, label=lst:config]{../kubernetes/nginx/config.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration einer ConfigMap.}, label=lst:config]{../kubernetes/nginx/config.yaml}
 
 
 Neben ConfigMaps gibt es auch \emph{Secrets}, die ihre Daten ebenfalls in Key-Value-Paaren speichern.
@@ -555,7 +562,7 @@ um Secrets zu verwalten. Der Typ Opaque erlaubt das Festlegen eines beliebigen W
 Listing \ref{lst:deploy-with-conf} enthält ebenfalls ein Beispiel, wie Werte aus einem
 Secret in ein Deployment eingebunden werden können.
 
-\lstinputlisting[caption={Beispielhafte Konfiguration eines Secrets in YAML.}, label=lst:secret]{../kubernetes/nginx/secret-example.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Secrets.}, label=lst:secret]{../kubernetes/nginx/secret-example.yaml}
 \begin{lstlisting}[caption={Referenzen zur ConfigMaps und Secrets können in einem Deployment unter dem Schlüssel \emph{env} definiert werden.}, label={lst:deploy-with-conf}]
 ...
 spec:
@@ -607,9 +614,30 @@ ohne Gefahr zu laufen, Ressourcen anderer Namespaces zu beeinflussen.
 Namespaces eines Clusters können über die Befehle \lstinline|kubectl create ns <name>| und
 \lstinline|kubectl get ns| erstellt und angezeigt werden \cite{Schmeling_Dargatz_2022}.
 
+\section{Erweiterte Kubernetes Konzepte}
+
+% TODO: \section{Kubernetes in der Softwareentwicklung}
+% Würde sich anbieten, da viele Fallbeispiele erwähnen, wie sie durch Kubernetes schneller deployen konnten
+
+\section{Fallbeispiele}
+% TODO: Für Fallbeispiele müssen Microservices wahrscheinlich einmal definiert werden.
+% Evtl. Stateful Services erklären?
+
+% Helm Chart, Horizontal Pod Scaler
+% TODO: Monitoring, Logging and Health Checking?
 % TODO: "StatefulSets, DaemonSets, and Jobs" Kapitel ergänzen
+% TODO: Vergleich zu anderen Container-Orchestrierungs Tools Bentaleb_Belloum_Sebaa_El S.13ff und Tabelle 2
+% TODO: Anbieter von Cloud Plattformen vergleichen GKS, AWS, Azure
+
 % TODO Fazit:
 % - Kubernetes vereinheitlicht Konzepte, die vorher schon da waren und macht sie damit zugänglicher und effizienter \cite{Schmeling_Dargatz_2022}
+% - 
+% TODO: Ausblick
+% - Vielleicht auc CNCF weiteren Ausblick für Kubernetes recherchieren
+% - Weitere Anwendungsgebiete von Containern (und damit auch Kubernetes) Bentaleb_Belloum_Sebaa_El S. 21ff.
+% TODO: Kubernetes Adoption Story
+
+
 
 % \section{Flottensimulation}
 
