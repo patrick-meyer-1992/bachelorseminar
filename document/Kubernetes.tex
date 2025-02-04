@@ -1,4 +1,5 @@
 % TODO: Wort "Abschnitt" durch "Kapitel" ersetzen
+% TODO: Begriffe Applikation und Anwendung vereinheitlichen
 
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
@@ -44,10 +45,6 @@
 }
 
 \lstset{style=mystyle}
-
-\hyphenation{In-stand-setz-ungs-kon-fi-gu-ra-tio-nen}
-\hyphenation{Name-spaces}
-
 \title{Container-Management-Tool Kubernetes}
 \begin{document}
 % \maketitle
@@ -108,53 +105,62 @@ Die nächste Stufe der Weiterentwicklung waren (Software-)\emph{Container}. Cont
 dass Container deutlich leichtgewichtiger sind. Das wird unter anderem dadurch erreicht, dass sie, statt ein komplett eigenes Betriebssystem zu verwenden,
 Anteile des Host-Betriebssystems mitnutzen. Dadurch sind die „Baupläne“ (sog. Images) für Container im Allgemeinen kleiner als für klassische virtuelle Maschinen.
 Durch den verringerten Overhead können auf gleicher Hardware auch mehr Container parallel betrieben werden, als es mit virtuellen Maschinen möglich wäre.
-% TODO: Containerperformance nahezu so gut wie Baremetal. Quelle: ISSN 0163–5980. https://doi.org/10.1145/1272998.1273025 bzw. Bentaleb_Belloum_Sebaa_El S.6
+Insgesamt können mit Containern Leistungswerte erreicht werden, die die von virtuellen Maschinen deutlich übertreffen,
+und nahezu an die von Bare-Metal heranreichen \cite{10.1145/1272998.1273025}.
 Durch diesen Umstand und dadurch, dass Container meist innerhalb weniger Sekunden gestartet werden können, sind diese besonders geeignet,
 um flexibel auf unterschiedliche Anfrageintensitäten zu reagieren und Ressourcen effizient zu verteilen \cite{kofler2021docker}.
 
-Einzelne Container führen in der Regel nur eine klar umgrenzte Aufgabe aus (z.B. Betrieb einer Datenbank oder eines Webservers). Da sie in sich geschlossen sind,
-können sie unabhängig von anderen Containern repliziert werden. Das verbessert nicht nur die Skalierbarkeit, sondern
-vereinfacht auch die Entwicklung und das Testen der umgrenzten Aufgaben.
-% Dies hat allerdings auch zur Folge, dass ursprünglich große, monolithische Anwendungen in kleinere Teilanwendungen zerlegt werden müssen.
-Im Gegenzug muss die potenziell sehr große Menge an Containern effizient orchestriert werden, um einen echten Mehrwert zu erhalten.
-Kubernetes übernimmt als eines der heute populärsten Container-Orchestrierungs-Tool diese Aufgabe.
+Container eignen sich besonders, um \emph{Microservice-Architekturen} zu betreiben \cite{7158965}. Dabei handelt es sich um die
+Entwicklung von Anwendungen, indem sie in kleine, unabhängige (Micro-)Services aufgeteilt werden. Jeder Microservice gehört zu
+einem eigenen Prozess und die Kommunikation untereinander erfolgt durch leichtgewichtige Protokolle \cite{8406008}.
+Der Vorteil von Microservice-Architekturen liegt im Vergleich zu monolithischen Architekturen in der
+leichteren Skalierbarkeit einzelner Module und darin, dass Services weitgehend unabhängig voneinander
+ausgebracht werden können. Zusätzlich erlauben sie, dass einzelne Services in unterschiedlichen Programmiersprachen
+verfasst sein können sogar von unterschiedlichen Teams entwickelt werden \cite{microservices}.
+
+Andererseits bringen Microservice-Architekturen im Vergleich zu monolithischen Anwendungen
+auch neue Herausforderungen mit sich.
+Grundsätzlich ist es komplexer eine Microservice-Architektur aufzubauen.
+Dazu gehört insbesondere, zu definieren, aus welchen Microservices eine Anwendung bestehen soll
+und welche Aufgaben diese jeweils umfassen. Darüber hinaus kann das Testen von Microservice-Architektur
+herausfordernder sein \cite{8406008}.
+
+Kubernetes bietet als eines der heute populärsten Tools zur Orchestrierung von Containern
+diverse Möglichkeiten, um vor allem containerisierte Microservice-Architekturen effizient zu verwalten.
 Es abstrahiert dazu von allen beteiligten Rechnern und deren Ressourcen und bietet zentrale Steuerungsmöglichkeiten.
-\cite{Pagani_2019}
-% TODO: Kurzer Vergleich verschiedener Containtertechnologien Bentaleb_Belloum_Sebaa_El S.7ff, insbesondere Tabelle 1
-% Näheres zu Containern wird im Abschnitt \ref{sec:Container} behandelt.
+\cite{Pagani_2019} % TODO: Wenn möglich bessere Quelle als Pagani_2019 finden
 
-
-% Um eine vollständige Anwendung zu erhalten, betreibt man  oft mehrere Container, die im Verbund zusammenwirken; eine sogenannte \emph{Microservice-Architektur}. 
-% Die Verwaltung einer solchen verteilten Microservice-Architektur kann schnell komplex werden, weshalb verschiedene Werkzeuge zur Unterstützung entwickelt wurden.
-
-% Eines der heute populärsten Werkzeuge dieser Art ist Kubernetes. 
-Im Folgenden soll die Funktionsweise von Kubernetes beschrieben und schließlich anhand eines Beispiels
-verdeutlicht werden.
-
-\section{Historie von Kubernetes}
 Kubernetes ist eine Software, die sich der Ausbringung (Deployment), der Skalierung und der Steuerung (Management) von Containern widmet.
 Dieser Vorgang wird auch als Container-Orchestrierung oder als Container-Management bezeichnet \cite{Bisong2019}.
 In diesem Zusammenhang wird Kubernetes auch als \emph{Betriebssystem der Cloud} bezeichnet \cite{Schmeling_Dargatz_2022}.
 Entwickelt wurde Kubernetes von Google. Dort wurde seit den frühen 2000er Jahren ein selbst entwickeltes Container-Management-System namens \emph{Borg} genutzt,
 um Googles Services möglichst performant zu betreiben.
 Im Jahr 2013 wurde \emph{Borg} von dessen Nachfolger \emph{Omega} abgelöst. Im selben Jahr erschien auch Docker, was ein wesentlicher Baustein des Kubernetes
-Projekts werden sollte.
+Projekts werden sollte \cite{ibm_history}.
 
 Die drei bei Google beschäftigten Ingenieure Craig McLuckie, Joe Beda und Brendan Burns setzten sich damals dafür ein,
 die bei \emph{Borg} und \emph{Omega} gemachten Erfahrungen zu nutzen, um ein leichter bedienbares Container-Orchestrierungs-Tool
-mit nutzerfreundlicher Schnittstelle zu entwickeln.
+mit nutzerfreundlicher Schnittstelle zu entwickeln \cite{ibm_history}.
 
 2014 wurde Kubernetes als eine Open-Source-Variante von \emph{Borg} veröffentlicht und schließlich 2015 mit der Veröffentlichung von Kubernetes 1.0
 von Google an die Cloud Native Computing Foundation (CNCF, \lstinline|https://www.cncf.io/|) gespendet. In den folgenden Jahren wuchs der Nutzerkreis von Kubernetes
 rasch an und es konnte sich deutlich gegen konkurrierende Anwendungen durchsetzen.
-
 Heutzutage ist Kubernetes, nach Linux, das zweitgrößte Open-Source-Projekt der Welt und wird von 71 \% der Fortune 100 Unternehmen genutzt
 \cite{ibm_history} \cite{kubernetes_journey}.
+Auf der Kubernetes Website wird es als ein Open-Source System für automatisierte Ausbringung, Skalierung
+und Steuerung von containerisierten Anwendungen beschrieben \cite{kubernetes.io_start}.
 
-% TODO: Was sind eigentlich die Ziele von Kubernetes? Skalierbarkeit, Schnelleres Deployment? Ausfallsicherheit? etc?
+Im Folgenden soll die Funktionsweise von Kubernetes beschrieben und schließlich anhand eines Beispiels
+verdeutlicht werden.
 
 \section{Container}
 \label{sec:Container}
+
+Für die Technologie von Containern haben sich mit der Zeit mehrere Alternativen entwickelt, die unterschiedliche
+Stärken und Schwächen aufweisen. Zum einen gibt es die Technologien \emph{Singularity} und \emph{uDocker}, deren Stärken
+vor allem in wissenschaftlichen Anwendungen über verteilte Rechenressourcen wie zum Beispiel High-Performance Computing
+liegen. Zum anderen gibt es die Technologie \emph{Docker}, die sich als die heutzutage populärste Containertechnologie
+herausgestellt hat und daher auch für die folgenden Abschnitte als Grundlage angenommen wird \cite{Bentaleb_Belloum_Sebaa_El-Maouhab_2021}.
 
 Um den Begriff des (Docker-)Containers zu verstehen, wird zunächst der Begriff \emph{Image} benötigt.
 Ein Image kann wie in der Einleitung bereits beschrieben als eine Art Bauplan für einen Container gesehen werden.
@@ -296,7 +302,7 @@ Containers nur dann sinnvoll zu betreiben ist, wenn auch ihr „Partner-“Conta
 Ein Beispiel für die Nutzung mehrerer Container innerhalb eines Pods ist die Verwendung
 eines zusätzlichen "Sidecar-Containers", der den Pod einer Anwendung um ein Netzwerkmanagement erweitert \cite{9783969109625}.
 
-Ressourcen werden in Kubernetes meist in Form von \emph{.YAML-Dateien} definiert, 
+Ressourcen werden in Kubernetes meist in Form von \emph{.YAML-Dateien} definiert,
 die auch als \emph{Kubernetes Manifeste} bezeichnet werden.
 Eine mögliche minimale Konfiguration könnte beispielsweise wie in Listing \ref{lst:pod-config} aussehen.
 
@@ -329,10 +335,10 @@ Der Status "Running" zeigt an, dass der Pod einem Node zugewiesen und alle seine
 Mindestens einer dieser Container läuft ebenfalls gerade oder wird gerade gestartet.
 Weitere mögliche Zustände sind \cite{kubernetes.io_pod_lifecycle}:
 \begin{itemize}
-    \item \textbf{Pending}: Der Pod wurde erstellt, aber einer oder mehrere Container sind noch nicht gestartet.
-    \item \textbf{Succeeded}: Alle Container im Pod haben ihre Ausführung erfolgreich beendet.
-    \item \textbf{Failed}: Einer oder mehrere Container im Pod haben ihre Ausführung nicht erfolgreich beendet.
-    \item \textbf{Unknown}: Der Status des Pods kann nicht ermittelt werden, normalerweise aufgrund eines Kommunikationsproblems mit dem Node.
+  \item \textbf{Pending}: Der Pod wurde erstellt, aber einer oder mehrere Container sind noch nicht gestartet.
+  \item \textbf{Succeeded}: Alle Container im Pod haben ihre Ausführung erfolgreich beendet.
+  \item \textbf{Failed}: Einer oder mehrere Container im Pod haben ihre Ausführung nicht erfolgreich beendet.
+  \item \textbf{Unknown}: Der Status des Pods kann nicht ermittelt werden, normalerweise aufgrund eines Kommunikationsproblems mit dem Node.
 \end{itemize}
 Weiterhin wird angezeigt, dass noch kein Neustartversuch unternommen wurde
 und der Pod seit 18 Sekunden existiert.
@@ -558,7 +564,7 @@ sind auch noch weitere Maßnahmen für einen sicheren Betrieb erforderlich, da d
 unverschlüsselt im Etcd (vgl. Kapitel \ref{Etcd}) gespeichert werden \cite{Schmeling_Dargatz_2022}.
 Aus Listing \ref{lst:secret} ist eine beispielhafte Strukturierung eines Secrets ersichtlich.
 Die Angabe \emph{type: Opaque} ist eine von mehreren in Kubernetes integrierten Möglichkeiten,
-um Secrets zu verwalten. Der Typ Opaque erlaubt das Festlegen eines beliebigen Wertes \cite{kubernetes.secret_types}.
+um Secrets zu verwalten. Der Typ Opaque erlaubt das Festlegen eines beliebigen Wertes \cite{kubernetes.io_secret_types}.
 Listing \ref{lst:deploy-with-conf} enthält ebenfalls ein Beispiel, wie Werte aus einem
 Secret in ein Deployment eingebunden werden können.
 
@@ -614,28 +620,116 @@ ohne Gefahr zu laufen, Ressourcen anderer Namespaces zu beeinflussen.
 Namespaces eines Clusters können über die Befehle \lstinline|kubectl create ns <name>| und
 \lstinline|kubectl get ns| erstellt und angezeigt werden \cite{Schmeling_Dargatz_2022}.
 
-\section{Erweiterte Kubernetes Konzepte}
+% \section{Erweiterte Kubernetes Konzepte}
+
+% Helm Chart, Horizontal Pod Scaler
 
 % TODO: \section{Kubernetes in der Softwareentwicklung}
 % Würde sich anbieten, da viele Fallbeispiele erwähnen, wie sie durch Kubernetes schneller deployen konnten
 
-\section{Fallbeispiele}
-% TODO: Für Fallbeispiele müssen Microservices wahrscheinlich einmal definiert werden.
+\section{Kubernetes in der Praxis}
+In diesem Kapitel soll anhand mehrerer Fallbeispiele dargestellt werden, wie Unternehmen
+Kubernetes in der Praxis nutzen, um Anwendungen bereitzustellen.
+Obwohl die aufgeführten Angaben direkt von den Unternehmen stammen und daher nicht im Detail
+überprüft werden können, sind sie dennoch geeignet, einen Eindruck davon zu vermitteln,
+in welchen Größendimensionen Kubernetes genutzt werden kann und wie es durch
+einheitliche Schnittstellen und vereinfachte Skalierung
+einen Mehrwert erzeugt.
+\subsection{Zalando}
+Zalando ist ein Unternehmen, das 2008 gegründet wurde und das sich auf den Verkauf
+von Bekleidung im Internet spezialisiert hat. Es beschäftigt über 14.000 Angestellte,
+ist in 15 Ländern aktiv und hatte im Jahr 2016 einem Umsatz von 3,6 Milliarden Euro.
+Zalandos Service basierte ursprünglich auf PHP \cite{php}, was einen leichten Start ermöglichte,
+aber langfristig mit wachsenden Anforderungen an die Skalierbarkeit nur schwer mithalten konnte.
+Daher begann das Unternehmen ab 2016 seine Anwendungen so zu verändern, dass sie
+in eine Cloud-Umgebung migriert werden können. Als Cloud Umgebung wurde AWS, % TODO: AWS erklären
+ursprünglich ohne Kubernetes, ausgewählt. Später entschied sich Zalando,
+zwar weiterhin AWS zu nutzen, aber dort Docker Container mit Kubernetes
+als Orchestrierungs-Tool einzusetzen. Der Vorteil, der darin gesehen wurde,
+war die Unabhängigkeit von einem spezifischen Cloud-Anbieter, die durch
+Kubernetes als Abstraktionsschicht erzielt wurde.
+Zalando betreibt über 40 Cluster und plant noch weiter zu skalieren \cite{story_zalando}.
+
+\subsection{Spotify}
+Spotify ist ein Streaming-Dienst für Musik, der 2008 gegründet wurde
+und über 200 Millionen aktive Nutzer pro Monat verzeichnet.
+Bereits seit 2014 nutzte Spotify ein eigens entwickeltes System zur Container-Orchestrierung
+namens \emph{Helios}. Dabei wurde beobachtet, dass die Weiterentwicklung von Helios
+durch das vergleichsweise kleine Team bei Spotify wenig effizient war.
+Folglich wurde 2017 nach einer Lösung gesucht, die von einer größeren Gemeinschaft
+unterstützt wird. Gleichzeitig erfolgte die Migration von hauseigener Infrastruktur
+zu Google Cloud. Spotify entschied sich, zukünftig Kubernetes zur Container-Orchestrierung zu nutzen, % TODO: Google Cloud erklären
+da dies einen breiteren Funktionsumfang anbot als Helios.
+Zusätzlich wurde dieser Schritt dadurch motiviert, dass ein Großteil
+vergleichbarer Unternehmen ebenfalls Kubernetes zu nutzen schienen.
+Spotify gelang es dabei, die eigenen Anwendungen schrittweise
+von Helios nach Kubernetes zu überführen und damit zu zeigen, dass Kubernetes
+auch im Verbund mit anderen Container-Orchestrierungs-Tools genutzt werden.
+Als Mehrwert, der durch die Nutzung von Kubernetes generiert wird,
+gibt das Unternehmen an, dass Entwickler sich besser auf konkrete Entwicklungsaufgaben
+konzentrieren können und dass sich die Ausnutzung von Rechenressourcen
+um das zwei- bis dreifache verbessert habe.
+Spotifys größter Service erhält ca. 10 Millionen Anfragen pro Sekunde
+und kann daher stark von Kubernetes automatischer Skalierung profitieren \cite{story_spotify}.
+
+\subsection{OpenAI}
+Der Fokus von OpenAI liegt auf Erforschung und Entwicklung von künstlicher Intelligenz.
+Zu diesem Zweck wurde eine Infrastruktur gesucht, die skalierbar, portierbar und günstig ist.
+Um dies zu erreichen, begann OpenAI 2016 Kubernetes auf AWS und ab 2017 auf
+Microsoft Azure zu nutzen. Zusätzlich wurde auch weiterhin eigene Hardware verwendet
+und mit Kubernetes gesteuert.
+Kubernetes unterstütze die Portierbarkeit zwischen diesen beiden Lösungen.
+Der hybride Ansatz ermöglichte OpenAI Kosteneinsparungen,
+da immer dann eigene Hardware genutzt werden konnte, wenn diese freie Kapazitäten hatte,
+und zusätzlich Ressourcen vom Cloud-Anbieter nur dann eingebunden wurden,
+wenn diese zwingend erforderlich waren.
+OpenAI gibt an, durch Kubernetes die Zeit, die für bestimmte Entwicklungsaufgaben
+benötigt wurde, von mehreren Monaten auf ein bis zwei Wochen reduziert zu haben.
+Das Unternehmen nutzte 2018 über 2500 Nodes \cite{openai_scaling_2500} und 2021 über 7500 \cite{openai_scaling_7500} \cite{story_openai}.
+
+% \subsection{Box}
+% Gegründet 2005
+% Enterprise Content Management Company
+% Über 50 Millionen Nutzer
+% Ursprünglich überwiegend Baremetal auf eigener Hardware
+% Monolithische PHP Code Basis
+% Global Expandierende Firma hatte Bedarf, Workload über verschiedene Cloud Infrastrukturen zu nutzen
+% Früher mehr als 6 Monate um einen neuen Microservice auszubringen. Mittlerweile weniger als 5 Tage.
+% 2014 knapp 10 Jahre Soft- und Hardware, die nicht mehr auf Stand war.
+% Kubernetes bietet einheitliche API (über verschiedene Cloudplattformen und Bare Metal), um neue Werkzeuge danach auszurichten
+% Services nach und nach migriert
+% Mehrere hundert Nodes
+
+% \subsection{BlaBlaCar}
+% Langstrecken Car Pooling
+% gegründet 2006
+
+% 40 Millionen Nutzer in 22 Ländern
+% Starkes Wachstum seit 2012
+% 2015 50 bare Metal Server
+% Kubernetes ermöglicht Entwicklern sich auf die Entwicklung zu konzentrieren (Features)
+% Nutzen rkt als Container Engine (statt Docker)
+% Bis Dezember 2015 sollte die gesamte Plattform containerisiert werden (bis dahin zu 80\% gelungen, mittlerweile 100\%)
+% Schnelleres Ausbringen von Services
+% Mittlerweile 3000 Pods, davon 1200 eingebunden in Kubernetes
+
+
+
+
+
 % Evtl. Stateful Services erklären?
 
-% Helm Chart, Horizontal Pod Scaler
 % TODO: Monitoring, Logging and Health Checking?
 % TODO: "StatefulSets, DaemonSets, and Jobs" Kapitel ergänzen
-% TODO: Vergleich zu anderen Container-Orchestrierungs Tools Bentaleb_Belloum_Sebaa_El S.13ff und Tabelle 2
 % TODO: Anbieter von Cloud Plattformen vergleichen GKS, AWS, Azure
 
 % TODO Fazit:
 % - Kubernetes vereinheitlicht Konzepte, die vorher schon da waren und macht sie damit zugänglicher und effizienter \cite{Schmeling_Dargatz_2022}
-% - 
+% - Nachteile von Microservices, die sich auch auf Kubernetes auswirken (Komplexere Entwicklung, schwieriger testen im Vergleich zu Monolith, Quelle: 8406008)
+% - Vergleich zu anderen Container-Orchestrierungs Tools Bentaleb_Belloum_Sebaa_El S.13ff und Tabelle 2
 % TODO: Ausblick
 % - Vielleicht auc CNCF weiteren Ausblick für Kubernetes recherchieren
 % - Weitere Anwendungsgebiete von Containern (und damit auch Kubernetes) Bentaleb_Belloum_Sebaa_El S. 21ff.
-% TODO: Kubernetes Adoption Story
 
 
 
