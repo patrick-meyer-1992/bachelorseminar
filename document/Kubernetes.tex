@@ -1,5 +1,6 @@
 % TODO: Wort "Abschnitt" durch "Kapitel" ersetzen
 % TODO: Begriffe Applikation und Anwendung vereinheitlichen
+% TODO: Code Listings mit Quelle versehen
 
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
@@ -170,8 +171,11 @@ getrennten Overlay-System behandelt.
 Das heißt, dass diese Änderungen in einem Verzeichnis auf dem Host-System abgebildet werden.
 Dadurch können beliebig viele Container von demselben Image abgeleitet werden \cite{kofler2021docker}.
 
-Für viele populäre Anwendungen (z.B. nginx, Ubuntu oder Node.js) gibt es vorgefertigte Images, die kostenfrei vom DockerHub %  TODO: Quelle ergänzen (Dockerhub, nginx, ubuntu, node.js)
-heruntergeladen werden können.
+Für viele populäre Anwendungen gibt es vorgefertigte Images, die kostenfrei aus im Internet verfügbaren
+\emph{Container-Repositories} (zum Beispiel \lstinline|https://hub.docker.com|) heruntergeladen werden können.
+Darüber hinaus ist es auch möglich eigene Container-Repositories zu betreiben,
+die zum Beispiel Images enthalten können, die von einem Unternehmen entwickelt wurden
+und Dritten nicht zur Verfügung gestellt werden sollen.
 Für einen konkreten Anwendungsfall kann es sinnvoll sein, ein bestehendes Basis-Image für die eigenen Zwecke anzupassen.
 Dies ist mithilfe eines sogenannten \emph{Dockerfile}s möglich. Darin wird definiert, wie ein Base-Image z.B. durch das Hinzufügen von Dateien,
 oder dem Ändern von Umgebungsvariablen angepasst werden soll. Dieses \emph{Dockerfile} wird dann für den \emph{build}
@@ -624,8 +628,162 @@ Namespaces eines Clusters können über die Befehle \lstinline|kubectl create ns
 
 % Helm Chart, Horizontal Pod Scaler
 
-% TODO: \section{Kubernetes in der Softwareentwicklung}
-% Würde sich anbieten, da viele Fallbeispiele erwähnen, wie sie durch Kubernetes schneller deployen konnten
+\section{Kubernetes in Softwareentwicklung und Betrieb}
+Container und Kubernetes können dazu beitragen, die Arbeit von Personal in Softwareentwicklung und
+Betrieb zu vereinfachen und damit Anwendungen schneller von der Entwicklung
+in eine Produktivumgebung zu bringen.
+Wichtige Konzepte in diesem Zusammenhang sind
+\emph{Continuous Integration}, \emph{Continuous Deployment} (CI/CD)
+und \emph{GitOps}. Diese Konzepte und deren Mehrwert sollen in diesem Kapitel vorgestellt werden \cite{domingus2022cloud}.
+
+Für das Verständnis der folgenden Absätze muss erst geklärt werden,
+welche Schritte Software von der Entwicklung bis zur Ausbringung an den
+Nutzenden durchläuft.
+Schmeling und Dargatz \cite{Schmeling_Dargatz_2022} schlagen dazu
+fünf aufeinanderfolgende Umgebungen vor.
+
+Die erste ist die \emph{Entwicklungsumgebung}, von der es potenziell
+eine eigene für jede entwickelnde Person gibt. Im Gegensatz zu den folgenden
+Umgebungen ist diese in der Regel strikt isoliert. Jeder und jede Entwickelnde
+kann seine oder ihre Umgebung für sich konfigurieren und Änderungen, die von anderen
+Personen am Quellcode vorgenommen werden, haben keinen unmittelbaren Einfluss \cite{Schmeling_Dargatz_2022}.
+
+Darauf folgt die \emph{Integrationsumgebung}. Meist handelt es sich dabei
+um ein zentrales Quellcode-\emph{Repository}, das mit einem System zu Versionskontrolle
+verwaltet wird, wie z.B. \emph{git} \cite{chacon2014pro}.
+Entwickelnde integrieren ihre Arbeit in das zentrale Repository, wo sie
+automatisch kompiliert und ihn lauffähige Software übersetzt wird (sog. \emph{build}).
+Weiterhin werden die individuellen Komponenten der Anwendung getestet (sog. \emph{Unit-Test}).
+Sollten Quell- oder Konfigurationsdateien, die in der Entwicklungsumgebung
+eines Entwickelnden vorhanden sind, in der Integrationsumgebung fehlen,
+wird dieser Fehler hier abgefangen.
+Ergebnisse des \emph{build} können bereits durch Entwickelnde getestet werden \cite{Schmeling_Dargatz_2022}.
+
+Es wird aber auch eine designierte \emph{Testumgebung} vorgeschlagen.
+Die hier durchgeführten Tests sind aufwändiger und dauern länger als
+die Tests, die in der Integrationsumgebung durchgeführt werden.
+Denkbar sind auch manuelle Tests wie zum Beispiel Nutzerakzeptanztests \cite{Schmeling_Dargatz_2022}.
+
+Die \emph{Präproduktivumgebung} ist der nachfolgenden Produktivumgebung am ähnlichsten.
+Sie ist daher besonders für Tests der Performanz geeignet, hat
+aber auch einen großen Ressourcenbedarf \cite{Schmeling_Dargatz_2022}.
+
+Schlussendlich ist die \emph{Produktivumgebung}, diejenige, auf der eine Anwendung
+Nutzenden bereitgestellt wird \cite{Schmeling_Dargatz_2022}.
+
+% TODO: Eventuell Absatz dazu wie Schmeling_Dargatz_2022 diese Umgebungen aufteilen würden (S. 249 ff.)
+
+Ein Ziel von CI/CD und GitOps ist es, den Weg einer Anwendung durch
+diese Umgebungen transparent zu dokumentieren und möglichst automatisiert
+durchzuführen, damit neue Inhalte möglichst schnell zu den
+Nutzenden gelangen \cite{cicd_with_kubernetes}.
+
+\emph{Continuous Integration} (CI) ist ein Konzept, das dann wichtig wird, wenn mehrere
+Entwicklerinnen und Entwickler an einem Produkt arbeiten.
+Wenn diese parallel Änderungen an verschiedenen Stellen des Quellcodes
+vornehmen, kann die Arbeit einer Person leicht obsolet werden,
+wenn sich in der Zwischenzeit an anderen Stellen im Quellcode größere
+Änderungen ergeben haben, die nicht mehr konform zu der nun obsoleten Arbeit sind \cite{fowler_Continuous_Integration}.
+
+Wie der Name vermuten lässt, betrifft CI vor allem die oben genannte Integrationsumgebung.
+Alle beteiligten Entwicklerinnen und Entwickler integrieren den von ihnen
+entwickelten Quellcode regelmäßig aber mindestens täglich in ein zentrales
+Repository. Dort findet der automatisierte \emph{build} statt.
+Solange Entwickelnde ihre lokale Entwicklungsumgebung regelmäßig mit dem
+zentralen Repository abgleichen, kann sichergestellt werden, dass
+Unstimmigkeiten im Quellcode schnell entdeckt und potenziell schnell behoben werden.
+Es verlangt allerdings, dass sämtlicher Quellcode durch automatisierte
+Tests abgedeckt ist \cite{fowler_Continuous_Integration}.
+
+Bis zu diesem Punkt gibt es kaum Unterschiede zwischen Entwicklungsprozessen,
+die Container und Kubernetes nutzen und solchen, die sie nicht nutzen.
+Beim {Continuous Deployment} ändert sich dies.
+Ein Continuous Deployment besteht aus mehreren automatisierten Schritten,
+die zusammen auch als \emph{Pipeline} bezeichnet werden.
+Eine Pipeline besteht typischerweise aus den folgenden Schritten \cite{domingus2022cloud}:
+\begin{enumerate}
+  \item Eine entwickelnde Person integriert ihre Änderungen in das zentrale Repository.
+  \item Es wird ein automatisierter \emph{build} mit Unit-Tests durchgeführt.
+  \item Wenn alle Tests erfolgreich waren, wird ein Container-Image erstellt und im zentralen Container-Repository veröffentlicht.
+  \item Die auf dem neuen Image basierenden Container werden in der Präproduktivumgebung ausgebracht.
+  \item In der Präproduktivumgebung werden weitere automatisierte und/oder manuelle Tests durchgeführt.
+  \item Das getestete Container-Image wird in der Produktivumgebung ausgebracht.
+\end{enumerate}
+Der wesentliche Unterschied zum Arbeiten ohne Container und Kubernetes ist, dass nicht Quellcode
+die Umgebungen durchläuft, sondern ein Container. Das kann dabei helfen, Fehler abzufangen,
+die bei der Umwandlung von Quellcode zu einer ausführbaren Datei auftreten können.
+Der Vorteil von Containern ist also, dass exakt das getestete Image schlussendlich
+Einzug in die Produktivumgebung hält, was die Wahrscheinlichkeit für unerwartete Fehler verringert  \cite{domingus2022cloud}.
+
+
+
+
+% \cite{Schmeling_Dargatz_2022}
+% S.138
+% Ziel: Code produktiv bekommen
+% Entwickler wollen sich auf Entwickeln konzentrieren
+% Unterschiedliche Entwickler nutzen unterschiedliche Programmiersprachen
+
+% S.139
+% Innerer Loop als erste Phase der Entwicklung.
+% Entwickler meist sehr effizient darin, in ihrem eigenen inner Loop zu arbeiten
+
+% S.140
+% Kubernetes hat keinen Fokus auf Unterstützung der Softwareentwicklung (sondern running container applications)
+
+% S.145
+% Hot reloading in klassischer Softwareentwicklung (Beispiel Angular)
+
+% S.146 - 147
+% Tabelle zeigt Vor- und Nachteile lokaler Entwicklung
+
+% S. 148
+% Fremde Komponenten, die für die Entwicklung an der eigenen Komponente wichtig sind, können einfach über ein Dockerfile definiert werden
+
+% S.150
+% Dockerfile für die eigene Anwendung kann erstellt werden
+
+% S.151
+% Hauptproblem: Hot Reloading. Kann aber dadurch gelöst werden, dass man den Ordner mit dem Quellcode als Volume einbindet
+
+% S.157 - 159
+% Vor- und Nachteile wenn man Container in der Entwicklung nutzt
+
+% S.160
+% Lücke zwischen Entwicklung und Produktion soll möglichst klein gehalten werden
+% Auch wenn Code auf Kubernetes ausgeführt und sogar entwickelt wird, bleibt noch eine Lücke
+% Kubernetes ist über verschiedene Plattformen hinweg gleich.
+
+% S.161
+% Loakles Minikube oder development cluster hat zwar nicht die Ressourcen von Prod, kann aber schon helfen, Fehler zu entdecken, die nichts mit der
+% Performance zu haben.
+
+% S. 174
+% Helm als Tool für Kubernetes Deployments. Helm ist templating language für Kubernetes Manifeste
+% Helm ersparte redundante Werte in den Manifesten. Zentrales values.yaml
+% Helm macht Releases transparent und vereinfacht rollbacks
+% Verschiedene values.yaml für verschiedene Umgebungen möglich
+% values.yaml haben Schleifen und Kontrollstrukturen
+
+% \cite{cicd_with_kubernetes}
+% S. 12 Was ist DevOps und was ist die Historie
+% Hochspezialisierte Server mit viel Konfigurationsaufwand (früher). Dann ersetzt durch Docker. Weniger Anforderungen an Hardwareserver
+
+% S. 254
+% Einzelne Schritte von Pipeline
+% \cite{Schmeling_Dargatz_2022} Verschiedene Umgebungen können unterschiedlich realisiert werden (Namespaces, Cluster)
+% Der Container wird getestet, nicht der Source Code, da Fehler zwischen Sourcecode und Binary auftreten können
+% verschiedene Tools für CI CD <-- evtl Gitlab und Github hervorheben
+
+% S. 266
+% GitOps als Infrastructure as Code
+
+% S. 269
+% GitOps Tools können automatisch ein Deployment triggern, wenn Änderungen an den Kubernetes Manifesten
+% oder am Helm Chart festgestellt werden
+% Alles was nicht im Git repo ist, wird automatisch zurückgerollt (z.B. manuelle Änderungen)
+% Alle Änderungen werden im Git Repo getrackt. Ermöglicht Dokumentation und Nachvollziehbarkeit
+
 
 \section{Kubernetes in der Praxis}
 In diesem Kapitel soll anhand mehrerer Fallbeispiele dargestellt werden, wie Unternehmen
@@ -730,6 +888,8 @@ Das Unternehmen nutzte 2018 über 2500 Nodes \cite{openai_scaling_2500} und 2021
 % TODO: Ausblick
 % - Vielleicht auc CNCF weiteren Ausblick für Kubernetes recherchieren
 % - Weitere Anwendungsgebiete von Containern (und damit auch Kubernetes) Bentaleb_Belloum_Sebaa_El S. 21ff.
+% - Will Kubernetes disappear? domingus2022cloud, S.13
+% - Schmeling und Dargatz gehen davon aus, dass Kubernetes "Standard" wird  und viele bestehende Tools dafür optimiert werden S.1 
 
 
 
