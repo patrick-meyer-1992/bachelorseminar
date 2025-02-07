@@ -401,6 +401,7 @@ webserver   3         3         3       8s
 \end{lstlisting}
 
 \subsection{Deployments}
+\label{sec:Deployments}
 % TODO: Deployment mit kubectl scale skalieren vs. yaml ändern. Quelle: 9783960102403 S.122
 % TODO: Rollout + History 9783960102403, S. 124ff (evtl. auch in eigenen Abschnitt)
 Ein \emph{Deployment} ist ein Konzept, das im Schwerpunkt genutzt wird, um Änderungen an Anwendungen auszubringen.
@@ -624,10 +625,6 @@ ohne Gefahr zu laufen, Ressourcen anderer Namespaces zu beeinflussen.
 Namespaces eines Clusters können über die Befehle \lstinline|kubectl create ns <name>| und
 \lstinline|kubectl get ns| erstellt und angezeigt werden \cite{Schmeling_Dargatz_2022}.
 
-% \section{Erweiterte Kubernetes Konzepte}
-
-% Helm Chart, Horizontal Pod Scaler
-
 \section{Kubernetes in Softwareentwicklung und Betrieb}
 Container und Kubernetes können dazu beitragen, die Arbeit von Personal in Softwareentwicklung und
 Betrieb zu vereinfachen und damit Anwendungen schneller von der Entwicklung
@@ -697,7 +694,7 @@ Tests abgedeckt ist \cite{fowler_Continuous_Integration}.
 
 Bis zu diesem Punkt gibt es kaum Unterschiede zwischen Entwicklungsprozessen,
 die Container und Kubernetes nutzen und solchen, die sie nicht nutzen.
-Beim {Continuous Deployment} ändert sich dies.
+Beim \emph{Continuous Deployment} ändert sich dies.
 Ein Continuous Deployment besteht aus mehreren automatisierten Schritten,
 die zusammen auch als \emph{Pipeline} bezeichnet werden.
 Eine Pipeline besteht typischerweise aus den folgenden Schritten \cite{domingus2022cloud}:
@@ -713,50 +710,61 @@ Der wesentliche Unterschied zum Arbeiten ohne Container und Kubernetes ist, dass
 die Umgebungen durchläuft, sondern ein Container. Das kann dabei helfen, Fehler abzufangen,
 die bei der Umwandlung von Quellcode zu einer ausführbaren Datei auftreten können.
 Der Vorteil von Containern ist also, dass exakt das getestete Image schlussendlich
-Einzug in die Produktivumgebung hält, was die Wahrscheinlichkeit für unerwartete Fehler verringert  \cite{domingus2022cloud}.
+Einzug in die Produktivumgebung hält, was die Wahrscheinlichkeit für unerwartete Fehler verringert.
+Dadurch dass Kubernetes-Deployments (vgl. \ref{sec:Deployments}) standardmäßig schrittweise ausgebracht werden,
+können neue Versionen ohne Serviceunterbrechungen in der Produktivumgebung bereitgestellt werden \cite{domingus2022cloud}.
+
+Zur Automatisierung eines Deployments stehen eine Reihe an verschiedenen Werkzeugen
+zur Verfügung, die beispielsweise von Domingus und Arundel \cite{domingus2022cloud}
+vorgestellt werden. Ein automatisiertes Deployment wird in der Regel ausgelöst,
+wenn eine neue Integration in das zentrale Repository bestimmte Eigenschaften erfüllt.
+Im Kontext von \emph{git} kann das ein bestimmter \emph{branch} sein, zu dem
+ein \emph{push} stattfand oder ein bestimmter \emph{tag}, der ergänzt wurde.
+
+Der Begriff \emph{GitOps} baut auf dem Begriff \emph{DevOps} auf \cite{cicd_with_kubernetes}.
+DevOps wiederum entstand aus der Motivation die Bereiche Entwicklung und Betrieb
+besser aufeinander abzustimmen, mit dem Ziel, entwickelte Software schnell
+für Nutzende verfügbar zu machen. Eine wesentliche Herausforderung in diesem Zusammenhang
+war, dass der Betrieb wenig über die entwickelten Anwendungen wusste und
+die Entwicklung nur begrenzte Kenntnisse über das Ausbringen von Anwendungen hatte.
+Zusätzlich waren verwendete Server oft stark spezialisiert und schwierig zu ersetzen.
+Als Lösungsansatz für letzteres wurden Prozesse entwickelt, um automatisiert Images
+für virtuelle Maschinen zu erstellen, die die Anwendung inklusive ihrer Abhängigkeiten
+und des Betriebssystems enthielt. Das erhöhte die Zuverlässigkeit von
+Anwendungen in der Produktivumgebung, war aber immer noch vergleichsweise langsam \cite{cicd_with_kubernetes}.
+
+Mit dem Aufkommen von Containern konnte dieser Prozess nicht nur performanter, sondern
+auch einfacher gemacht werden. Dadurch dass die Konfiguration des "Servers" (also in diesem
+Fall das Container-Image) übersichtlich und nachvollziehbar in einer Textdatei stattfand,
+konnte dies auch zunehmend durch den Entwicklungsbereich übernommen werden.
+Gleichzeitig konnte die Konfiguration der physischen oder virtuellen Server
+stark vereinfacht werden, da sie nur noch in der Lage sein mussten, Container auszuführen.
+Ob diese Server selbst betrieben wurden oder in der Cloud spielte damit auch nur
+noch eine untergeordnete Rolle \cite{cicd_with_kubernetes}.
+
+Kubernetes führt die Idee der vereinfachten Konfiguration noch einen Schritt weiter.
+Deklarative Kubernetes-Manifeste beschreiben einen erwünschten Zustand
+und Kubernetes sorgt dafür, dass dieser erreicht wird.
+Da diese Konfiguration ebenfalls aus leicht lesbaren Textdateien besteht,
+kann diese Konfiguration mit gängigen Werkzeugen zur Versionskontrolle
+überwacht werden. \emph{GitOps} beschreibt daher ein Vorgehen,
+in dem ein zentrales Repository alle Informationen, einschließlich Quellcode und Konfiguration,
+enthält, die zum Betrieb einer Anwendung erforderlich sind.
+Jede Änderung, die vorgenommen werden soll, wird durch eine Aktualisierung
+des zentralen Repositories ausgelöst. Ein CI/CD Prozess sorgt dann dafür,
+dass diese Änderungen auch ausgebracht werden.
+Im Umkehrschluss wird ein strenger GitOps Prozess auch dafür sorgen,
+dass manuelle Änderungen, die zum Beispiel durch über einen Kommandozeilenbefehl
+vorgenommen wurden und die von dem erwünschten Status im zentralen Repository
+abweichen, automatisch zurückgesetzt werden.
+Dadurch wird erreicht, dass es nur eine gültige und zugleich transparente
+Quelle für den erwünschten Zustand der Infrastruktur gibt \cite{domingus2022cloud} \cite{cicd_with_kubernetes}.
+
 
 
 
 
 % \cite{Schmeling_Dargatz_2022}
-% S.138
-% Ziel: Code produktiv bekommen
-% Entwickler wollen sich auf Entwickeln konzentrieren
-% Unterschiedliche Entwickler nutzen unterschiedliche Programmiersprachen
-
-% S.139
-% Innerer Loop als erste Phase der Entwicklung.
-% Entwickler meist sehr effizient darin, in ihrem eigenen inner Loop zu arbeiten
-
-% S.140
-% Kubernetes hat keinen Fokus auf Unterstützung der Softwareentwicklung (sondern running container applications)
-
-% S.145
-% Hot reloading in klassischer Softwareentwicklung (Beispiel Angular)
-
-% S.146 - 147
-% Tabelle zeigt Vor- und Nachteile lokaler Entwicklung
-
-% S. 148
-% Fremde Komponenten, die für die Entwicklung an der eigenen Komponente wichtig sind, können einfach über ein Dockerfile definiert werden
-
-% S.150
-% Dockerfile für die eigene Anwendung kann erstellt werden
-
-% S.151
-% Hauptproblem: Hot Reloading. Kann aber dadurch gelöst werden, dass man den Ordner mit dem Quellcode als Volume einbindet
-
-% S.157 - 159
-% Vor- und Nachteile wenn man Container in der Entwicklung nutzt
-
-% S.160
-% Lücke zwischen Entwicklung und Produktion soll möglichst klein gehalten werden
-% Auch wenn Code auf Kubernetes ausgeführt und sogar entwickelt wird, bleibt noch eine Lücke
-% Kubernetes ist über verschiedene Plattformen hinweg gleich.
-
-% S.161
-% Loakles Minikube oder development cluster hat zwar nicht die Ressourcen von Prod, kann aber schon helfen, Fehler zu entdecken, die nichts mit der
-% Performance zu haben.
 
 % S. 174
 % Helm als Tool für Kubernetes Deployments. Helm ist templating language für Kubernetes Manifeste
