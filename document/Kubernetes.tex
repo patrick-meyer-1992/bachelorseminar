@@ -16,6 +16,10 @@
 \lstset{basicstyle=\ttfamily}
 \addbibresource{literature.bib}
 
+\hyphenation{Ku-ber-ne-tes}
+\hyphenation{Ma-ni-fest}
+% \hyphenation{Ser-vice}
+
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -71,7 +75,7 @@
 \pagenumbering{arabic}
 \section{Einleitung}
 \label{sec:einleitung}
-Die vorliegende Arbeit soll einen Überblick über das Container-Orchestrierungs-Tool \emph{Kubernetes} geben.
+Diese Arbeit soll einen Überblick über das Container-Orchestrierungs-Tool \emph{Kubernetes} geben.
 Dazu werden zunächst Historie und grundlegende Funktionsprinzipien von Kubernetes beschrieben.
 In dem darauffolgenden Kapitel wird aufgeführt, wie Kubernetes in Verbindung mit modernen
 Konzepten zur Entwicklung und zur Ausbringung von Software genutzt werden kann,
@@ -92,7 +96,7 @@ Ist eine Anwendung darauf angewiesen eine bestimmte Abhängigkeit in der Version
 benötigt eine Version \(\geq 1.4\) derselben Abhängigkeit, lässt sich das nur schwer vereinbaren.
 Zum anderen erschwert dieser Aufbau eine effiziente Ressourcenverteilung. Selbst wenn eine Anwendung alleine auf einem Rechner betrieben wird (z.B. um Konflikte zu anderen
 Anwendungen zu vermeiden), muss dieser Rechner ausreichende Kapazitäten haben, um die höchsten Anfragespitzen an diese Anwendung zu verarbeiten.
-Selbst dann, wenn diese Anfragespitzen nur äußerst selten erreicht werden \cite{Pagani_2019}.
+Selbst dann, wenn diese Anfragespitzen nur äußerst selten erreicht werden \cite{Schmeling_Dargatz_2022} (S. 115-116).
 
 Eine Weiterentwicklung dieser Bare-Metal-Architektur waren virtuelle Maschinen.
 Virtuelle Maschinen erlauben es, auf derselben Hardware mehrere virtuelle Instanzen eines
@@ -135,12 +139,12 @@ herausfordernd sein \cite{8406008}.
 Abbildung \ref{fig:arch-vergleich} visualisiert exemplarisch, welche Ebenen bei Bare-Metal-Architekturen, virtuellen Maschinen und Containern
 jeweils zwischen Hardware und den Anwendungen liegen und wie Anwendungen voneinander isoliert werden.
 
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[width=1\textwidth]{./media/7899247 (eigen).png}
-%   \caption{Eine Gegenüberstellung von Bare-Metal-Architekturen, virtuellen Maschinen und Containern zeigt die einzelnen Ebenen und die Trennung von Anwendungen \cite{7899247}.}
-%   \label{fig:arch-vergleich}
-% \end{figure}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=1\textwidth]{./media/7899247 (eigen).png}
+  \caption{Eine Gegenüberstellung von Bare-Metal-Architekturen, virtuellen Maschinen und Containern zeigt die einzelnen Ebenen und die Trennung von Anwendungen \cite{7899247}.}
+  \label{fig:arch-vergleich}
+\end{figure}
 
 Kubernetes bietet als eines der heute populärsten Tools zur Orchestrierung von Containern
 diverse Möglichkeiten, um vor allem containerisierte Microservice-Architekturen effizient zu verwalten.
@@ -188,13 +192,13 @@ Das heißt, dass diese Änderungen in einem Verzeichnis auf dem Host-System abge
 Dadurch können beliebig viele Container von demselben Image abgeleitet werden \cite{kofler2021docker} (S. 140).
 Eine Visualisierung dieses Konzepts ist in Abbildung \ref{fig:overlay} dargestellt.
 
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[width=0.5\textwidth]{./media/kofler2021docker S.140.png}
-%   \caption{Ein von einem Image abgeleiteter Container hat ein eigenes Dateisystem für Lese- und Schreibvorgänge, das
-%     von dem Dateisystem des Images getrennt ist \cite{kofler2021docker} (S. 140).}
-%   \label{fig:overlay}
-% \end{figure}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{./media/kofler2021docker S.140.png}
+  \caption{Ein von einem Image abgeleiteter Container hat ein eigenes Dateisystem für Lese- und Schreibvorgänge, das
+    von dem Dateisystem des Images getrennt ist \cite{kofler2021docker} (S. 140).}
+  \label{fig:overlay}
+\end{figure}
 
 Für viele populäre Anwendungen gibt es vorgefertigte Images, die kostenfrei aus im Internet verfügbaren
 \emph{Container-Repositories} (zum Beispiel \lstinline|https://hub.docker.com|) heruntergeladen werden können.
@@ -256,13 +260,13 @@ die in Abbildung \ref{fig:containerschiff} dargestellt ist. Dort gibt es mehrere
 Im Anschluss daran werden die wichtigsten Ressourcen
 von Kubernetes beschrieben und anhand von kurzen Beispielen vorgestellt.
 
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[width=1\textwidth]{./media/Schmeling_Dargatz_2022 S.7.png}
-%   \caption{Die verschiedenen Komponenten von Master und Worker Nodes können mit
-%     verschiedenen Komponenten eines Leitschiffs und mehrerer Containerschiffe verglichen werden. \cite{Schmeling_Dargatz_2022} (S. 7).}
-%   \label{fig:containerschiff}
-% \end{figure}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=1\textwidth]{./media/Schmeling_Dargatz_2022 S.7.png}
+  \caption{Die verschiedenen Komponenten von Master und Worker Nodes können mit
+    verschiedenen Komponenten eines Leitschiffs und mehrerer Containerschiffe verglichen werden. \cite{Schmeling_Dargatz_2022} (S. 7).}
+  \label{fig:containerschiff}
+\end{figure}
 
 \subsection{Master Node Komponenten}
 \label{sec:MasterNodeKomponenten}
@@ -342,8 +346,8 @@ Ressourcen werden in Kubernetes meist in Form von \emph{.YAML-Dateien} definiert
 die auch als \emph{Kubernetes Manifeste} bezeichnet werden.
 Eine mögliche minimale Konfiguration könnte beispielsweise wie in Listing \ref{lst:pod-config} aussehen.
 
-% \lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Pods \cite{Schmeling_Dargatz_2022} (S. 20).}, label=lst:pod-config]{../kubernetes/nginx/pod.yaml}
-% 
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Pods \cite{Schmeling_Dargatz_2022} (S. 20).}, label=lst:pod-config]{../kubernetes/nginx/pod.yaml}
+
 Ein Kubernetes Manifest ist hierarchisch aufgebaut
 und enthält stets die gleichen vier übergeordneten Schlüssel.
 Die \emph{apiVersion} gibt an welche Version der Endpunkte des Kube-apiservers für diese Ressource
@@ -380,10 +384,10 @@ Weiterhin wird angezeigt, dass noch kein Neustartversuch unternommen wurde
 und der Pod seit 18 Sekunden existiert.
 Bei Bedarf kann der Pod mit \lstinline|kubectl delete pod webserver| wieder gelöscht werden.
 
-% \begin{lstlisting}[caption={Der Pod wurde erfolgreich gestartet \cite{Schmeling_Dargatz_2022} (S. 21).}, label={lst:pod-state}]
-% NAME        READY   STATUS    RESTARTS   AGE
-% webserver   1/1     Running   0          18s
-% \end{lstlisting}
+\begin{lstlisting}[caption={Der Pod wurde erfolgreich gestartet \cite{Schmeling_Dargatz_2022} (S. 21).}, label={lst:pod-state}]
+NAME        READY   STATUS    RESTARTS   AGE
+webserver   1/1     Running   0          18s
+\end{lstlisting}
 
 \subsection{ReplicaSets}
 Pods bieten eine Grundlage, um Anwendungen flexibel zu gestalten und
@@ -405,18 +409,18 @@ erfolgt unter dem Schlüssel \emph{template} \cite{Schmeling_Dargatz_2022} (S. 2
 Wie auch schon bei den Pods kann dieses ReplicaSet mit dem Befehl
 \lstinline|kubectl create -f <Pfad/zum/Manifest>| erstellt werden \cite{Schmeling_Dargatz_2022} (S. 24-29).
 
-% \lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines ReplicaSets mit drei Pods \cite{Schmeling_Dargatz_2022} (S. 26).}, label=lst:rs-config]{../kubernetes/nginx/replicaset.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines ReplicaSets mit drei Pods \cite{Schmeling_Dargatz_2022} (S. 26).}, label=lst:rs-config]{../kubernetes/nginx/replicaset.yaml}
 
 Das Kommando \lstinline|kubectl get pods| erzeugt eine mit Listing \ref{lst:rs-pods}
 vergleichbare Ausgabe. Dabei ist anzumerken, dass jeder Pod den Namen des ReplicaSets,
 ergänzt um ein automatisch generiertes Suffix, erhält.
 
-% \begin{lstlisting}[caption={Drei Pods wurden erfolgreich gestartet \cite{Schmeling_Dargatz_2022} (S. 27).}, label={lst:rs-pods}]
-% NAME              READY   STATUS    RESTARTS   AGE
-% webserver-86mvm   1/1     Running   0          35s
-% webserver-bxvwp   1/1     Running   0          35s
-% webserver-wzrs8   1/1     Running   0          35s
-% \end{lstlisting}
+\begin{lstlisting}[caption={Drei Pods wurden erfolgreich gestartet \cite{Schmeling_Dargatz_2022} (S. 27).}, label={lst:rs-pods}]
+NAME              READY   STATUS    RESTARTS   AGE
+webserver-86mvm   1/1     Running   0          35s
+webserver-bxvwp   1/1     Running   0          35s
+webserver-wzrs8   1/1     Running   0          35s
+\end{lstlisting}
 
 Kompakter kann der Status des ReplicaSets mit dem Befehl \lstinline|kubectl get rs webserver|
 abgerufen werden. Listing \ref{lst:rs-state} enthält eine mögliche Ausgabe.
@@ -427,15 +431,13 @@ Das Replizieren von Anwendungen ist grundsätzlich kein neues Phänomen, aber
 die wesentliche Neuerung durch Kubernetes ist, dass die Replikation einheitlich
 und anwendungsunabhängig erfolgen kann \cite{Schmeling_Dargatz_2022} (S. 29).
 
-% \begin{lstlisting}[caption={Ein ReplicaSet mit drei erfolgreich gestarteten Instanzen \cite{Schmeling_Dargatz_2022} (S. 27).}, label={lst:rs-state}]
-% NAME        DESIRED   CURRENT   READY   AGE
-% webserver   3         3         3       8s
-% \end{lstlisting}
+\begin{lstlisting}[caption={Ein ReplicaSet mit drei erfolgreich gestarteten Instanzen \cite{Schmeling_Dargatz_2022} (S. 27).}, label={lst:rs-state}]
+NAME        DESIRED   CURRENT   READY   AGE
+webserver   3         3         3       8s
+\end{lstlisting}
 
 \subsection{Deployments}
 \label{sec:Deployments}
-% TODO: Deployment mit kubectl scale skalieren vs. yaml ändern. Quelle: 9783960102403 S.122
-% TODO: Rollout + History 9783960102403, S. 124ff (evtl. auch in eigenen Abschnitt)
 Ein \emph{Deployment} ist ein Konzept, das im Schwerpunkt genutzt wird, um Änderungen an Anwendungen auszubringen.
 Das Szenario, das ein Deployment notwendig macht, kann wie folgt beschrieben werden:
 
@@ -456,8 +458,11 @@ muss aktualisiert werden, reicht es, das Deployment dafür anzupassen.
 Kubernetes stellt dann sicher, dass das alte ReplicaSet und die dazugehörigen Pods gelöscht werden.
 Damit es dadurch aber keine Serviceunterbrechungen gibt, wird zunächst ein anderes ReplicaSet mit dem neuen
 Image initialisiert. Während das alte ReplicaSet also schrittweise abgebaut wird, wird das neue ReplicaSet
-schrittweise aufgebaut. Ein Deployment kann so konfiguriert werden, dass immer eine bestimmte Mindestanzahl an
+schrittweise aufgebaut. Diese Strategie wird auch als \emph{Rolling Update} bezeichnet.
+Ein Rolling Update kann so konfiguriert werden, dass immer eine bestimmte Mindestanzahl an
 Pods während der Aktualisierung zur Verfügung steht.
+Die Alternative zum Rolling Update ist die \emph{Recreate} Strategie, bei der zunächst
+alle Pods der alten Version heruntergefahren werden, bevor die neuen gestartet werden.
 Ein weiterer Vorteil von Deployments ist, dass sie anhand eines einzelnen Befehls auf die vorherige Version
 zurückgesetzt werden können (sog. \emph{Rollback}). Das kann hilfreich sein, wenn sich nach Ausbringung eines
 Updates herausstellt, dass dieses doch nicht den Erwartungen entspricht und man stattdessen bei der vorherigen
@@ -475,19 +480,23 @@ Listing \ref{lst:deploy-rollout} stellt dar wie durch mehrfaches Aufrufen
 von \lstinline|kubectl get rs| sichtbar wird, wie das alte
 ReplicaSet schrittweise abgebaut und das neue schrittweise aufgebaut wird \cite{Schmeling_Dargatz_2022} (S. 30-31).
 
-% \begin{lstlisting}[caption={Ein Deployment, das schrittweise ein Update ausführt \cite{Schmeling_Dargatz_2022} (S. 31).}, label={lst:deploy-rollout}]
-% NAME                   DESIRED   CURRENT   READY   AGE
-% webserver-54596f9745   3         3         3       48s
-% webserver-57db766469   1         1         0       5s
+Alternativ kann nach Initialisierung des Deployments die Anzahl der Replikationen auch mit
+dem Befehl \lstinline|kubectl scale --replicas=<Anzahl Replicas> deployment/<Name des Deployments>|
+verändert werden.
 
-% NAME                   DESIRED   CURRENT   READY   AGE
-% webserver-54596f9745   2         2         2       53s
-% webserver-57db766469   2         2         1       10s
+\begin{lstlisting}[caption={Ein Deployment, das schrittweise ein Update ausführt \cite{Schmeling_Dargatz_2022} (S. 31).}, label={lst:deploy-rollout}]
+NAME                   DESIRED   CURRENT   READY   AGE
+webserver-54596f9745   3         3         3       48s
+webserver-57db766469   1         1         0       5s
 
-% NAME                   DESIRED   CURRENT   READY   AGE
-% webserver-54596f9745   0         0         0       1m10s
-% webserver-57db766469   3         3         3       27s
-% \end{lstlisting}
+NAME                   DESIRED   CURRENT   READY   AGE
+webserver-54596f9745   2         2         2       53s
+webserver-57db766469   2         2         1       10s
+
+NAME                   DESIRED   CURRENT   READY   AGE
+webserver-54596f9745   0         0         0       1m10s
+webserver-57db766469   3         3         3       27s
+\end{lstlisting}
 
 \subsection{Services}
 Innerhalb eines Kubernetes Clusters besteht ein internes Netzwerk. Dementsprechend hat auch jeder Pod
@@ -495,12 +504,12 @@ eine eigene IP-Adresse, über die er erreichbar ist. Diese IP-Adresse wird autom
 Auf diese Weise können Anwendungen innerhalb des Clusters über Pod-Grenzen hinweg miteinander kommunizieren.
 Listing \ref{lst:pod-ip} zeigt die Ausgabe von \lstinline|kubectl get pods -o wide|, in der auch die IP-Adressen
 der einzelnen Pods aufgeführt sind \cite{Schmeling_Dargatz_2022} (S. 36-37).
-% \begin{lstlisting}[caption={\lstinline|kubectl get pods -o wide| veranschautlicht, dass jeder Pod seine eigene IP-Adresse erhält. Die Ausgabe wurde zur besseren Lesbarkeit gekürzt \cite{Schmeling_Dargatz_2022} (S. 35).}, label={lst:pod-ip}]
-% NAME              READY   STATUS    AGE  ...   IP           
-% webserver-9c44s   1/1     Running   6s   ...   10.244.0.15
-% webserver-p5tcb   1/1     Running   6s   ...   10.244.0.16
-% webserver-vccrb   1/1     Running   6s   ...   10.244.0.17
-% \end{lstlisting}
+\begin{lstlisting}[caption={\lstinline|kubectl get pods -o wide| veranschautlicht, dass jeder Pod seine eigene IP-Adresse erhält. Die Ausgabe wurde zur besseren Lesbarkeit gekürzt \cite{Schmeling_Dargatz_2022} (S. 35).}, label={lst:pod-ip}]
+NAME              READY   STATUS    AGE  ...   IP           
+webserver-9c44s   1/1     Running   6s   ...   10.244.0.15
+webserver-p5tcb   1/1     Running   6s   ...   10.244.0.16
+webserver-vccrb   1/1     Running   6s   ...   10.244.0.17
+\end{lstlisting}
 
 Abgesehen davon, dass es recht umständlich ist, die IP-Adressen der einzelnen Pods herauszufinden,
 ergibt sich die eigentliche Herausforderung daraus, dass Pods jederzeit beliebig gelöscht
@@ -519,7 +528,7 @@ Damit das nicht notwendig ist, verwaltet Kubernetes ein internes Domain-Name-Sys
 der Services beim Start automatisch registriert wird und anschließend unter seinem Namen
 erreichbar ist. \cite{Schmeling_Dargatz_2022} (S. 37-39).
 
-Listing \ref{lst:svc-config} zeigt ein Beispiel für ein Kubernetes Manifest,
+Listing \ref{lst:svc-config} zeigt ein Beispiel für ein Manifest,
 mit dem ein Service konfiguriert werden kann.
 Unter dem Schlüssel \emph{selector} können Schlüssel-Wert-Paare definiert werden,
 anhand derer die zum Service zugehörigen Pods identifiziert werden. Alle Pods, die
@@ -529,7 +538,7 @@ Während der in Listing \ref{lst:svc-config} verwendete Wert ClusterIP genutzt w
 (und die zugehörigen Pods) \emph{innerhalb} eines Clusters
 einheitlich adressierbar zu machen, wird NodePort verwendet, um einen Service von \emph{außerhalb}
 über die öffentlichen IP-Adressen der Nodes des Clusters an einem zufällig gewählten Port erreichbar zu machen \cite{Schmeling_Dargatz_2022} (S. 36-38).
-% \lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Service \cite{Schmeling_Dargatz_2022} (S. 36).}, label=lst:svc-config]{../kubernetes/nginx/service.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Service \cite{Schmeling_Dargatz_2022} (S. 36).}, label=lst:svc-config]{../kubernetes/nginx/service.yaml}
 % TODO: Evtl. Bild, das die IP-Adressräume in Kubernetes visualisiert
 
 \subsection{Ingress}
@@ -546,7 +555,7 @@ Für die Anwendung muss lediglich der Part in den spitzen Klammern durch die IP-
 oder durch einen Domain-Namen, der auf die IP-Adresse eines Nodes verweist, ersetzt werden.
 Alle Anfragen an die eingetragene Adresse werden dann an den webserver-Service
 und von dort an die webserver-Pods weitergeleitet. \cite{Schmeling_Dargatz_2022} (S. 38-40).
-% \lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Ingress \cite{Schmeling_Dargatz_2022} (S. 38-39).}, label=lst:ingress-config]{../kubernetes/nginx/ingress.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Ingress \cite{Schmeling_Dargatz_2022} (S. 38-39).}, label=lst:ingress-config]{../kubernetes/nginx/ingress.yaml}
 
 
 \subsection{Volumes}
@@ -574,9 +583,9 @@ Listing \ref{lst:deploy-pvc} dargestellt. In diesem wird unter anderem festgeleg
 welches PVC zu nutzen ist (Wert zum Schlüssel \emph{claimName}) und auf welchen Pfad
 welcher Container innerhalb des Pods das PV abgebildet werden soll \cite{Schmeling_Dargatz_2022} (S. 41-47).
 
-% \lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Persistent Volume \cite{Schmeling_Dargatz_2022} (S. 43).}, label=lst:pv]{../kubernetes/nginx/pv.yaml}
-% \lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Persistent Volume Claims \cite{Schmeling_Dargatz_2022} (S. 44).}, label=lst:pvc]{../kubernetes/nginx/pvc.yaml}
-% \lstinputlisting[caption={Auszug aus einem beispielhaften Kubernetes Manifest für ein Deployment, das ein Persistent Volume Claim einbindet \cite{Schmeling_Dargatz_2022} (S. 45-46).}, label=lst:deploy-pvc]{../kubernetes/nginx/pvc-deployment.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Persistent Volume \cite{Schmeling_Dargatz_2022} (S. 43).}, label=lst:pv]{../kubernetes/nginx/pv.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Persistent Volume Claims \cite{Schmeling_Dargatz_2022} (S. 44).}, label=lst:pvc]{../kubernetes/nginx/pvc.yaml}
+\lstinputlisting[caption={Auszug aus einem beispielhaften Kubernetes Manifest für ein Deployment, das ein Persistent Volume Claim einbindet \cite{Schmeling_Dargatz_2022} (S. 45-46).}, label=lst:deploy-pvc]{../kubernetes/nginx/pvc-deployment.yaml}
 
 \subsection{ConfigMaps und Secrets}
 Die Daten, die von einer Anwendung in Volumes gespeichert werden, unterliegen oft regelmäßigen Veränderungen
@@ -589,7 +598,7 @@ Unter dem Schlüssel \emph{data} sind Host und Port einer Datenbankanwendung ang
 die von anderen Anwendungen genutzt werden können. Dazu müssen sie in der Konfiguration des
 Deployments eingebunden werden. Ein Beispiel dazu ist in Listing \ref{lst:deploy-with-conf} dargestellt \cite{Schmeling_Dargatz_2022} (S. 47-50).
 
-% \lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Erstellung einer ConfigMap, die Umgebungsvariablen für die Konfiguration einer Datenbankanwendung enthält.}, label=lst:config]{../kubernetes/nginx/config.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Erstellung einer ConfigMap, die Umgebungsvariablen für die Konfiguration einer Datenbankanwendung enthält.}, label=lst:config]{../kubernetes/nginx/config.yaml}
 
 
 Neben ConfigMaps gibt es auch \emph{Secrets}, die ihre Daten ebenfalls in Key-Value-Paaren speichern.
@@ -605,26 +614,26 @@ um Secrets zu verwalten. Der Typ Opaque erlaubt das Festlegen eines beliebigen W
 Listing \ref{lst:deploy-with-conf} enthält ebenfalls ein Beispiel, wie Werte aus einem
 Secret in ein Deployment eingebunden werden können.
 
-% \lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Erstellung eines Secrets, das vertrauliche Daten im Cluster bereitstellt.}, label=lst:secret]{../kubernetes/nginx/secret-example.yaml}
-% \begin{lstlisting}[caption={Referenzen zur ConfigMaps und Secrets können in einem Deployment unter dem Schlüssel \emph{env} definiert werden \cite{Schmeling_Dargatz_2022} (S. 50).}, label={lst:deploy-with-conf}]
-% ...
-% spec:
-%   containers:
-%   ...
-%     env:
-%       - name: POSTGRES_HOST
-%         valueFrom:
-%           configMapKeyRef:
-%             name: postgres-config
-%             key: POSTGRES_HOST
-%       ...
-%       - name: POSTGRES_PASSWORD
-%         valueFrom:
-%           secretKeyRef:
-%             name: postgres-secret
-%             key: POSTGRES_PASSWORD
-%       ...
-% \end{lstlisting}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Erstellung eines Secrets, das vertrauliche Daten im Cluster bereitstellt.}, label=lst:secret]{../kubernetes/nginx/secret-example.yaml}
+\begin{lstlisting}[caption={Referenzen zur ConfigMaps und Secrets können in einem Deployment unter dem Schlüssel \emph{env} definiert werden \cite{Schmeling_Dargatz_2022} (S. 50).}, label={lst:deploy-with-conf}]
+...
+spec:
+  containers:
+  ...
+    env:
+      - name: POSTGRES_HOST
+        valueFrom:
+          configMapKeyRef:
+            name: postgres-config
+            key: POSTGRES_HOST
+      ...
+      - name: POSTGRES_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: postgres-secret
+            key: POSTGRES_PASSWORD
+      ...
+\end{lstlisting}
 
 Die Daten aus ConfigMaps und Secrets werden den Anwendungen innerhalb der Pods als Umgebungsvariablen
 bereitgestellt und können darüber ausgelesen werden \cite{Schmeling_Dargatz_2022} (S. 47-51).
@@ -635,7 +644,7 @@ Bis auf wenige Ausnahmen (z.B. PersistentVolumes) sind die meisten Ressourcen in
 Namespace zugeordnet. Wird dieser nicht explizit ausgewählt, werden Ressourcen automatisch dem
 Namespace \emph{default} zugeordnet \cite{Schmeling_Dargatz_2022} (S. 52).
 
-Namespaces bieten mehrere Vorteile. Zum einen können Namen für Ressourcen doppelt vergeben werden,
+Namespaces bieten mehrere Vorteile. Zum einen können Namen für Ressourcen mehrfach vergeben werden,
 solange sie sich in unterschiedlichen Namespaces befinden. Sie können trotzdem weiterhin
 über ihren Fully-Qualified-Domain-Name (FQDN) innerhalb des Clusters angesprochen werden.
 Dazu betreibt Kubernetes intern ein eigenes Domain-Name-System (DNS), das die Namen
@@ -803,7 +812,7 @@ noch eine untergeordnete Rolle \cite{cicd_with_kubernetes_devops} (S. 19).
 Dieser Ansatz wird auch als \emph{Infrastructure as Code} bezeichnet \cite{domingus2022cloud} (S. 6).
 
 Kubernetes führt die Idee der vereinfachten Konfiguration noch einen Schritt weiter.
-Deklarative Kubernetes-Manifeste beschreiben einen erwünschten Zustand
+Deklarative Manifeste beschreiben einen erwünschten Zustand
 und Kubernetes sorgt dafür, dass dieser erreicht wird.
 Da diese Konfiguration ebenfalls aus leicht lesbaren Textdateien besteht,
 kann diese Konfiguration mit gängigen Werkzeugen zur Versionskontrolle
@@ -978,7 +987,7 @@ ausschließlich für Prüfungszwecke gespeichert wird.
 Generative Künstliche Intelligenz (ChatGPT und GitHub Copilot) wurde in folgendem Umfang verwendet:
 \begin{itemize}
   \item Suchen von Literatur
-  \item Erstellung und Debugging von Kubernetes-Manifesten
+  \item Erstellung und Debugging von Kubernetes Manifesten
 \end{itemize}
 
 
