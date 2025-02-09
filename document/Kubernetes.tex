@@ -1,7 +1,7 @@
 % TODO: Wort "Abschnitt" durch "Kapitel" ersetzen
 % TODO: Begriffe Applikation und Anwendung vereinheitlichen
 % TODO: Code Listings mit Quelle versehen
-
+% TODO: Seitenangaben für Zitate aus Büchern
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -75,9 +75,16 @@
 \pagenumbering{arabic}
 \section{Einleitung}
 \label{sec:einleitung}
-Die vorliegende Arbeit soll einen Überblick über das Container-\linebreak Orchestrierungs-Tool \emph{Kubernetes} geben.
-Dazu werden zunächst Historie und grundlegende Funktionsprinzipien von Kubernetes beschrieben, die anschließend
-anhand einer beispielhaften Anwendung aus dem Bereich verteilter, agentenbasierter Simulationen demonstriert werden. % TODO: Simulation rausnehmen
+Die vorliegende Arbeit soll einen Überblick über das Container-Orchestrierungs-Tool \emph{Kubernetes} geben.
+Dazu werden zunächst Historie und grundlegende Funktionsprinzipien von Kubernetes beschrieben.
+In dem darauffolgenden Kapitel wird aufgeführt, wie Kubernetes in Verbindung mit modernen
+Konzepten zur Entwicklung und zur Ausbringung von Software genutzt werden kann,
+um diese Prozesse zu beschleunigen und zu vereinfachen.
+Anhand von Fallbeispielen bekannter Unternehmen, die Kubernetes in ihre Infrastruktur übernommen haben,
+werden die Möglichkeiten zur praxisnahen Nutzung von Kubernetes skizziert.
+Die Arbeit schließt mit einem Fazit zu den Eigenschaften, Vor- und Nachteilen
+von Kubernetes sowie einem Ausblick zur erwarteten zukünftigen Rolle von Kubernetes
+in Wirtschaft und Forschung.
 
 Zunächst soll die Historie betrachtet werden, vor deren Hintergrund Kubernetes entstanden ist.
 Das stetige Ziel, das sich durch diese Historie zieht, ist das Bereitstellen von Applikationen.
@@ -89,18 +96,21 @@ Ist eine Applikation darauf angewiesen eine bestimmte Abhängigkeit in der Versi
 benötigt eine Version \(\geq 1.4\) derselben Abhängigkeit, lässt sich das nur schwer vereinbaren.
 Zum anderen erschwert dieser Aufbau eine effiziente Ressourcenverteilung. Selbst wenn eine Applikation alleine auf einem Rechner betrieben wird (z.B. um Konflikte zu anderen
 Applikationen zu vermeiden), muss dieser Rechner ausreichende Kapazitäten haben, um die höchsten Anfragespitzen an diese Applikation zu verarbeiten.
-Selbst dann, wenn diese Anfragespitzen nur äußerst selten erreicht werden \cite{Pagani_2019}.
+Selbst dann, wenn diese Anfragespitzen nur äußerst selten erreicht werden \cite{Pagani_2019}. % TODO: Pagani Quelle ersetzen
 
-Eine Weiterentwicklung dieser Bare-Metal-Architektur waren virtuelle Maschinen. Virtuelle Maschinen erlauben es, auf derselben Hardware mehrere virtuelle Instanzen eines
-Systems zu nutzen. Die Instanzen nutzen dabei nicht direkt die physischen Ressourcen, sondern lediglich virtuelle, die durch Software nachgebildet werden \cite{kofler2021docker}.
+Eine Weiterentwicklung dieser Bare-Metal-Architektur waren virtuelle Maschinen.
+Virtuelle Maschinen erlauben es, auf derselben Hardware mehrere virtuelle Instanzen eines
+Systems zu nutzen. Die Instanzen nutzen dabei nicht direkt die physischen Ressourcen, sondern lediglich virtuelle,
+die durch Software nachgebildet werden.
 Dadurch, dass verschiedene Applikationen in verschiedenen virtuellen Maschinen betrieben werden, können Abhängigkeitskonflikte zwischen Applikationen
 vermieden werden. Weiterhin sind virtuelle Maschinen leichter auszubringen und zu administrieren als Bare-Metal-Lösungen.
 Grundsätzlich können mit diesem Ansatz Applikationen auch flexibler und skalierbarer bereitgestellt werden.
-Leistungsfähige Hardware kann Anfragespitzen einer Applikation in einer virtuellen Maschine abfangen und zu anderen Zeiten anderen virtuellen Maschinen mit anderen
+Leistungsfähige Hardware kann Anfragespitzen einer Applikation in einer virtuellen Maschine abfangen und
+zu anderen Zeiten anderen virtuellen Maschinen mit anderen
 Applikationen diese Ressourcen zuweisen.
 Obwohl das schon einige Verbesserungen im Vergleich zu Bare-Metal-Lösungen sind, haben auch virtuelle Maschinen ihre eigenen Limitationen.
 Da virtuelle Maschinen jeweils Ressourcen für ein eigenes Betriebssystem beanspruchen, geht vergleichsweise viel Leistung verloren,
-die besser in der Applikation genutzt werden könnte.
+die besser in der Applikation genutzt werden könnte \cite{kofler2021docker} (S. 48).
 
 Die nächste Stufe der Weiterentwicklung waren (Software-)\emph{Container}. Container haben einige Gemeinsamkeiten mit virtuellen Maschinen, doch der wesentliche Unterschied ist,
 dass Container deutlich leichtgewichtiger sind. Das wird unter anderem dadurch erreicht, dass sie, statt ein komplett eigenes Betriebssystem zu verwenden,
@@ -109,7 +119,7 @@ Durch den verringerten Overhead können auf gleicher Hardware auch mehr Containe
 Insgesamt können mit Containern Leistungswerte erreicht werden, die die von virtuellen Maschinen deutlich übertreffen,
 und nahezu an die von Bare-Metal heranreichen \cite{10.1145/1272998.1273025}.
 Durch diesen Umstand und dadurch, dass Container meist innerhalb weniger Sekunden gestartet werden können, sind diese besonders geeignet,
-um flexibel auf unterschiedliche Anfrageintensitäten zu reagieren und Ressourcen effizient zu verteilen \cite{kofler2021docker}.
+um flexibel auf unterschiedliche Anfrageintensitäten zu reagieren und Ressourcen effizient zu verteilen \cite{kofler2021docker} (S. 48).
 
 Container eignen sich besonders, um \emph{Microservice-Architekturen} zu betreiben \cite{7158965}. Dabei handelt es sich um die
 Entwicklung von Anwendungen, indem sie in kleine, unabhängige (Micro-)Services aufgeteilt werden. Jeder Microservice gehört zu
@@ -131,9 +141,9 @@ diverse Möglichkeiten, um vor allem containerisierte Microservice-Architekturen
 Es abstrahiert dazu von allen beteiligten Rechnern und deren Ressourcen und bietet zentrale Steuerungsmöglichkeiten.
 \cite{Pagani_2019} % TODO: Wenn möglich bessere Quelle als Pagani_2019 finden
 
-Kubernetes ist eine Software, die sich der Ausbringung (Deployment), der Skalierung und der Steuerung (Management) von Containern widmet.
-Dieser Vorgang wird auch als Container-Orchestrierung oder als Container-Management bezeichnet \cite{Bisong2019}.
-In diesem Zusammenhang wird Kubernetes auch als \emph{Betriebssystem der Cloud} bezeichnet \cite{Schmeling_Dargatz_2022}.
+Kubernetes ist eine Software, die sich der Ausbringung (Deployment), der Skalierung und der Überwachung (Monitoring) von Containern widmet.
+Dieser Vorgang wird auch als Container-Orchestrierung oder als Container-Management bezeichnet \cite{Bisong2019} (S. 664).
+In diesem Zusammenhang wird Kubernetes auch als \emph{Betriebssystem der Cloud} bezeichnet \cite{Schmeling_Dargatz_2022} (S. 4).
 Entwickelt wurde Kubernetes von Google. Dort wurde seit den frühen 2000er Jahren ein selbst entwickeltes Container-Management-System namens \emph{Borg} genutzt,
 um Googles Services möglichst performant zu betreiben.
 Im Jahr 2013 wurde \emph{Borg} von dessen Nachfolger \emph{Omega} abgelöst. Im selben Jahr erschien auch Docker, was ein wesentlicher Baustein des Kubernetes
@@ -154,6 +164,8 @@ und Steuerung von containerisierten Anwendungen beschrieben \cite{kubernetes.io_
 Im Folgenden soll die Funktionsweise von Kubernetes beschrieben und schließlich anhand eines Beispiels
 verdeutlicht werden.
 
+% TODO: Bild einfügen, das Bare Metal, VM und Container Architektur vergleicht.
+
 \section{Container}
 \label{sec:Container}
 
@@ -169,7 +181,16 @@ Es stellt ein read-only Dateisystem als Basis für den Container zur Verfügung.
 keine Änderungen vor. Stattdessen wird jedes Hinzufügen und jede Änderung während der Laufzeit des Containers in einem
 getrennten Overlay-System behandelt.
 Das heißt, dass diese Änderungen in einem Verzeichnis auf dem Host-System abgebildet werden.
-Dadurch können beliebig viele Container von demselben Image abgeleitet werden \cite{kofler2021docker}.
+Dadurch können beliebig viele Container von demselben Image abgeleitet werden \cite{kofler2021docker} (S. 140).
+Eine Visualisierung dieses Konzepts ist in Abbildung \ref{fig:overlay} dargestellt.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{./media/kofler2021docker S.140.png}
+  \caption{Ein von einem Image abgeleiteter Container hat ein eigenes Dateisystem für Lese- und Schreibvorgänge, das
+    von dem Dateisystem des Images getrennt ist \cite{kofler2021docker} (S. 140).}
+  \label{fig:overlay}
+\end{figure}
 
 Für viele populäre Anwendungen gibt es vorgefertigte Images, die kostenfrei aus im Internet verfügbaren
 \emph{Container-Repositories} (zum Beispiel \lstinline|https://hub.docker.com|) heruntergeladen werden können.
@@ -179,7 +200,7 @@ und Dritten nicht zur Verfügung gestellt werden sollen.
 Für einen konkreten Anwendungsfall kann es sinnvoll sein, ein bestehendes Basis-Image für die eigenen Zwecke anzupassen.
 Dies ist mithilfe eines sogenannten \emph{Dockerfile}s möglich. Darin wird definiert, wie ein Base-Image z.B. durch das Hinzufügen von Dateien,
 oder dem Ändern von Umgebungsvariablen angepasst werden soll. Dieses \emph{Dockerfile} wird dann für den \emph{build}
-eines neuen Images verwendet. \cite{kofler2021docker}
+eines neuen Images verwendet \cite{kofler2021docker} (S. 81-82).
 
 Aus dem erstellten Image können dann Container abgeleitet werden. Ein Container ist insofern „flüchtig“ als dass er nach seiner
 Beendigung restlos gelöscht wird. Bei einem Neustart enthält er wieder nur die Daten, die vorher durch das Image definiert wurden.
@@ -187,17 +208,16 @@ Natürlich gibt es Anwendungsfälle, in denen die persistente Speicherung von Da
 eine Datenbank in einem Container betrieben wird. Für diesen Fall gibt es das Konzept der \emph{Volumes}.
 Ein Volume spiegelt einen definierten Speicherbereich aus dem Dateisystem des Containers auf das Host-System.
 Wird ein Container beendet und durch einen neuen ersetzt, bindet dieser das Volume in sein Dateisystem ein übernimmt
-dabei die Daten seines beendeten Vorgängers \cite{kofler2021docker}.
+dabei die Daten seines beendeten Vorgängers \cite{kofler2021docker} (S. 44-45).
 
 Die in diesem Abschnitt beschriebenen Konzepte sind ausreichend, um Container zu betreiben.
 Nutzt man aber lediglich diese Konzepte, verhalten sich die Container im Prinzip wie leichtgewichtige virtuelle Maschinen.
 Der eigentliche Vorteil von Containern, nämlich die horizontale Skalierbarkeit, wird damit noch nicht ausgenutzt.
-
 Die \emph{horizontale} Skalierbarkeit ist abzugrenzen von der \emph{vertikalen} Skalierbarkeit.
 Bei letzterer geht es darum, einen einzelnen Server um weitere Ressourcen (Rechenleistung, Speicher etc.) zu ergänzen.
 Da hierbei keine Änderungen an der Anwendung selbst erforderlich sind, ist dieser Ansatz vergleichsweise leicht
 zu administrieren. Er stößt jedoch schnell an seine physikalischen Grenzen und wird daher den hohen
-Ressourcenanforderungen moderner Anwendungen oft nicht gerecht.
+Ressourcenanforderungen moderner Anwendungen oft nicht gerecht \cite{Schmeling_Dargatz_2022} (S. 64).
 
 Horizontale Skalierung sieht im Gegensatz dazu vor, dass eine Anwendung
 auf mehrere Rechner verteilt wird. Durch Hinzufügen weiterer Rechner können die zur Verfügung stehenden Ressourcen nahezu beliebig erweitert werden.
@@ -205,10 +225,10 @@ Zusätzlich ist auch eine geografische Optimierung möglich, indem zum Beispiel 
 Letztendlich trägt horizontale Skalierung auch zur Ausfallsicherheit einer Anwendung bei, da der Ausfall einzelner Instanzen durch andere Instanzen
 aufgefangen werden kann.
 Container haben sich als eine wesentliche Grundlage für die horizontale Skalierung etabliert.
-Der Nachteil dieser Methode ist die deutliche erhöhte Komplexität,
-die mit dem Betrieb einer verteilten Anwendung einhergeht \cite{Schmeling_Dargatz_2022}.
+Der Nachteil dieser Methode ist die deutlich erhöhte Komplexität,
+die mit dem Betrieb einer verteilten Anwendung einhergeht \cite{Schmeling_Dargatz_2022} (S. 64).
 
-Im folgenden Abschnitt soll beschrieben werden, welche Werkzeuge Kubernetes anbietet, um mit dieser Komplexität umzugehen.
+Im folgenden Kapitel soll beschrieben werden, welche Werkzeuge Kubernetes anbietet, um mit dieser Komplexität umzugehen.
 
 \section{Grundlegende Kubernetes-Konzepte}
 \label{sec:Grundlegende_Kubernetes-Konzepte}
@@ -216,65 +236,75 @@ Ein durch Kubernetes verwaltetes System wird üblicherweise als \emph{Cluster} b
 Ein Cluster besteht aus einer oder mehreren physischen und/oder virtuellen Maschinen, die darin eingebunden sind.
 Jede Maschine wird dabei als ein \emph{Node} (deutsch: Knoten) bezeichnet. Diese Nodes werden wiederum unterschieden in
 \emph{Master Nodes} und \emph{Worker Nodes}.
-Für die meisten Cluster reicht ein Master Node aus. In Hochverfügbarkeitsszenarien oder bei mehreren
-tausend Worker Nodes kann es jedoch auch mehrere Master Nodes geben \cite{Schmeling_Dargatz_2022}.
+Für viele Cluster reicht ein Master Node aus. In Hochverfügbarkeitsszenarien oder bei mehreren
+tausend Worker Nodes kann es jedoch auch mehrere Master Nodes geben \cite{Schmeling_Dargatz_2022} (S. 7).
 Wie die Namen vermuten lassen, ist der Master Node für die Orchestrierung
 des Systems verantwortlich während die Worker Nodes bestimmte Aufgaben ausführen \cite{Bentaleb_Belloum_Sebaa_El-Maouhab_2021}.
 Für den Spezialfall eines \emph{Single-Node-Clusters} kann dieser einzelne Node auch die Rolle von sowohl
 Master als auch Worker übernehmen.
 
 Master und Worker Nodes bestehen zur Erfüllung ihrer Aufgaben aus unterschiedlichen Komponenten,
-die im Folgenden beschrieben werden. Im Anschluss daran werden die wichtigsten Ressourcen
+die im Folgenden beschrieben werden.
+Zur Veranschaulichung dieser Komponenten kann eine Containerschiffmetapher verwendet werden,
+die in Abbildung \ref{fig:containerschiff} dargestellt ist. Dort gibt es mehrere Containerschiffe
+(Worker Node 1 und 2), die ihre Anweisungen von einem Leitschiff (Master Node) erhalten \cite{Schmeling_Dargatz_2022} (S. 7).
+
+Im Anschluss daran werden die wichtigsten Ressourcen
 von Kubernetes beschrieben und anhand von kurzen Beispielen vorgestellt.
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=1\textwidth]{./media/Schmeling_Dargatz_2022 S.7.png}
+  \caption{Die verschiedenen Komponenten von Master und Worker Nodes können mit
+    verschiedenen Komponenten eines Leitschiffs und mehrerer Containerschiffe verglichen werden. \cite{Schmeling_Dargatz_2022} (S. 7).}
+  \label{fig:containerschiff}
+\end{figure}
+
 \subsection{Master Node Komponenten}
-\subsubsection{Etcd}
-\label{Etcd}
+\label{sec:MasterNodeKomponenten}
 Bei \emph{Etcd} handelt es sich um einen \emph{key-value-store} (Schlüssel-Wert-Speicher),
 der alle Informationen über den Zustand eines Kubernetes Clusters speichert.
+In Bezug auf die Containerschiffmetapher kann Etcd als das Logbuch des Schiffs verstanden werden.
 Jede Änderung an den Cluster-Ressourcen wird im Etcd gespeichert und von dort wieder abgerufen.
 Etcd wird auf jedem Master Node ausgeführt, wobei einer dieser Nodes als „Anführer“
-ausgewählt wird und dieser die Schreibanfragen verarbeitet.
+ausgewählt wird und dieser die Schreibanfragen verarbeitet \cite{Schmeling_Dargatz_2022} (S. 8).
 
-\subsubsection{Kube-apiserver}
-\label{sec:Kube-apiverver}
 Die übliche Vorgehensweise um mit einem Kubernetes Cluster zu interagieren, ist das Kommandozeilenwerkzeug \emph{kubectl}.
 Dieses Werkzeug ermöglicht sowohl die Abfrage als auch die Änderung von im Cluster vorhandenen Ressourcen.
+Im Hintergrund stellt \emph{kubectl} eine Anfrage an den \emph{Kube-apiserver}, der Endpunkte anbietet,
+um mit dem Cluster zu interagieren. Vergleichbar mit der Kommandobrücke des Leitschiffs ist der Kube-apiserver
+somit dafür verantwortlich, die angefragten Informationen
+aus verschiedenen Quellen zu sammeln und gegebenenfalls andere Komponenten anzuweisen, bestimmte Änderungen vorzunehmen \cite{Schmeling_Dargatz_2022} (S. 10).
 
-Im Hintergrund stellt \emph{kubectl} eine Anfrage an den Kube-apiserver, der Endpunkte anbietet,
-um mit dem Cluster zu interagieren. Der Kube-apiserver ist somit dafür verantwortlich, die angefragten Informationen,
-aus verschiedenen Quellen zu sammeln und gegebenenfalls andere Komponenten anzuweisen, bestimmte Änderungen vorzunehmen.
-
-\subsubsection{Kube-Controller-Manager}
 Neben dem tatsächlichen Zustand des Clusters enthält Etcd auch den gewünschten Zustand.
-Sollten diese voneinander abweichen, ist es die Aufgabe des Kube-Controller-Managers,
+Sollten diese voneinander abweichen, ist es die Aufgabe des \emph{Kube-Controller-Managers},
 dies zu erkennen und über eine Anfrage an den Kube-apiserver den gewünschten Zustand wiederherzustellen.
+Er überwacht also symbolisch mit Containerschiffe. \cite{Schmeling_Dargatz_2022} (S. 11).
 
-
-\subsubsection{Kube-Scheduler}
-\label{sec:Kube-Scheduler}
-Der Kube-Scheduler entscheidet, welche Container auf welchem Node betrieben werden.
+Der \emph{Kube-Scheduler} entscheidet, welche Container auf welchem Node betrieben werden.
+Im Sinne der Containerschiffmetapher ist dies die Komponente, die bestimmt
+wie und wo welche Container verstaut werden.
 Er verwaltet dazu Informationen über verfügbare Rechen- und Speicherressourcen sowie über weitere Eigenschaften
-der Nodes.
+der Nodes \cite{Schmeling_Dargatz_2022} (S. 12).
 
 \subsection{Worker Node Komponenten}
-
+\label{sec:WorkerNodeKomponenten}
 Auf jedem Worker Node finden sich drei wesentliche Komponenten.
 Die erste Komponente ist der \emph{Kubelet}. Das Kubelet kann als Schnittstelle
-zu den Master Nodes gesehen werden. Sobald der Kube-Scheduler entschieden hat, auf welchem
+zu den Master Nodes beziehungsweise als Kommandobrücke der Containerschiffe gesehen werden.
+Sobald der Kube-Scheduler entschieden hat, auf welchem
 Worker Node ein Container betrieben werden soll, bekommt das Kubelet auf diesem Node
-vom Kube-apiserver den Auftrag einen Container zu starten.
+vom Kube-apiserver den Auftrag einen Container zu starten \cite{Schmeling_Dargatz_2022} (S. 13).
 
-Kubelet gibt diesen Auftrag weiter an die Komponente \emph{Container Runtime}.
+Kubelet gibt diesen Auftrag weiter an die Komponente \emph{Container Runtime}, die
+in Abbildung \ref{fig:containerschiff} als die Kräne der Containerschiffe dargestellt ist.
 Diese übernimmt das eigentliche Starten des Containers, in dem sie das zugehörige Image
-abruft (z.B. von DockerHub) und daraus einen Container erstellt.
+abruft (zum Beispiel von \lstinline|https://hub.docker.com|) und daraus einen Container erstellt \cite{Schmeling_Dargatz_2022} (S. 13).
 
 Der physische „Standort“ eines Containers, also der Node, auf dem er betrieben wird, ist insofern
 flüchtig, als das der Container jederzeit auf einem anderen Node neu ausgebracht werden könnte.
 Um trotzdem einen Überblick zu behalten, welcher Container wo verortet ist, gibt es die Komponente
-\emph{Kube-Proxy}. Auf jedem Node läuft genau eine Instanz des Kube-Proxys.
-
-% TODO: Bild einfügen, das die Master und Worker Node Komponenten veranschautlicht.
+\emph{Kube-Proxy}. Auf jedem Node läuft genau eine Instanz des Kube-Proxys \cite{Schmeling_Dargatz_2022} (S. 14).
 
 \subsection{Clusterinitialisierung}
 Um die Ressourcen zu verwenden, muss zunächst ein Cluster aufgesetzt werden.
@@ -283,7 +313,7 @@ Im Rahmen dieser Arbeit wird dazu \emph{Minikube} verwendet.
 Minikube ist eine Anwendung, die genutzt werden kann, um mit vergleichsweise wenig Aufwand ein lokales
 Kubernetes Cluster mit einem Node zu erstellen. Diese relativ einfache Konfiguration hat
 den Nachteil, dass Minikube lediglich für Test- und Entwicklungsaufgaben geeignet ist.
-Für Produktivsysteme sollte eine andere Lösung gewählt werden. % Quelle für diese Behauptung 
+Für Produktivsysteme sollte eine andere Lösung gewählt werden. % TODO: Quelle für diese Behauptung 
 Zum Betrieb des Clusters verwendet Minikube eine virtuelle Maschine, innerhalb derer
 alle Kubernetes Komponenten laufen. Dementsprechend ist eine der Voraussetzungen,
 um Minikube zu nutzen auch die vorherige Installation einer Virtualisierungsanwendung.
@@ -292,7 +322,7 @@ Näheres kann der Minikube Dokumentation entnommen werden \cite{minikube}.
 \subsection{Pods}
 \emph{Pods} sind die kleinste adressierbare Einheit in einem Kubernetes Cluster.
 Sie sind die Entitäten, innerhalb derer der Anwendungscode ausgeführt wird.
-Im Abschnitt \ref{sec:Kube-Scheduler} wurde beschrieben, dass Container auf Nodes betrieben werden.
+Im Abschnitt \ref{sec:WorkerNodeKomponenten} wurde beschrieben, dass Container auf Nodes betrieben werden.
 Diese Darstellung ist allerdings nur indirekt richtig. Tatsächlich werden nicht Container,
 sondern Pods auf Nodes betrieben.
 Ein Pod wiederum kann einen oder mehrere Container enthalten. Enthält ein Pod nur einen Container,
@@ -301,23 +331,23 @@ Wenn ein Pod mehrere Container enthält, teilen sich diese eine IP-Adresse,
 den Port-Space, den Hostnamen und ein gemeinsames Dateisystem.
 Zusätzlich bedeutet es, dass diese Container nur gemeinsam skalierbar sind.
 Das bietet sich in der Regel dann an, wenn die Funktionen dieser Container eng gekoppelt sind und eine Instanz eines
-Containers nur dann sinnvoll zu betreiben ist, wenn auch ihr „Partner-“Container vorhanden ist \cite{9783969109625} \cite{Schmeling_Dargatz_2022}.
+Containers nur dann sinnvoll zu betreiben ist, wenn auch ihr „Partner-“Container vorhanden ist \cite{9783969109625} \cite{Schmeling_Dargatz_2022} (S. 18-19).
 
 Ein Beispiel für die Nutzung mehrerer Container innerhalb eines Pods ist die Verwendung
-eines zusätzlichen "Sidecar-Containers", der den Pod einer Anwendung um ein Netzwerkmanagement erweitert \cite{9783969109625}.
+eines zusätzlichen „Sidecar-Containers“, der den Pod einer Anwendung um ein Netzwerkmanagement erweitert \cite{9783969109625}.
 
 Ressourcen werden in Kubernetes meist in Form von \emph{.YAML-Dateien} definiert,
 die auch als \emph{Kubernetes Manifeste} bezeichnet werden.
 Eine mögliche minimale Konfiguration könnte beispielsweise wie in Listing \ref{lst:pod-config} aussehen.
 
-\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Pods.}, label=lst:pod-config]{../kubernetes/nginx/pod.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Pods \cite{Schmeling_Dargatz_2022} (S. 20).}, label=lst:pod-config]{../kubernetes/nginx/pod.yaml}
 
 Ein Kubernetes Manifest ist hierarchisch aufgebaut
 und enthält stets die gleichen vier übergeordneten Schlüssel.
 Die \emph{apiVersion} gibt an welche Version der Endpunkte des Kube-apiservers für diese Ressource
-verwendet werden soll (vgl. \ref{sec:Kube-apiverver}).
+verwendet werden soll (vgl. \ref{sec:MasterNodeKomponenten}).
 Der Schlüssel \emph{Kind} gibt an, um welche Art von Ressource es sich handelt.
-In diesem Fall um einen Pod.
+In diesem Fall handelt es sich um einen Pod.
 Unter dem Schlüssel \emph{metadata} wird zum einen ein Name für den Pod
 und zum anderen eine Menge von frei wählbaren Labels definiert.
 Schließlich werden unter \emph{spec} die inhaltlichen Spezifikationen des Pods
@@ -325,7 +355,7 @@ definiert. Für dieses Beispiel enthält der Pod nur einen Container, der ebenfa
 \emph{webserver} trägt. Das für den Container verwendete nginx Image \cite{nginx} wird aus einer
 öffentlichen Container Registry in der Version 1.20.1 geladen. Da diesbezüglich keine weiteren
 Einschränkungen gemacht werden, wird standardmäßig \linebreak \lstinline|https://hub.docker.com| als Container Registry
-verwendet. Abschließend wird der Container über den Port 80 erreichbar gemacht. \cite{Schmeling_Dargatz_2022}
+verwendet. Abschließend wird der Container über den Port 80 erreichbar gemacht \cite{Schmeling_Dargatz_2022} (S. 18-21).
 
 Vorausgesetzt das Cluster ist bereits initialisiert, kann mit dem Kommandozeilenbefehl
 \lstinline|kubectl create -f <Pfad/zum/Manifest>|
@@ -335,7 +365,7 @@ ein Pod mit dem Namen \emph{webserver} gestartet werden.
 ob der Pod erfolgreich gestartet wurde. Eine mögliche Ausgabe ist in
 Listing \ref{lst:pod-state} angegeben. Darin ist zu sehen, dass
 von dem einen vorgesehenen Container im Pod \emph{webserver} auch einer vorhanden ist.
-Der Status "Running" zeigt an, dass der Pod einem Node zugewiesen und alle seine Container erstellt wurden.
+Der Status „Running“ zeigt an, dass der Pod einem Node zugewiesen und alle seine Container erstellt wurden.
 Mindestens einer dieser Container läuft ebenfalls gerade oder wird gerade gestartet.
 Weitere mögliche Zustände sind \cite{kubernetes.io_pod_lifecycle}:
 \begin{itemize}
@@ -348,14 +378,14 @@ Weiterhin wird angezeigt, dass noch kein Neustartversuch unternommen wurde
 und der Pod seit 18 Sekunden existiert.
 Bei Bedarf kann der Pod mit \lstinline|kubectl delete pod webserver| wieder gelöscht werden.
 
-\begin{lstlisting}[caption={Der Pod wurde erfolgreich gestartet.}, label={lst:pod-state}]
+\begin{lstlisting}[caption={Der Pod wurde erfolgreich gestartet \cite{Schmeling_Dargatz_2022} (S. 21).}, label={lst:pod-state}]
 NAME        READY   STATUS    RESTARTS   AGE
 webserver   1/1     Running   0          18s
 \end{lstlisting}
 
 \subsection{ReplicaSets}
 Pods bieten eine Grundlage, um Anwendungen flexibel zu gestalten und
-transparent sowie reproduzierbar auszubringen \cite{Schmeling_Dargatz_2022}.
+transparent sowie reproduzierbar auszubringen \cite{Schmeling_Dargatz_2022} (S. 24-29).
 Sofern aber nur einzelne Pods betrachtet werden, wird das Potenzial von Kubernetes
 nicht vollständig ausgeschöpft.
 Meist ist es beabsichtigt, Pods zu replizieren und gegebenenfalls
@@ -369,17 +399,17 @@ Listing \ref{lst:rs-config} zeigt ein ReplicaSet, das drei Pods startet (Schlüs
 Es ist zu beachten, dass die Konfiguration des ReplicaSets unabhängig von der Konfiguration
 des Pods in Listing \ref{lst:pod-config} ist.
 Die Spezifikationen welche Art von Pods in diesem ReplicaSet gestartet werden sollen,
-erfolgt unter dem Schlüssel \emph{template} \cite{Schmeling_Dargatz_2022}.
+erfolgt unter dem Schlüssel \emph{template} \cite{Schmeling_Dargatz_2022} (S. 26).
 Wie auch schon bei den Pods kann dieses ReplicaSet mit dem Befehl
-\lstinline|kubectl create -f <Pfad/zum/Manifest>| erstellt werden \cite{Schmeling_Dargatz_2022}.
+\lstinline|kubectl create -f <Pfad/zum/Manifest>| erstellt werden \cite{Schmeling_Dargatz_2022} (S. 24-29).
 
-\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines ReplicaSets mit drei Pods.}, label=lst:rs-config]{../kubernetes/nginx/replicaset.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines ReplicaSets mit drei Pods \cite{Schmeling_Dargatz_2022} (S. 26).}, label=lst:rs-config]{../kubernetes/nginx/replicaset.yaml}
 
 Das Kommando \lstinline|kubectl get pods| erzeugt eine mit Listing \ref{lst:rs-pods}
 vergleichbare Ausgabe. Dabei ist anzumerken, dass jeder Pod den Namen des ReplicaSets,
 ergänzt um ein automatisch generiertes Suffix, erhält.
 
-\begin{lstlisting}[caption={Drei Pods wurden erfolgreich gestartet.}, label={lst:rs-pods}]
+\begin{lstlisting}[caption={Drei Pods wurden erfolgreich gestartet \cite{Schmeling_Dargatz_2022} (S. 27).}, label={lst:rs-pods}]
 NAME              READY   STATUS    RESTARTS   AGE
 webserver-86mvm   1/1     Running   0          35s
 webserver-bxvwp   1/1     Running   0          35s
@@ -393,9 +423,9 @@ einen neuen Pod zu starten, um diesen zu ersetzen.
 
 Das Replizieren von Anwendungen ist grundsätzlich kein neues Phänomen, aber
 die wesentliche Neuerung durch Kubernetes ist, dass die Replikation einheitlich
-und anwendungsunabhängig erfolgen kann \cite{Schmeling_Dargatz_2022}.
+und anwendungsunabhängig erfolgen kann \cite{Schmeling_Dargatz_2022} (S. 29).
 
-\begin{lstlisting}[caption={Ein ReplicaSet mit drei erfolgreich gestarteten Instanze.}, label={lst:rs-state}]
+\begin{lstlisting}[caption={Ein ReplicaSet mit drei erfolgreich gestarteten Instanzen \cite{Schmeling_Dargatz_2022} (S. 27).}, label={lst:rs-state}]
 NAME        DESIRED   CURRENT   READY   AGE
 webserver   3         3         3       8s
 \end{lstlisting}
@@ -416,7 +446,7 @@ gerade mit steigender Anzahl an Pods ist dieser Prozess höchst
 fehleranfällig, da es schwer zu überblicken ist, welche Pods noch mit dem alten und welche schon mit dem
 neuen Image laufen. Alternativ könnten auch das gesamte ReplicaSet und damit alle zugehörigen Pods gelöscht werden.
 Das kann in einer Testumgebung problemlos möglich sein. In einer Produktivumgebung möchte man derartige
-Ausfälle aber in der Regel vermeiden \cite{Schmeling_Dargatz_2022}. % TODO: Quelle für Ausfälle in Prod vermeiden?
+Ausfälle aber in der Regel vermeiden \cite{Schmeling_Dargatz_2022} (S. 29-30). % TODO: Quelle für Ausfälle in Prod vermeiden?
 
 Um diese Probleme zu bewältigen, kann ein Deployment erstellt werden.
 Ein Deployment enthält wiederum ein ReplicaSet. Tritt nun das oben aufgeführte Szenario ein und ein Image
@@ -429,7 +459,7 @@ Pods während der Aktualisierung zur Verfügung steht.
 Ein weiterer Vorteil von Deployments ist, dass sie anhand eines einzelnen Befehls auf die vorherige Version
 zurückgesetzt werden können (sog. \emph{Rollback}). Das kann hilfreich sein, wenn sich nach Ausbringung eines
 Updates herausstellt, dass dieses doch nicht den Erwartungen entspricht und man stattdessen bei der vorherigen
-Version bleiben möchte \cite{Schmeling_Dargatz_2022}.
+Version bleiben möchte \cite{Schmeling_Dargatz_2022} (S. 30-32).
 
 Das Kubernetes Manifest für ein Deployment ist genauso aufgebaut, wie bereits beim ReplicaSet in
 Listing \ref{lst:rs-config}, mit der Ausnahme, dass der Schlüssel \emph{kind} den Wert
@@ -441,9 +471,9 @@ man ein aktuelleres Image verwendet, reicht es, den zugehörigen Wert im Manifes
 zu verändern und anschließend mit \lstinline|kubectl apply -f <Pfad/zum/Manifest>| anzuwenden.
 Listing \ref{lst:deploy-rollout} stellt dar wie durch mehrfaches Aufrufen
 von \lstinline|kubectl get rs| sichtbar wird, wie das alte
-ReplicaSet schrittweise abgebaut und das neue schrittweise aufgebaut wird \cite{Schmeling_Dargatz_2022}.
+ReplicaSet schrittweise abgebaut und das neue schrittweise aufgebaut wird \cite{Schmeling_Dargatz_2022} (S. 30-31).
 
-\begin{lstlisting}[caption={Ein Deployment, das schrittweise ein Update ausführt.}, label={lst:deploy-rollout}]
+\begin{lstlisting}[caption={Ein Deployment, das schrittweise ein Update ausführt \cite{Schmeling_Dargatz_2022} (S. 31).}, label={lst:deploy-rollout}]
 NAME                   DESIRED   CURRENT   READY   AGE
 webserver-54596f9745   3         3         3       48s
 webserver-57db766469   1         1         0       5s
@@ -463,8 +493,8 @@ Innerhalb eines Kubernetes Clusters besteht ein internes Netzwerk. Dementspreche
 eine eigene IP-Adresse, über die er erreichbar ist. Diese IP-Adresse wird automatisch zugewiesen, wenn der Pod startet.
 Auf diese Weise können Anwendungen innerhalb des Clusters über Pod-Grenzen hinweg miteinander kommunizieren.
 Listing \ref{lst:pod-ip} zeigt die Ausgabe von \lstinline|kubectl get pods -o wide|, in der auch die IP-Adressen
-der einzelnen Pods aufgeführt sind \cite{Schmeling_Dargatz_2022}.
-\begin{lstlisting}[caption={\lstinline|kubectl get pods -o wide| veranschautlicht, dass jeder Pod seine eigene IP-Adresse erhält. Die Ausgabe wurde zur besseren Lesbarkeit gekürzt.}, label={lst:pod-ip}]
+der einzelnen Pods aufgeführt sind \cite{Schmeling_Dargatz_2022} (S. 36-37).
+\begin{lstlisting}[caption={\lstinline|kubectl get pods -o wide| veranschautlicht, dass jeder Pod seine eigene IP-Adresse erhält. Die Ausgabe wurde zur besseren Lesbarkeit gekürzt \cite{Schmeling_Dargatz_2022} (S. 35).}, label={lst:pod-ip}]
 NAME              READY   STATUS    AGE  ...   IP           
 webserver-9c44s   1/1     Running   6s   ...   10.244.0.15
 webserver-p5tcb   1/1     Running   6s   ...   10.244.0.16
@@ -486,7 +516,7 @@ Natürlich kann auch ein Service gelöscht und neu gestartet werden, wodurch ihm
 Es ist also in der Regel nicht zielführend einen Service anhand seiner IP-Adresse anzusprechen.
 Damit das nicht notwendig ist, verwaltet Kubernetes ein internes Domain-Name-System (DNS), in dem
 der Services beim Start automatisch registriert wird und anschließend unter seinem Namen
-erreichbar ist. \cite{Schmeling_Dargatz_2022}.
+erreichbar ist. \cite{Schmeling_Dargatz_2022} (S. 37-39).
 
 Listing \ref{lst:svc-config} zeigt ein Beispiel für ein Kubernetes Manifest,
 mit dem ein Service konfiguriert werden kann.
@@ -497,8 +527,9 @@ Kubernetes unterscheidet zwischen den Service-Typen \emph{ClusterIP} und \emph{N
 Während der in Listing \ref{lst:svc-config} verwendete Wert ClusterIP genutzt wird, um einen Service
 (und die zugehörigen Pods) \emph{innerhalb} eines Clusters
 einheitlich adressierbar zu machen, wird NodePort verwendet, um einen Service von \emph{außerhalb}
-über die öffentlichen IP-Adressen der Nodes des Clusters an einem zufällig gewählten Port erreichbar zu machen \cite{Schmeling_Dargatz_2022}.
-\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Service.}, label=lst:svc-config]{../kubernetes/nginx/service.yaml}
+über die öffentlichen IP-Adressen der Nodes des Clusters an einem zufällig gewählten Port erreichbar zu machen \cite{Schmeling_Dargatz_2022} (S. 36-38).
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Service \cite{Schmeling_Dargatz_2022} (S. 36).}, label=lst:svc-config]{../kubernetes/nginx/service.yaml}
+% TODO: Evtl. Bild, das die IP-Adressräume in Kubernetes visualisiert
 
 \subsection{Ingress}
 \label{sec:Ingress}
@@ -513,8 +544,8 @@ Ein Beispiel für eine Ingress-Konfigurationsdatei ist in Listing \ref{lst:ingre
 Für die Anwendung muss lediglich der Part in den spitzen Klammern durch die IP-Adresse eines Nodes
 oder durch einen Domain-Namen, der auf die IP-Adresse eines Nodes verweist, ersetzt werden.
 Alle Anfragen an die eingetragene Adresse werden dann an den webserver-Service
-und von dort an die webserver-Pods weitergeleitet. \cite{Schmeling_Dargatz_2022}.
-\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Ingress.}, label=lst:ingress-config]{../kubernetes/nginx/ingress.yaml}
+und von dort an die webserver-Pods weitergeleitet. \cite{Schmeling_Dargatz_2022} (S. 38-40).
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Ingress \cite{Schmeling_Dargatz_2022} (S. 38-39).}, label=lst:ingress-config]{../kubernetes/nginx/ingress.yaml}
 
 
 \subsection{Volumes}
@@ -527,7 +558,7 @@ Alle zu diesem Deployment gehörigen Pods teilen sich also dasselbe Volume.
 Beispiele für die Konfiguration eines PV bzw. eines PVC sind in Listing \ref{lst:pv} und Listing \ref{lst:pvc}
 aufgeführt. Bezüglich der Konfiguration des PV ist insbesondere zu beachten, dass hier
 festgelegt wird, dass ein Speicherbereich des Hostsystems genutzt wird (Schlüssel \emph{hostPath}),
-welchen Pfad dieser hat (hier \emph{"/mnt/data"})
+welchen Pfad dieser hat (hier \emph{„/mnt/data“})
 und wie groß der zur Verfügung gestellte Speicherbereich sein soll (hier 100 MB).
 Der Wert zu dem Schlüssel \emph{accessModes} gibt an, welche Zugriffsparallelität das Volume anbietet.
 Mit \emph{ReadWriteOnce} ist in diesem Fall festgelegt, dass nur ein Pod zur Zeit
@@ -540,11 +571,11 @@ Schlussendlich muss das PVC noch in ein Deployment eingebunden werden, damit die
 Pods es nutzen können. Ein Auszug aus einer möglichen Konfiguration ist dazu in
 Listing \ref{lst:deploy-pvc} dargestellt. In diesem wird unter anderem festgelegt,
 welches PVC zu nutzen ist (Wert zum Schlüssel \emph{claimName}) und auf welchen Pfad
-welcher Container innerhalb des Pods das PV abgebildet werden soll.
+welcher Container innerhalb des Pods das PV abgebildet werden soll \cite{Schmeling_Dargatz_2022} (S. 41-47).
 
-\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Persistent Volume.}, label=lst:pv]{../kubernetes/nginx/pv.yaml}
-\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Persistent Volume Claims.}, label=lst:pvc]{../kubernetes/nginx/pvc.yaml}
-\lstinputlisting[caption={Auszug aus einem beispielhaften Kubernetes Manifest für ein Deployment, das ein Persistent Volume Claim einbindet.}, label=lst:deploy-pvc]{../kubernetes/nginx/pvc-deployment.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Persistent Volume \cite{Schmeling_Dargatz_2022} (S. 43).}, label=lst:pv]{../kubernetes/nginx/pv.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Persistent Volume Claims \cite{Schmeling_Dargatz_2022} (S. 44).}, label=lst:pvc]{../kubernetes/nginx/pvc.yaml}
+\lstinputlisting[caption={Auszug aus einem beispielhaften Kubernetes Manifest für ein Deployment, das ein Persistent Volume Claim einbindet \cite{Schmeling_Dargatz_2022} (S. 45-46).}, label=lst:deploy-pvc]{../kubernetes/nginx/pvc-deployment.yaml}
 
 \subsection{ConfigMaps und Secrets}
 Die Daten, die von einer Anwendung in Volumes gespeichert werden, unterliegen oft regelmäßigen Veränderungen
@@ -555,26 +586,26 @@ Derartige Daten können Pods über \emph{ConfigMaps} in Form von \emph{Key-Value
 Listing \ref{lst:config} zeigt ein Beispiel für eine ConfigMap Ressource.
 Unter dem Schlüssel \emph{data} sind Host und Port einer Datenbankanwendung angegeben,
 die von anderen Anwendungen genutzt werden können. Dazu müssen sie in der Konfiguration des
-Deployments eingebunden werden. Ein Beispiel dazu ist in Listing \ref{lst:deploy-with-conf} dargestellt \cite{Schmeling_Dargatz_2022}.
+Deployments eingebunden werden. Ein Beispiel dazu ist in Listing \ref{lst:deploy-with-conf} dargestellt \cite{Schmeling_Dargatz_2022} (S. 47-50).
 
-\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration einer ConfigMap.}, label=lst:config]{../kubernetes/nginx/config.yaml}
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Erstellung einer ConfigMap, die Umgebungsvariablen für die Konfiguration einer Datenbankanwendung enthält.}, label=lst:config]{../kubernetes/nginx/config.yaml}
 
 
 Neben ConfigMaps gibt es auch \emph{Secrets}, die ihre Daten ebenfalls in Key-Value-Paaren speichern.
 Der Unterschied ist, dass die Werte, die in Secrets eingetragen werden, üblicherweise geheim bleiben sollen und
 dass sie base64 \cite{rfc4648} kodiert sind. Innerhalb der Pods werden die Werte automatisch dekodiert.
 Es ist allerdings zu beachten, dass das Eintragen von Geheimnissen in Secrets sie nicht automatisch sicher
-aufbewahrt. Davon ab, dass natürlich niemand Unbefugtes Zugriff auf die Konfigurationsdateien der Secrets haben sollte,
-sind auch noch weitere Maßnahmen für einen sicheren Betrieb erforderlich, da die Secrets ansonsten
-unverschlüsselt im Etcd (vgl. Kapitel \ref{Etcd}) gespeichert werden \cite{Schmeling_Dargatz_2022}.
+aufbewahrt.
+Eine angemessene Sicherheitskonfiguration des Clusters vorausgesetzt (zum Beispiel die Verschlüsselung des Etcd),
+werden Secrets sicher gespeichert und vor unbefugtem Zugriff geschützt \cite{Schmeling_Dargatz_2022} (S. 51).
 Aus Listing \ref{lst:secret} ist eine beispielhafte Strukturierung eines Secrets ersichtlich.
 Die Angabe \emph{type: Opaque} ist eine von mehreren in Kubernetes integrierten Möglichkeiten,
 um Secrets zu verwalten. Der Typ Opaque erlaubt das Festlegen eines beliebigen Wertes \cite{kubernetes.io_secret_types}.
 Listing \ref{lst:deploy-with-conf} enthält ebenfalls ein Beispiel, wie Werte aus einem
 Secret in ein Deployment eingebunden werden können.
 
-\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Konfiguration eines Secrets.}, label=lst:secret]{../kubernetes/nginx/secret-example.yaml}
-\begin{lstlisting}[caption={Referenzen zur ConfigMaps und Secrets können in einem Deployment unter dem Schlüssel \emph{env} definiert werden.}, label={lst:deploy-with-conf}]
+\lstinputlisting[caption={Ein beispielhaftes Kubernetes Manifest zur Erstellung eines Secrets, das vertrauliche Daten im Cluster bereitstellt.}, label=lst:secret]{../kubernetes/nginx/secret-example.yaml}
+\begin{lstlisting}[caption={Referenzen zur ConfigMaps und Secrets können in einem Deployment unter dem Schlüssel \emph{env} definiert werden \cite{Schmeling_Dargatz_2022} (S. 50).}, label={lst:deploy-with-conf}]
 ...
 spec:
   containers:
@@ -595,13 +626,13 @@ spec:
 \end{lstlisting}
 
 Die Daten aus ConfigMaps und Secrets werden den Anwendungen innerhalb der Pods als Umgebungsvariablen
-bereitgestellt und können darüber ausgelesen werden \cite{Schmeling_Dargatz_2022}.
+bereitgestellt und können darüber ausgelesen werden \cite{Schmeling_Dargatz_2022} (S. 47-51).
 
 \subsection{Namespaces}
 Namespaces (dt. Namensräume) bietet eine ordnende Funktion innerhalb eines Kubernetes Clusters.
 Bis auf wenige Ausnahmen (z.B. PersistentVolumes) sind die meisten Ressourcen in Kubernetes einem
 Namespace zugeordnet. Wird dieser nicht explizit ausgewählt, werden Ressourcen automatisch dem
-Namespace \emph{default} zugeordnet \cite{Schmeling_Dargatz_2022}.
+Namespace \emph{default} zugeordnet \cite{Schmeling_Dargatz_2022} (S. 52).
 
 Namespaces bieten mehrere Vorteile. Zum einen können Namen für Ressourcen doppelt vergeben werden,
 solange sie sich in unterschiedlichen Namespaces befinden. Sie können trotzdem weiterhin
@@ -623,7 +654,7 @@ Schließlich können Namespaces auch genutzt werden, um verschiedene Nutzergrupp
 zu trennen. Innerhalb einer Nutzergruppe können so Änderungen an den zugehörigen Ressourcen vorgenommen werden,
 ohne Gefahr zu laufen, Ressourcen anderer Namespaces zu beeinflussen.
 Namespaces eines Clusters können über die Befehle \lstinline|kubectl create ns <name>| und
-\lstinline|kubectl get ns| erstellt und angezeigt werden \cite{Schmeling_Dargatz_2022}.
+\lstinline|kubectl get ns| erstellt und angezeigt werden \cite{Schmeling_Dargatz_2022} (S. 52-53).
 
 \section{Kubernetes in Softwareentwicklung und Betrieb}
 Container und Kubernetes können dazu beitragen, die Arbeit von Personal in Softwareentwicklung und
@@ -631,19 +662,20 @@ Betrieb zu vereinfachen und damit Anwendungen schneller von der Entwicklung
 in eine Produktivumgebung zu bringen.
 Wichtige Konzepte in diesem Zusammenhang sind
 \emph{Continuous Integration}, \emph{Continuous Deployment} (CI/CD)
-und \emph{GitOps}. Diese Konzepte und deren Mehrwert sollen in diesem Kapitel vorgestellt werden \cite{domingus2022cloud}.
+und \emph{GitOps}. Diese Konzepte und deren Mehrwert sollen in diesem Kapitel vorgestellt werden \cite{domingus2022cloud} (S. 253).
 
-Für das Verständnis der folgenden Absätze muss erst geklärt werden,
+\subsection{Von der Entwicklung bis zur Ausbringung}
+Für das Verständnis der folgenden Unterkapitel muss erst geklärt werden,
 welche Schritte Software von der Entwicklung bis zur Ausbringung an den
 Nutzenden durchläuft.
-Schmeling und Dargatz \cite{Schmeling_Dargatz_2022} schlagen dazu
+Schmeling und Dargatz \cite{Schmeling_Dargatz_2022} (S. 246-249) schlagen dazu
 fünf aufeinanderfolgende Umgebungen vor.
 
 Die erste ist die \emph{Entwicklungsumgebung}, von der es potenziell
 eine eigene für jede entwickelnde Person gibt. Im Gegensatz zu den folgenden
 Umgebungen ist diese in der Regel strikt isoliert. Jeder und jede Entwickelnde
 kann seine oder ihre Umgebung für sich konfigurieren und Änderungen, die von anderen
-Personen am Quellcode vorgenommen werden, haben keinen unmittelbaren Einfluss \cite{Schmeling_Dargatz_2022}.
+Personen am Quellcode vorgenommen werden, haben keinen unmittelbaren Einfluss \cite{Schmeling_Dargatz_2022} (S. 247).
 
 Darauf folgt die \emph{Integrationsumgebung}. Meist handelt es sich dabei
 um ein zentrales Quellcode-\emph{Repository}, das mit einem System zu Versionskontrolle
@@ -654,26 +686,27 @@ Weiterhin werden die individuellen Komponenten der Anwendung getestet (sog. \emp
 Sollten Quell- oder Konfigurationsdateien, die in der Entwicklungsumgebung
 eines Entwickelnden vorhanden sind, in der Integrationsumgebung fehlen,
 wird dieser Fehler hier abgefangen.
-Ergebnisse des \emph{build} können bereits durch Entwickelnde getestet werden \cite{Schmeling_Dargatz_2022}.
+Ergebnisse des \emph{build} können bereits durch Entwickelnde getestet werden \cite{Schmeling_Dargatz_2022} (S. 247).
 
 Es wird aber auch eine designierte \emph{Testumgebung} vorgeschlagen.
 Die hier durchgeführten Tests sind aufwändiger und dauern länger als
 die Tests, die in der Integrationsumgebung durchgeführt werden.
-Denkbar sind auch manuelle Tests wie zum Beispiel Nutzerakzeptanztests \cite{Schmeling_Dargatz_2022}.
+Denkbar sind auch manuelle Tests wie zum Beispiel Nutzerakzeptanztests \cite{Schmeling_Dargatz_2022} (S. 248).
 
 Die \emph{Präproduktivumgebung} ist der nachfolgenden Produktivumgebung am ähnlichsten.
 Sie ist daher besonders für Tests der Performanz geeignet, hat
-aber auch einen großen Ressourcenbedarf \cite{Schmeling_Dargatz_2022}.
+aber auch einen großen Ressourcenbedarf \cite{Schmeling_Dargatz_2022} (S. 248).
 
 Schlussendlich ist die \emph{Produktivumgebung}, diejenige, auf der eine Anwendung
-Nutzenden bereitgestellt wird \cite{Schmeling_Dargatz_2022}.
+Nutzenden bereitgestellt wird \cite{Schmeling_Dargatz_2022} (S. 248).
 
 % TODO: Eventuell Absatz dazu wie Schmeling_Dargatz_2022 diese Umgebungen aufteilen würden (S. 249 ff.)
 
+\subsection{Continuous Integration}
 Ein Ziel von CI/CD und GitOps ist es, den Weg einer Anwendung durch
 diese Umgebungen transparent zu dokumentieren und möglichst automatisiert
 durchzuführen, damit neue Inhalte möglichst schnell zu den
-Nutzenden gelangen \cite{cicd_with_kubernetes}.
+Nutzenden gelangen \cite{cicd_with_kubernetes_devops} (S. 12).
 
 \emph{Continuous Integration} (CI) ist ein Konzept, das dann wichtig wird, wenn mehrere
 Entwicklerinnen und Entwickler an einem Produkt arbeiten.
@@ -692,12 +725,13 @@ Unstimmigkeiten im Quellcode schnell entdeckt und potenziell schnell behoben wer
 Es verlangt allerdings, dass sämtlicher Quellcode durch automatisierte
 Tests abgedeckt ist \cite{fowler_Continuous_Integration}.
 
+\subsection{Continuous Deployment}
 Bis zu diesem Punkt gibt es kaum Unterschiede zwischen Entwicklungsprozessen,
 die Container und Kubernetes nutzen und solchen, die sie nicht nutzen.
 Beim \emph{Continuous Deployment} ändert sich dies.
 Ein Continuous Deployment besteht aus mehreren automatisierten Schritten,
 die zusammen auch als \emph{Pipeline} bezeichnet werden.
-Eine Pipeline besteht typischerweise aus den folgenden Schritten \cite{domingus2022cloud}:
+Eine Pipeline besteht typischerweise aus den folgenden Schritten \cite{domingus2022cloud} (S. 253-254):
 \begin{enumerate}
   \item Eine entwickelnde Person integriert ihre Änderungen in das zentrale Repository.
   \item Es wird ein automatisierter \emph{build} mit Unit-Tests durchgeführt.
@@ -712,16 +746,17 @@ die bei der Umwandlung von Quellcode zu einer ausführbaren Datei auftreten kön
 Der Vorteil von Containern ist also, dass exakt das getestete Image schlussendlich
 Einzug in die Produktivumgebung hält, was die Wahrscheinlichkeit für unerwartete Fehler verringert.
 Dadurch dass Kubernetes-Deployments (vgl. \ref{sec:Deployments}) standardmäßig schrittweise ausgebracht werden,
-können neue Versionen ohne Serviceunterbrechungen in der Produktivumgebung bereitgestellt werden \cite{domingus2022cloud}.
+können neue Versionen ohne Serviceunterbrechungen in der Produktivumgebung bereitgestellt werden \cite{domingus2022cloud} (S. 254).
 
 Zur Automatisierung eines Deployments stehen eine Reihe an verschiedenen Werkzeugen
-zur Verfügung, die beispielsweise von Domingus und Arundel \cite{domingus2022cloud}
+zur Verfügung, die beispielsweise von Domingus und Arundel \cite{domingus2022cloud} (S. 254-257)
 vorgestellt werden. Ein automatisiertes Deployment wird in der Regel ausgelöst,
 wenn eine neue Integration in das zentrale Repository bestimmte Eigenschaften erfüllt.
 Im Kontext von \emph{git} kann das ein bestimmter \emph{branch} sein, zu dem
 ein \emph{push} stattfand oder ein bestimmter \emph{tag}, der ergänzt wurde.
 
-Der Begriff \emph{GitOps} baut auf dem Begriff \emph{DevOps} auf \cite{cicd_with_kubernetes}.
+\subsection{GitOps}
+Der Begriff \emph{GitOps} baut auf dem Begriff \emph{DevOps} auf \cite{cicd_with_kubernetes_devops} (S. 33).
 DevOps wiederum entstand aus der Motivation die Bereiche Entwicklung und Betrieb
 besser aufeinander abzustimmen, mit dem Ziel, entwickelte Software schnell
 für Nutzende verfügbar zu machen. Eine wesentliche Herausforderung in diesem Zusammenhang
@@ -731,16 +766,17 @@ Zusätzlich waren verwendete Server oft stark spezialisiert und schwierig zu ers
 Als Lösungsansatz für letzteres wurden Prozesse entwickelt, um automatisiert Images
 für virtuelle Maschinen zu erstellen, die die Anwendung inklusive ihrer Abhängigkeiten
 und des Betriebssystems enthielt. Das erhöhte die Zuverlässigkeit von
-Anwendungen in der Produktivumgebung, war aber immer noch vergleichsweise langsam \cite{cicd_with_kubernetes}.
+Anwendungen in der Produktivumgebung, war aber immer noch vergleichsweise langsam \cite{cicd_with_kubernetes_devops} (S. 33-35).
 
 Mit dem Aufkommen von Containern konnte dieser Prozess nicht nur performanter, sondern
-auch einfacher gemacht werden. Dadurch dass die Konfiguration des "Servers" (also in diesem
+auch einfacher gemacht werden. Dadurch dass die Konfiguration des „Servers“ (also in diesem
 Fall das Container-Image) übersichtlich und nachvollziehbar in einer Textdatei stattfand,
 konnte dies auch zunehmend durch den Entwicklungsbereich übernommen werden.
 Gleichzeitig konnte die Konfiguration der physischen oder virtuellen Server
 stark vereinfacht werden, da sie nur noch in der Lage sein mussten, Container auszuführen.
-Ob diese Server selbst betrieben wurden oder in der Cloud spielte damit auch nur
-noch eine untergeordnete Rolle \cite{cicd_with_kubernetes}.
+Ob diese Server selbst oder in der Cloud betrieben wurden, spielte damit auch nur
+noch eine untergeordnete Rolle \cite{cicd_with_kubernetes_devops} (S. 19).
+% TODO: Infrastructure as a Service aus \cite{domingus2022cloud} (S. 3) und Infrastructure as Code \cite{domingus2022cloud} (S. 6)
 
 Kubernetes führt die Idee der vereinfachten Konfiguration noch einen Schritt weiter.
 Deklarative Kubernetes-Manifeste beschreiben einen erwünschten Zustand
@@ -758,42 +794,10 @@ dass manuelle Änderungen, die zum Beispiel durch über einen Kommandozeilenbefe
 vorgenommen wurden und die von dem erwünschten Status im zentralen Repository
 abweichen, automatisch zurückgesetzt werden.
 Dadurch wird erreicht, dass es nur eine gültige und zugleich transparente
-Quelle für den erwünschten Zustand der Infrastruktur gibt \cite{domingus2022cloud} \cite{cicd_with_kubernetes}.
-
-
-
-
-
-% \cite{Schmeling_Dargatz_2022}
-
-% S. 174
-% Helm als Tool für Kubernetes Deployments. Helm ist templating language für Kubernetes Manifeste
-% Helm ersparte redundante Werte in den Manifesten. Zentrales values.yaml
-% Helm macht Releases transparent und vereinfacht rollbacks
-% Verschiedene values.yaml für verschiedene Umgebungen möglich
-% values.yaml haben Schleifen und Kontrollstrukturen
-
-% \cite{cicd_with_kubernetes}
-% S. 12 Was ist DevOps und was ist die Historie
-% Hochspezialisierte Server mit viel Konfigurationsaufwand (früher). Dann ersetzt durch Docker. Weniger Anforderungen an Hardwareserver
-
-% S. 254
-% Einzelne Schritte von Pipeline
-% \cite{Schmeling_Dargatz_2022} Verschiedene Umgebungen können unterschiedlich realisiert werden (Namespaces, Cluster)
-% Der Container wird getestet, nicht der Source Code, da Fehler zwischen Sourcecode und Binary auftreten können
-% verschiedene Tools für CI CD <-- evtl Gitlab und Github hervorheben
-
-% S. 266
-% GitOps als Infrastructure as Code
-
-% S. 269
-% GitOps Tools können automatisch ein Deployment triggern, wenn Änderungen an den Kubernetes Manifesten
-% oder am Helm Chart festgestellt werden
-% Alles was nicht im Git repo ist, wird automatisch zurückgerollt (z.B. manuelle Änderungen)
-% Alle Änderungen werden im Git Repo getrackt. Ermöglicht Dokumentation und Nachvollziehbarkeit
-
+Quelle für den erwünschten Zustand der Infrastruktur gibt \cite{domingus2022cloud} (S. 266) \cite{cicd_with_kubernetes_devops} (S. 33-35).
 
 \section{Kubernetes in der Praxis}
+\label{sec:Fallbeispiele}
 In diesem Kapitel soll anhand mehrerer Fallbeispiele dargestellt werden, wie Unternehmen
 Kubernetes in der Praxis nutzen, um Anwendungen bereitzustellen.
 Obwohl die aufgeführten Angaben direkt von den Unternehmen stammen und daher nicht im Detail
@@ -853,454 +857,81 @@ OpenAI gibt an, durch Kubernetes die Zeit, die für bestimmte Entwicklungsaufgab
 benötigt wurde, von mehreren Monaten auf ein bis zwei Wochen reduziert zu haben.
 Das Unternehmen nutzte 2018 über 2500 Nodes \cite{openai_scaling_2500} und 2021 über 7500 \cite{openai_scaling_7500} \cite{story_openai}.
 
-% \subsection{Box}
-% Gegründet 2005
-% Enterprise Content Management Company
-% Über 50 Millionen Nutzer
-% Ursprünglich überwiegend Baremetal auf eigener Hardware
-% Monolithische PHP Code Basis
-% Global Expandierende Firma hatte Bedarf, Workload über verschiedene Cloud Infrastrukturen zu nutzen
-% Früher mehr als 6 Monate um einen neuen Microservice auszubringen. Mittlerweile weniger als 5 Tage.
-% 2014 knapp 10 Jahre Soft- und Hardware, die nicht mehr auf Stand war.
-% Kubernetes bietet einheitliche API (über verschiedene Cloudplattformen und Bare Metal), um neue Werkzeuge danach auszurichten
-% Services nach und nach migriert
-% Mehrere hundert Nodes
+\section{Fazit und Ausblick}
+In dieser Arbeit wurden die Historie und die Technologien, die der Entwicklung von Kubernetes
+vorausgingen, vorgestellt. Weiterhin wurde ein Überblick gegeben, aus welchen Komponenten
+Kubernetes besteht und wie es zu einem Mehrwert in moderner Softwareentwicklung
+beitragen kann.
 
-% \subsection{BlaBlaCar}
-% Langstrecken Car Pooling
-% gegründet 2006
+Die durch Container und Kubernetes eingebrachten Konzepte waren schon zum Zeitpunkt der Einführung
+nichts grundlegend neues.
+Es existierten bereits Images, die genutzt werden konnten, um virtuelle Maschinen automatisiert
+zu erstellen. Container bieten allerdings eine leichtgewichtige Alternative zu diesem Prinzip,
+deren Konfiguration auf Basis von menschenlesbaren Textdateien leicht nachvollziehbar ist.
+Auch konnten Anwendungen bereits früher schon repliziert werden.
+Das Vorgehen dazu war aber meist anwendungsspezifisch und erforderte spezifische Kenntnisse.
+Durch ReplicaSets bietet Kubernetes eine Lösung, die Teil der Plattform ist
+und alle Arten von Anwendungen auf die gleiche Weise replizieren kann.
+Mit Kubernetes definierte Deployments schaffen ebenfalls kein gänzlich neues Konzept.
+Sie tragen aber dazu bei, einen vorher vielfältigen Prozess zu vereinheitlichen,
+zu automatisieren und nachvollziehbar sowie replizierbar zu machen.
+Insgesamt kann Kubernetes auf diese Weise dazu beitragen, dass
+Anwendungen schneller weiterentwickelt, kontrolliert ausgebracht und
+performanter betrieben werden \cite{Schmeling_Dargatz_2022} (S. 15-55).
 
-% 40 Millionen Nutzer in 22 Ländern
-% Starkes Wachstum seit 2012
-% 2015 50 bare Metal Server
-% Kubernetes ermöglicht Entwicklern sich auf die Entwicklung zu konzentrieren (Features)
-% Nutzen rkt als Container Engine (statt Docker)
-% Bis Dezember 2015 sollte die gesamte Plattform containerisiert werden (bis dahin zu 80\% gelungen, mittlerweile 100\%)
-% Schnelleres Ausbringen von Services
-% Mittlerweile 3000 Pods, davon 1200 eingebunden in Kubernetes
+Kubernetes verringert zudem die Anforderungen, die an die zugrundeliegende
+Infrastruktur gestellt werden. Es reicht aus, wenn physische und virtuelle Maschinen
+Container und Kubernetes betreiben können \cite{cicd_with_kubernetes_devops} (S. 19).
+Wie in den Fallbeispielen (vgl. Kapitel \ref{sec:Fallbeispiele}) dargestellt, können Anwendungen daher
+flexibel sowohl auf eigener Hardware als auch bei Cloud-Anbietern betrieben werden,
+wodurch Potenzial für Kosteneinsparungen entsteht, ohne Leistungseinbußen
+hinnehmen zu müssen \cite{story_openai}.
+Im Gegenzug kann die Nutzung von Kubernetes für Unternehmen aber auch
+hohen Mehraufwand bedeuten.
+Bei allen Vereinfachungen, die Kubernetes mit sich bringt, muss beachtet werden,
+dass die Situationen, für die es gemacht ist, äußerst komplex sind.
+Naturgemäß sind der Vereinfachung dadurch Grenzen gesetzt und
+sowohl die Migration zu und das Betreiben von Kubernetes bleiben
+arbeitsintensive Aufgaben \cite{domingus2022cloud} (S. 39).
+Für eine Migration müssen außerdem möglicherweise über Jahre gewachsene monolithische
+Anwendungen in containerisierte Microservices aufgeteilt und übersetzt werden müssen,
+um den vollen Funktionsumfang von Kubernetes nutzen zu können.
+Zusätzlich ist eine Microservice-Architektur grundsätzlich komplexer
+in ihrem Aufbau und schwieriger zu testen, als eine monolithische Anwendung \cite{8406008}.
+Folglich sollte die Einführung von Kubernetes sorgfältig anhand der Ziele
+und den damit verbundenen Anforderungen an Skalierbarkeit und Flexibilität
+geprüft werden.
 
+Abschließend bleibt festzuhalten, dass es sich bei Kubernetes zum Zeitpunkt des Erstellens dieser
+Arbeit keineswegs um eine sich entwickelnde Technologie handelt, sondern um eine, die bereits
+in vielen Bereichen von Forschung und Wirtschaft etabliert ist. In einer Umfrage der
+Cloud Native Computing Foundation von 2024 \cite{cncf} gaben 41 \% der befragten Unternehmen an,
+bereits jetzt die meisten oder alle ihrer Anwendungen in einem Cloud-Umfeld zu betreiben und
+80 \% gaben an, in den nächsten fünf Jahren die meisten oder alle ihrer neu entwickelten Anwendungen
+auf der Cloud betreiben zu wollen.
+Vor diesem Hintergrund ist auch nachvollziehbar, dass es Autoren gibt, die vermuten,
+dass Kubernetes in der Zukunft weniger sichtbar wird. Nicht weil es an Bedeutung verliert,
+sondern weil es sich nach und nach als Standard etablieren wird \cite{domingus2022cloud} (S. 13) \cite{Schmeling_Dargatz_2022} (S. 2).
 
-
-
-
-% Evtl. Stateful Services erklären?
 
 % TODO: Monitoring, Logging and Health Checking?
 % TODO: "StatefulSets, DaemonSets, and Jobs" Kapitel ergänzen
 % TODO: Anbieter von Cloud Plattformen vergleichen GKS, AWS, Azure
 
 % TODO Fazit:
-% - Kubernetes vereinheitlicht Konzepte, die vorher schon da waren und macht sie damit zugänglicher und effizienter \cite{Schmeling_Dargatz_2022}
-% - Nachteile von Microservices, die sich auch auf Kubernetes auswirken (Komplexere Entwicklung, schwieriger testen im Vergleich zu Monolith, Quelle: 8406008)
 % - Vergleich zu anderen Container-Orchestrierungs Tools Bentaleb_Belloum_Sebaa_El S.13ff und Tabelle 2
 % TODO: Ausblick
-% - Vielleicht auc CNCF weiteren Ausblick für Kubernetes recherchieren
 % - Weitere Anwendungsgebiete von Containern (und damit auch Kubernetes) Bentaleb_Belloum_Sebaa_El S. 21ff.
-% - Will Kubernetes disappear? domingus2022cloud, S.13
-% - Schmeling und Dargatz gehen davon aus, dass Kubernetes "Standard" wird  und viele bestehende Tools dafür optimiert werden S.1 
-
-
-
-% \section{Flottensimulation}
-
-% \subsection{Motivation und Prinzip}
-% \label{sec:Motivation-und-Prinzip}
-% Für ein besseres Verständnis der grundlegenden Konzepte von Kubernetes sollen diese anhand eines
-% Anwendungsfalls vorgestellt werden.
-% Vor der Implementierung des Anwendungsfalls muss aber die Motivation für diesen geklärt werden.
-
-% Konkret soll der Anwendungsfall die simulationsgestützte Analyse einer Fahrzeugflotte behandeln.
-% Im Kern handelt es hier um eine Abwandlung eines Warteschlangenmodells \cite{Leonelli2021}, bei dem 
-% „Kunden“ (hier: Fahrzeuge) an einem „Dienstleistungspunkt“ (hier: Instandsetzungseinrichtung) ankommen 
-% und dort bedient (hier: instandgesetzt) werden.
-% Wenn die Kapazitäten des Dienstleistungspunkts voll ausgelastet sind und trotzdem neue Kunden ankommen, entsteht eine Warteschlange.
-
-% Ziel eines solchen Modells ist die Optimierung eines realen Systems mithilfe der Simulation.
-% Dazu wird das reale System mit möglichst allen relevanten Eigenschaften in der Simulation nachgebildet.
-% Dabei werden auch alle Eingangsparameter (im Folgenden als \emph{Faktoren} bezeichnet) bestimmt, 
-% von denen man im realen System erwartet, dass sie einen Einfluss auf die zu optimierenden
-% Ausgangsvariablen (im Folgenden als \emph{Key-Performance-Indicators bzw. KPI} bezeichnet)
-% haben könnten und die auch aktiv verändert werden können.
-
-% Der grundlegende Ablauf in dem verwendeten Modell ist in Abbildung \ref{fig:Simulationsmodell} dargestellt.
-% Die Simulation enthält eine Menge an Fahrzeugen, die einer nicht näher definierten Nutzung unterliegen. 
-% Für jeden Iterationsschritt besteht für jedes Fahrzeug eine Wahrscheinlichkeit von $\lambda$, dass dieses ausfällt.
-% Tritt dieser Fall ein, wird das Fahrzeug einer Instandsetzungseinrichtung zugewiesen. 
-% Eine Instandsetzungseinrichtung hat einen oder mehrere Arbeitsplätze und diese enthalten wiederum Arbeiter.
-% Hat die Instandsetzungseinrichtung einen freien Arbeitsplatz, wird das defekte Fahrzeug diesem zugewiesen und
-% dort mit einer Rate instandgesetzt, die abhängig von der Anzahl und Fertigkeit der zugehörigen Arbeiter ist.
-% Falls gerade keine freien Kapazitäten vorhanden sind, verbleibt das Fahrzeug in der Warteschlange der jeweiligen Einrichtung.
-% Ist die Instandsetzung abgeschlossen, verlässt das Fahrzeug die Instandsetzungseinrichtung und wird weiter genutzt.
-
-% \begin{figure}
-% 	\centering
-% 	\includegraphics[width=\textwidth]{media/Simulationsmodell.png}
-% 	\caption{
-% 		Grundlegender Prozess innerhalb der Simulation. Fahrzeuge werden
-% 		genutzt, fallen nach einiger Zeit aus und müssen dann instandgesetzt
-% 		werden.
-% 		}
-% 	\label{fig:Simulationsmodell}
-% \end{figure}
-
-% Bereits in diesem vergleichsweise simplen Modell sind mehrere verschiedene Faktoren und KPI denkbar.
-
-% \textbf{Beispiele für Faktoren:}
-% \begin{itemize}
-% 	\item Anzahl der Fahrzeuge
-% 	\item Ausfallwahrscheinlichkeit der Fahrzeuge $\lambda$
-% 	\item Höhe der Instandsetzungskapazitäten
-% 	\item Reparaturrate der Fahrzeuge
-% \end{itemize}
-
-% \textbf{Beispiele für KPI:}
-% \begin{itemize}
-% 	\item Anzahl einsatzbereiter Fahrzeuge
-% 	\item Dauer von Reparaturen
-% 	\item Länge der Warteschlangen
-% 	\item Länge der Wartezeiten
-% 	\item Auslastung der Instandsetzungseinrichtungen
-% \end{itemize}
-
-% Für die vorliegende Implementierung des Simulationsmodells wurde das Python-Paket \emph{mesa} \cite{python-mesa-2020} genutzt.
-% Von den genannten Faktoren können die Anzahl der Fahrzeuge, die Höhe der Instandsetzungskapazitäten und die
-% Reparaturrate beeinflusst werden. Von den genannten KPI ist für die Anzahl einsatzbereiter Fahrzeuge
-% eine automatisierte Auswertung vorhanden.
-
-% Um eine möglichst optimale Konfiguration der Faktoren zu identifizieren, wird die Simulation 
-% mit vielen verschiedenen Konfigurationen durchgeführt und die dazugehörigen KPI ausgewertet.
-% Diese Methode ist auch unter dem Begriff \emph{Data Farming} bekannt \cite{8632383}.
-
-% In einer Simulation werden statt fester Werte oft Verteilungsfunktionen verwendet, aus denen Einflussgrößen abgeleitet werden. 
-% Aufgrund dieser Eigenschaft wird ein Simulationsmodell in der Regel mehrfach
-% mit gleichen Faktoren ausgeführt, um die stochastischen Effekte in den KPI zu beobachten und
-% um einzelne Ausreißer auszuschließen. 
-
-% Eine populäre Klassifizierung von Analysemodellen erfolgte durch Gartner \cite{Gartner} (vgl. Abbildung \ref{fig:gartner-modell}).
-% Diese Klassifizierung geht von vier Stufen von Analysemethoden aus, die anhand der Skalen \emph{Schwierigkeit} und \emph{Mehrwert} sortiert werden.
-% Beginnend bei niedriger Schwierigkeit und bei niedrigem Mehrwert bis hin zu hoher Schwierigkeit und hohem Mehrwert
-% handelt es sich dabei um:
-% \begin{enumerate}
-% 	\item Deskriptive Analyse
-% 	\item Diagnostische Analyse
-% 	\item Prädiktive Analyse
-% 	\item Präskriptive Analyse
-% \end{enumerate}
-
-% \begin{figure}
-% 	\centering
-% 	\includegraphics[width=\textwidth]{media/analytic-maturity.png}
-% 	\caption{
-% 		Das Gartner Modell schlägt eine Klassifizierung von Analysemodellen vor.
-% 		Das hier dargestellte Simulationsmodell fällt in den Bereich der 
-% 		präskriptiven Analyse \cite{Gartner}. 
-% 		}
-% 	\label{fig:gartner-modell}
-% \end{figure}
-
-% Ein Simulationsmodell der hier vorliegenden Art fällt grundsätzlich in den Bereich der präskriptiven Analyse, 
-% da es nicht nur die Vorhersage zukünftiger Systemzustände erlaubt, sondern auch Faktoren identifiziert,
-% die verändert werden können, um einen bestimmten Zustand zu erreichen.
-
-% Ein Beispiel für eventuelle Nutzer einer Simulation wie der hier verwendeten, könnten 
-% Betreiber größerer Fahrzeugflotten (z.B. LKW oder Busse) sein. 
-% Gemäß Isermann \cite{Isermann_2011} belaufen sich bis zu 20 \% der laufenden Kosten beim Betrieb von Maschinen auf
-% die Instandhaltung bzw. Instandsetzung.
-% Fahrzeuge, die sich lange in Instandsetzung befinden, können in dieser Zeit keinen Mehrwert generieren.
-% Es besteht also ein Interesse daran, immer ausreichende Instandsetzungskapazitäten vorhalten zu können.
-% Da der Unterhalt derartiger Kapazitäten aber mit hohen Kosten verbunden ist, ist es von großem
-% Interesse, die \emph{optimale} Instandsetzungskapazität für eine gegebene Flotte zu identifizieren.
-
-% Der Bedarf an skalierbarer Infrastruktur zum Betrieb der Simulation ergibt sich wie folgt:
-% Bereits bei den vier oben aufgeführten Faktoren, mit denen das vorliegende Simulationsmodell betrieben werden könnte,
-% ergibt sich eine große Anzahl an Faktorkombinationen.
-% Angenommen jeder Faktor soll um fünf Stufen variiert werden. Dann ergeben sich daraus
-% $5^4 = 625$ Kombinationen. Aufgrund stochastischer Effekte empfiehlt es sich, jede einzelne
-% Kombination mehrfach zu wiederholen. Davon ausgehend, dass jede Kombination 20-mal wiederholt wird,
-% ergeben sich daraus $625 * 20 = 12.500$ Simulationsläufe. Bei einer angenommenen Laufzeit von ca. 10 Sekunden
-% pro Simulationslauf und rein serieller Ausführung ergibt sich daraus eine Gesamtlaufzeit von
-% knapp 35 Stunden.
-
-% Bei Modellen für realistische Szenarien ist natürlich von mehr Faktoren und auch von mehr Zeit 
-% für einzelne Simulationsläufe auszugehen. Um einen vollständigen Simulationslauf möglichst schnell abzuschließen
-% und folglich auswertbare Ergebnisse zu erhalten, bietet es sich an, die Rechenlast zu verteilen.  
-
-% \subsection{Die Microservice-Architektur}
-% Nachdem im vorangegangenen Abschnitt die Motivation und die Funktionsprinzipien der Simulation erklärt wurden,
-% soll in diesem Abschnitt auf die für den Betrieb genutzte Microservice-Architektur Bezug genommen werden.
-
-
-% Grundlegend besteht die Microservice-Architektur aus sechs verschiedenen Services, deren Zusammenwirken
-% in Abbildung \ref{fig:microservice-architektur} dargestellt ist.
-
-% \begin{figure}
-% 	\centering
-% 	\includegraphics[width=\textwidth]{media/Microservice-Architektur.png}
-% 	\caption{
-% 		Eine Übersicht über die verwendete Microservice-Architektur.
-% 		Details können dem Text entnommen werden.
-% 		}
-% 	\label{fig:microservice-architektur}
-% \end{figure}
-
-% Die Dateien, die zum Aufsetzen der Services verwendet wurden, sind unter
-% \lstinline|https://github.com/patrick-meyer-1992/bachelorseminar| \cite{Meyer_bachelorseminar}
-% verfügbar.
-
-% \subsubsection{Minikube}
-% Zum Aufsetzen des Clusters wurde \emph{Minikube} verwendet.
-% Minikube ist eine Anwendung, die genutzt werden kann, um mit vergleichsweise wenig Aufwand ein lokales
-% Kubernetes Cluster mit einem Node zu erstellen. Diese relativ einfache Konfiguration hat 
-% den Nachteil, dass Minikube lediglich für Test- und Entwicklungsaufgaben geeignet ist.
-% Für Produktivsysteme sollte eine andere Lösung gewählt werden (vgl. Abschnitt \ref{sec:Ausblick}). 
-
-% Zum Betrieb des Clusters verwendet Minikube eine virtuelle Maschine, innerhalb derer
-% alle Kubernetes Komponenten laufen. Dementsprechend ist eine der Voraussetzungen,
-% um Minikube zu nutzen auch die vorherige Installation einer Virtualisierungsanwendung.
-% Näheres kann der Minikube Dokumentation entnommen werden \cite{minikube}.
-
-% \subsubsection{FastAPI}
-% \label{sec:FastAPI}
-% FastAPI ist ein modernes, performantes Web-Framework, das genutzt werden kann, um \emph{Application-Programming-Interfaces} (API)
-% mit Python zu erstellen \cite{Ramirez_FastAPI}.
-
-% In diesem Fall wird es als zentrale Schnittstelle der Microservice-Architektur genutzt.
-% Anfragen an die Datenbanken (vgl. \ref{sec:Datenbanken})
-% über das Frontend (vgl. \ref{sec:Angular}) oder vom Simulationsservice (vgl. \ref{sec:Flottensimulation})
-% werden durch diese Schnittstelle angenommen, validiert, bearbeitet und beantwortet.
-% Gleiches gilt für die Befüllung der Job-Warteschlange (bzw. Message Queue) im Service
-% RabbitMQ (vgl. \ref{sec:RabbitMQ}), die über eine Anfrage seitens des Frontends an
-% FastAPI ausgelöst wird.
-
-% In der erstellten Microservice-Architektur wird das FastAPI-Deployment nur einfach repliziert,
-% da nicht zu erwarten ist, da in diesem Demonstrationsbeispiel (Proof-of-Concept) nicht von einer
-% großen Anzahl an Anfragen auszugehen ist. 
-% Die Anzahl der Replicas kann aber über ein einfaches Kommandozeilenargument angepasst werden, %, z.B. (\lstinline|kubectl scale deployment fastapi-deployment --replicas=4|) 
-% falls das erforderlich sein sollte.
-
-% \subsubsection{Angular}
-% \label{sec:Angular}
-% Grundsätzlich ist es möglich, die Simulation vollständig über die Kommandozeile zu bedienen.
-% Da das Ziel einer solchen Simulation aber üblicherweise die Unterstützung von (nicht-technischen) 
-% Entscheidungsträgern ist, wurde ein Frontend entworfen, das eine Idee davon bieten soll, wie man Simulationsservices
-% einer breiteren Masse zur Verfügung stellen kann. Das Frontend basiert auf Angular,
-% einer Entwicklungsplattform zum Erstellen von Handy- und Desktop-Webanwendungen \cite{jain2014angularjs},
-% und ermöglicht das Konfigurieren, Starten und Auswerten von Simulationsläufen über eine interaktive Web-Oberfläche.
-% Ein Eindruck einer möglichen visuellen Auswertung kann Abbildung \ref{fig:ergebnis-plot} entnommen werden.
-
-% \begin{figure}
-% 	\centering
-% 	\includegraphics[width=\textwidth]{media/Ergebnisplot.png}
-% 	\caption{
-% 		Darstellung des Ergebnisses von einem Simulationslauf mit den eingestellten Faktoren.
-% 		Zu sehen sind die Anzahl Fahrzeuge in den Zuständen „Ausgefallen“, „Einsatzbereit“ und „in Reparatur“	
-% 		für jeden Tag des einjährigen Simulationszeitraums.
-% 		}
-% 	\label{fig:ergebnis-plot}
-% \end{figure}
-
-% \subsubsection{RabbitMQ}
-% \label{sec:RabbitMQ}
-% RabbitMQ ist ein Message- und Streaming-Broker \cite{RabbitMQ}. Es bildet eine Zwischenstation
-% zwischen Sender und Empfänger einer Nachricht. Das vereinfacht beispielsweise die Verteilung auf 
-% mehrere Empfänger, glättet Auslastungsspitzen und ermöglicht asynchrone Kommunikation zwischen
-% Sender und Empfänger. 
-
-% In der vorliegenden Microservice-Architektur wird RabbitMQ als Zwischenspeicher für
-% Simulationsaufträge genutzt. Das Frontend sendet für jeden einzelnen Simulationslauf
-% ein json-Objekt über FastAPI an RabbitMQ, wo jedes Objekt als ein Simulationsauftrag
-% in der Message Queue vorgehalten wird. Der Simulationsservice abonniert diese Message Queue,
-% wenn er gestartet wird und empfängt von dort einzeln seine Aufträge.
-
-% Dieses Vorgehen hat den Vorteil, dass Simulationsaufträge unabhängig von der Existenz
-% des Simulationsservices eingestellt werden können. Sobald der Simulationsservice gestartet
-% oder um weitere Replikationen ergänzt wird, beginnt die Bearbeitung der Aufträge durch den
-% bzw. die neuen Arbeiter.
-
-% \subsubsection{Datenbanken}
-% \label{sec:Datenbanken}
-% Zur persistenten Speicherung von Daten werden sowohl MongoDB als auch PostgreSQL verwendet.
-
-% MongoDB ist ein dokumentenorientiertes Datenbanksystem mit einem Fokus auf Skalierbarkeit und Flexibilität \cite{Bradshaw_2010}.
-% Dokumentenorientiert heißt in diesem Fall, dass die Daten nicht wie in einem relationalen
-% Datenbanksystem in Form von Tabellen gespeichert wird, sondern als Objekte in json-Notation.
-
-% In der Microservice-Architektur speichert MongoDB die Instandsetzungskonfigurationen,
-% die über das Frontend erstellt werden.
-% Eine Instandsetzungskonfiguration ist ein json-Objekt, das eine Liste von Instandsetzungseinrichtungen,
-% enthält. Diese enthalten wiederum eine Liste von Arbeitsplätzen, zu denen jeweils eine Liste
-% von Arbeitern gehört. 
-% Die Arbeiter enthalten Attribute, die ihre jeweilige Instandsetzungsgeschwindigkeit definieren.
-
-% Da eine Instandsetzungskonfiguration mitunter sehr komplex werden kann, war es wichtig,
-% dass einmal erstellte Konfiguration persistent gespeichert und auch wieder abrufbar und veränderbar sind.
-
-% Für die Speicherung der Simulationsergebnisse wird in diesem Szenario PostgreSQL als relationale Datenbank verwendet.
-
-% \subsubsection{Ingress}
-% Der Ingress-Controller hat die Aufgabe, Anfragen entsprechend des Hostnamens zu verteilen (vgl. \ref{sec:Ingress}).
-% In diesem Fall werden http-Anfragen gemäß der Subdomains \emph{app}, \emph{api}, \emph{rmq} an das
-% Frontend, den FastAPI-Service oder an den RabbitMQ-Service weitergeleitet. Um dieses Verhalten
-% in einer lokalen Umgebung zu ermöglichen, muss zusätzlich zum Cluster ein Weg eingerichtet werden,
-% um DNS-Anfragen an app.domain.com, api.domain.com und rmq.domain.com an die IP-Adresse des Clusters zu senden.
-% Das kann entweder durch das Aufsetzen eines DNS-Servers geschehen oder durch Anpassen der Datei 
-% \lstinline|/etc/hosts| unter Linux oder \lstinline|C:\Windows\system32\drivers\etc\hosts| unter Windows 11.
-
-% \subsubsection{Flottensimulation}
-% \label{sec:Flottensimulation}
-% Der Simulationsservice ist der Anteil der Microservice-Architektur, der den größten Anteil
-% der dort stattfindenden Berechnungen vornimmt und dementsprechend auch den größten Bedarf
-% an Rechenressourcen hat. Das ist insbesondere dann der Fall, wenn die Pods des Simulationsservice,
-% wie vorgesehen, vielfach repliziert werden.
-
-% Bei seinem Start abonniert jeder Pod unabhängig von den anderen die Job-Warteschlange von RabbitMQ.
-% Jeder Job enthält die konkreten Faktoren, mit denen der Simulationslauf durchgeführt werden soll.
-% Dazu gehört auch der Name der zugehörigen Instandsetzungskonfiguration. Aufgrund
-% dieses Namens wird die zu verwendende Instandsetzungskonfiguration über FastAPI
-% aus der MongoDB abgerufen.
-
-% Über einen Simulationszeitraum von einem Jahr wird für jeden Tag die Anzahl der Fahrzeuge
-% in den möglichen Zuständen (Einsatzbereit, Ausgefallen, in Reparatur) als KPI gespeichert.
-% Bei Abschluss der Simulation werden diese Ergebnisse ebenfalls über FastAPI in die 
-% PostgreSQL Datenbank geschrieben.
-
-% \section{Fazit}
-% Die erstellte Architektur konnte im Rahmen dieser Arbeit erfolgreich für die Konfiguration, Durchführung und grundsätzliche
-% Auswertung der Simulation genutzt werden. 
-% Kubernetes zeigte sich auch geeignet, um dem vorliegenden Anwendungsfall, nämlich die Skalierung des Simulationsservice,
-% zu unterstützen. 
-
-% Durch die Replikation der Pods kann die Rechenlast grundsätzlich effizient verteilt und 
-% die Gesamtlaufzeit der Simulationen deutlich reduziert werden 
-% (auch wenn für diese Arbeit keine Hardware zur Verfügung stand, um das konkret zu testen).
-% Die Entkopplung der einzelnen Services ermöglicht zusätzlich die unabhängige Skalierbarkeit dieser.
-
-% Durch die Nutzung von FastAPI als zentrales Kommunikationselement ist es auch möglich, weitere Komponenten hinzuzufügen
-% oder bestehende zu verändern ohne, dass dafür alle anderen Komponenten angepasst werden müssen.
-% Es reicht stattdessen in der Regel, die Änderungen in FastAPI abzubilden.
-
-% RabbitMQ stellte sich als zielführende Lösung für die Verteilung von Simulationsaufträgen hinaus.
-% Eine Alternative, wie zum Beispiel die Verteilung der Simulationsaufträge nach dem Push-Prinzip an die Pods
-% hätte verschiedene Nachteile mit sich gebracht. Darunter die Tatsache, dass nur gerade aktive Pods
-% in der Lage gewesen wären, Aufträge entgegenzunehmen. Außerdem wären bei Fehler eines Pods alle
-% ihm zugeordneten Aufträge verloren gegangen.
-
-% Die Simulation an sich war zu Bestätigung des Funktionsprinzips gut geeignet,
-% müsste für einen realitätsnahen Einsatzzweck aber noch deutlich weiterentwickelt werden.
-% Schmeling und Dargatz \cite{Schmeling_Dargatz_2022}, Kap. 3 geben einen guten Überblick,
-% wie Kubernetes genutzt werden kann, um Anwendungsentwicklung zu unterstützen und zu beschleunigen.
-
-% Die Speicherung der Konfiguration der Instandsetzungseinrichtungen im json-Format stellte sich als 
-% angemessen für die Komplexität und Flexibilität eines derartigen Systems heraus. 
-% Vergleichbare Daten in klassischen relationalen Tabellenstrukturen zu speichern, wäre auch
-% möglich gewesen, könnte allerdings Limitationen bei der Flexibilität einbringen.
-% MongoDB als eine Anwendung, die insbesondere für die Speicherung und den Abruf von
-% Daten im json-Format gestaltet wurde, war für diesen Zweck dementsprechend gut geeignet.
-
-% Die Speicherung der Simulationsergebnisse in einer relationalen\linebreak PostgreSQL-Datenbank
-% erfolgte, da diese weniger komplex als die Konfigurationsdaten sind und weil
-% gängige Werkzeuge zur Datenanalyse gut mit tabellarisch organisierten zusammenwirken.
-% PostgreSQL als etabliertes Open-Source Werkzeug für relationale Datenbanken bot
-% hierfür eine leicht einzubindende Grundlage.
-
-% Angular als professionelles Werkzeug zur Erstellung von webbasierten Benutzeroberflächen,
-% ist geeignet, um einen zentralen Zugang für Nutzer zur Bedienung und Auswertung der Simulation zu bieten.
-% Für ein realistisches Einsatzszenario muss das Frontend noch um weitere Funktionen
-% und um grafische Aufbereitungen ergänzt werden.
-
-% Schließlich ist ein weiterer Vorteil die Unabhängigkeit von proprietären Anwendungen und die Möglichkeit, 
-% die gesamte Infrastruktur auf verschiedenen Plattformen (lokal oder in der Cloud) zu betreiben. 
-% Die Nutzung von Pods und Containern bringt zwar einen geringen Overhead mit sich,
-% der aber durch die Vorteile der Skalierbarkeit und Flexibilität ausgeglichen werden können.
-
-% Insgesamt hat sich Kubernetes als geeignetes Werkzeug für den gedachten Einsatzzweck erwiesen 
-% und bietet eine solide Grundlage für die weitere Entwicklung und den Betrieb der Simulationsanwendung.
-
-
-% \section{Limitationen}
-% Obwohl der für diese Arbeit geplante Anwendungsfall erfolgreich umgesetzt werden konnte,
-% gab es einige Limitationen in Bezug auf den Anwendungsfall an sich und auf
-% Kubernetes im Allgemeinen. Diese sollen in diesem Abschnitt diskutiert werden.
-
-% Die Skalierbarkeit des Simulationsservice mit Kubernetes auch über mehrere Rechner hinweg,
-% konnte aufgrund begrenzter Hardware nur eingeschränkt getestet werden. Ein alternativer Ansatz,
-% der mehrere virtuelle Maschinen verwendet, die jeweils einen Node abbilden, könnte 
-% für zukünftige Anwendungsfälle genutzt werden. Das war hier allerdings nicht realistisch,
-% da die zur Verfügung stehende Hardware nicht genug Rechen- und Speicherressourcen
-% für mehrere virtuelle Maschinen hatte.
-
-% Eine weitere Alternative wäre die Nutzung von kommerziellen Cloud-Anbietern.
-% Die wohl populärsten in diesem Zusammenhang sind Microsoft Azure,
-% Amazon Webservices und Google Kubernetes Engine. Alle drei Anbieter
-% ermöglichen den Betrieb von Kubernetes Clustern auf den von 
-% ihnen bereitgestellten Plattformen. Diese Dienstleistung
-% besteht aber entweder aus stark begrenzten Testversionen oder
-% ist mit hohen Kosten verbunden, weswegen sie für diese Arbeit nicht genutzt wurde.
-
-% Der Mangel an verfügbaren Rechen- und Speicherressourcen sorgte auch dafür,
-% dass die Microservice-Architektur keinem echten Stresstest unterzogen werden konnte.
-% Gerade im Bereich der verwendeten relationalen Datenbank könnte es bei vielen
-% parallelen Lese- und Schreibvorgängen schnell zu Leistungseinbußen kommen.
-% Die Replizierung relationaler Datenbanken unter Einhaltung des ACID-Prinzips
-% ist keine triviale Aufgabe und könnte für die weitere Ausgestaltung 
-% größere Herausforderungen mit sich bringen.
-
-% Da es sich in dieser Arbeit um das grundlegende Funktionsprinzip der Microservice-Architektur drehte,
-% wurde der Aspekt der Sicherheit an vielen Stellen vernachlässigt. Sollten die Services echten
-% Nutzern über das Internet zur Verfügung gestellt werden, müssten weitere Maßnahmen ergriffen werden.
-% Dazu gehört zunächst, dass die Kommunikation mit den http-Services verschlüsselt über https
-% stattfinden sollte. Zudem müsste gegebenenfalls ein Nutzerkonzept mit entsprechender
-% Authentisierung implementiert werden. Das gilt insbesondere dann, wenn sensible
-% Daten verarbeitet werden. Zusätzlich wurde keine Ausnahmebehandlung für fehlerhafte
-% Nutzereingaben und nur rudimentäres Eingabefeedback im Frontend integriert.
-% Generell fehlen für ein produktiv nutzbares System automatisierte Tests
-% aller Komponenten.
-
-% Die Skalierung des Simulationsservice fand in dieser Arbeit zwar mithilfe von Kubernetes
-% aber schlussendlich immer noch manuell statt, indem Kubernetes über die Kommandozeile angewiesen wurde
-% eine bestimmte Anzahl an Pods zu starten. Kubernetes bietet aber auch die Möglichkeit 
-% Services je nach Nutzlast automatisch zu skalieren. Für den vorliegenden 
-% Anwendungsfall war das nicht erforderlich, es könnte aber dennoch eine Verbesserung 
-% der Nutzbarkeit bewirken.
-
-% Abschließend bleibt zu erwähnen, dass Kubernetes zwar eine hohe Flexibilität bietet,
-% aber damit fast automatisch auch eine hohe Komplexität hat. Für große Anbieter von Onlinediensten
-% ist der Mehrwert durch diese Komplexität sicherlich vorhanden.
-% Für kleinere Unternehmen, die überlegen, Kubernetes zu verwenden, kann es sinnvoller sein,
-% alternative, simplere Methoden für die Serviceerbringung zu nutzen \cite{Pagani_2019}.
-
-% \section{Ausblick}
-% \label{sec:Ausblick}
-% Die hier beschriebene Microservice-Architektur war gedacht, um ein grundlegendes Prinzip
-% zu verdeutlichen. Einige weitere Einsatzmöglichkeiten von Kubernetes sind damit aber noch nicht ausgeschöpft 
-% und diese sollen in diesem Abschnitt diskutiert werden.
-
-% Zunächst sei angemerkt, dass Minikube zum Einrichten des Clusters für diesen Testfall
-% zwar völlig ausreichend war, in realistischen Szenarien aber durch andere Werkzeuge ersetzt werden sollte.
-% Für Kubernetes Cluster in Produktivumgebungen sind zum Beispiel \emph{Rancher}, \emph{OpenShift} oder \emph{Tanzu} als
-% gängige Lösungen verfügbar \cite{rancher}. Darüber hinaus bietet Kubernetes noch viele andere 
-% Anwendungsmöglichkeiten, wie zum Beispiel die Unterstützung von Entwicklern, um Software-Produkte
-% schneller von der Entwicklung bis zum produktiven Einsatz zu bringen \cite{Schmeling_Dargatz_2022}.
-
-% Bezüglich des Simulationsmodells sind je nach Anwendungsfall viele weitere Veränderungen denkbar.
-% Dazu gehören unter anderem die Berücksichtigung von Wartungsplänen und Nutzungsmustern, aber auch
-% die genauere Modellierung von Fahrzeugen und ihren Baugruppen. 
-% Zusätzlich könnte die Realitätsnähe der Simulation verbessert werden, indem die Option
-% implementiert wird, dass Faktoren sich auf der Zeitachse des Simulationslaufs dynamisch verändern.
-% Zum Beispiel ist es in einem realen Szenario sehr wahrscheinlich, dass Instandhaltungskapazitäten
-% sich im Laufe der Zeit verändern und nicht so bleiben, wie zu Beginn der Simulationszeit konfiguriert.
-
-% Abschließend bleibt festzuhalten, dass es sich bei Kubernetes zum Zeitpunkt des Erstellens dieser
-% Arbeit keineswegs um eine sich entwickelnde Technologie handelt, sondern um eine, die bereits
-% in vielen Bereichen von Forschung und Wirtschaft etabliert ist. In einer Umfrage der 
-% Cloud Native Computing Foundation von 2024 \cite{cncf} gaben 41 \% der befragten Unternehmen an,
-% bereits jetzt die meisten oder alle ihrer Anwendungen in einem Cloud-Umfeld zu betreiben und
-% 80 \% gaben an, in den nächsten fünf Jahren die meisten oder alle ihrer neu entwickelten Anwendungen
-% auf der Cloud betreiben zu wollen. Durch den wachsenden Nutzerkreis wird auch mit Weiterentwicklungen
-% von Kubernetes in Bereichen der Bedienbarkeit und Standardisierung gerechnet \cite{emerging_trends}.
-% Erstere ist von großer Bedeutung, um Kubernetes einem größeren Feld an Entwicklern zugänglich
-% zu machen, während letztes einen wesentlichen Beitrag zur Flexibilität und Interoperabilität
-% leisten kann.
+% - Weitere Clusterlösungen?: Für Kubernetes Cluster in Produktivumgebungen sind zum Beispiel \emph{Rancher}, \emph{OpenShift} oder \emph{Tanzu} 
+
+% \cite{Schmeling_Dargatz_2022}
+
+% S. 174
+% Helm als Tool für Kubernetes Deployments. Helm ist templating language für Kubernetes Manifeste
+% Helm ersparte redundante Werte in den Manifesten. Zentrales values.yaml
+% Helm macht Releases transparent und vereinfacht rollbacks
+% Verschiedene values.yaml für verschiedene Umgebungen möglich
+% values.yaml haben Schleifen und Kontrollstrukturen
 
 \newpage
 \section{Anhang}
@@ -1317,15 +948,14 @@ veröffentlicht. Mit der Abgabe der elektronischen Fassung der endgültigen Vers
 der Ausarbeitung nehme ich zur Kenntnis, dass diese mit Hilfe eines
 Plagiatserkennungsdienstes auf enthaltene Plagiate geprüft werden kann und
 ausschließlich für Prüfungszwecke gespeichert wird.
-% Ich erkläre, dass ich die vorliegende Arbeit selbstständig und ohne fremde Hilfe verfasst habe.
-% Zitate aus anderen Quellen sind entsprechend gekennzeichnet.
-% Generative Künstliche Intelligenz (ChatGPT und GitHub Copilot) wurde in folgendem Umfang verwendet:
-% \begin{itemize}
-%     \item Suchen von Literatur
-%     \item Prüfung der Arbeit auf Rechtschreib- und Grammatikfehler
-%     \item Entwurf einer Gliederung (die nur unwesentlich übernommen wurde)
-%     \item Erstellung und Debugging von Code und Kubernetes-Skripten
-% \end{itemize}
+
+
+Generative Künstliche Intelligenz (ChatGPT und GitHub Copilot) wurde in folgendem Umfang verwendet:
+\begin{itemize}
+  \item Suchen von Literatur
+  \item Erstellung und Debugging von Kubernetes-Manifesten
+\end{itemize}
+
 
 \newpage
 \printbibliography
