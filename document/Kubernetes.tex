@@ -728,7 +728,8 @@ Personen am Quellcode vorgenommen werden, haben keinen unmittelbaren Einfluss \c
 
 Darauf folgt die \emph{Integrationsumgebung}. Meist handelt es sich dabei
 um ein zentrales Quellcode-\emph{Repository}, das mit einem System zu Versionskontrolle
-verwaltet wird, wie zum Beispiel \emph{git} \cite{chacon2014pro}.
+verwaltet wird, wie zum Beispiel 
+\emph{git}\footnote{git ist eine Open-Source-Anwendung zur Versionskontrolle, mit der Versionen von Dateien überwacht werden können \cite{chacon2014pro}.}.
 Entwickelnde integrieren ihre Arbeit in das zentrale Repository, wo sie
 automatisch kompiliert und ihn lauffähige Software übersetzt wird (sog. \emph{build}).
 Weiterhin werden die individuellen Komponenten der Anwendung getestet (sog. \emph{Unit-Test}).
@@ -740,29 +741,29 @@ Ergebnisse des \emph{build} können bereits durch Entwickelnde getestet werden \
 Es wird aber auch eine designierte \emph{Testumgebung} vorgeschlagen.
 Die hier durchgeführten Tests sind aufwändiger und dauern länger als
 die Tests, die in der Integrationsumgebung durchgeführt werden.
-Denkbar sind auch manuelle Tests wie zum Beispiel Nutzerakzeptanztests \cite{Schmeling_Dargatz_2022} (S. 248).
+Denkbar sind auch manuelle Tests, wie zum Beispiel Nutzerakzeptanztests \cite{Schmeling_Dargatz_2022} (S. 248).
 
 Die \emph{Präproduktivumgebung} ist der nachfolgenden Produktivumgebung am ähnlichsten.
 Sie ist daher besonders für Tests der Performanz geeignet, hat
-aber auch einen großen Ressourcenbedarf \cite{Schmeling_Dargatz_2022} (S. 248).
+aber auch einen hohen Ressourcenbedarf \cite{Schmeling_Dargatz_2022} (S. 248).
 
-Schlussendlich ist die \emph{Produktivumgebung}, diejenige, auf der eine Anwendung
+Schlussendlich ist die \emph{Produktivumgebung} diejenige, auf der eine Anwendung
 Nutzenden bereitgestellt wird \cite{Schmeling_Dargatz_2022} (S. 248).
 
 Kubernetes bietet verschiedene Möglichkeiten, diese Umgebungen zu betreiben und voneinander zu trennen.
 Die stärkste Isolation wird erreicht, wenn jede Umgebung in einem eigenen Cluster betrieben wird.
 Der Nachteil dieser Variante ist, dass fünf Cluster individuell verwaltet werden müssen.
-Jeder davon mit eigenen Master und Worker Nodes \cite{Schmeling_Dargatz_2022} (S. 249-250).
+Jedes davon mit eigenen Master und Worker Nodes \cite{Schmeling_Dargatz_2022} (S. 249-250).
 
 Ein alternativer Ansatz ist die Verwendung von Namespaces, sodass jede Umgebung in einem eigenen
 Namespace isoliert ist.
 Dadurch können die gleichen Manifeste in zum Teil leicht abgeänderter Form für die verschiedenen
 Namespaces verwendet werden, ohne dass Namenskonflikte entstehen. Außerdem sind die Ergebnisse
 der Performanztests in der Präproduktivumgebung besser vergleichbar zu der Produktivumgebung,
-da sie im gleichen Cluster betrieben werden.
-Das bringt aber auch gleichzeitig den Nachteil mit sich, dass die Tests in der Präproduktivumgebung
+da sie im gleichen Cluster durchgeführt werden.
+Das bringt aber gleichzeitig den Nachteil mit sich, dass die Tests in der Präproduktivumgebung
 die Leistung der Produktivumgebung negativ beeinflussen können, wenn sie auf dem gleichen Node laufen.
-Ähnliches gilt auch die gleichzeitige Nutzung von Netzwerkressourcen durch Prozesse in den
+Ähnliches gilt für die gleichzeitige Nutzung von Netzwerkressourcen durch Prozesse in den
 verschiedenen Umgebungen. Einige dieser Probleme lassen sich durch weitere Konfiguration
 von Kubernetes mitigieren, erhöhen dadurch aber die Komplexität dieses Ansatzes \cite{Schmeling_Dargatz_2022} (S. 250-251).
 
@@ -771,7 +772,7 @@ Dieser sieht für die Entwicklungsumgebungen ein lokales Cluster auf jedem Entwi
 Die Integrations-, Test und Präproduktivumgebungen werden hingegen auf einem gemeinsamen Cluster,
 das aus mehreren Nodes besteht, betrieben und durch unterschiedliche Namespaces getrennt.
 Schließlich erhält die Produktivumgebung ihr eigenes Cluster, sodass deren Performanz
-nicht durch die Tests aus den anderen Umgebungen beeinflusst wird \cite{Schmeling_Dargatz_2022} (S. 251-252).
+nicht durch die Vorgänge aus den anderen Umgebungen beeinflusst wird \cite{Schmeling_Dargatz_2022} (S. 251-252).
 
 \subsection{Continuous Integration}
 Ein Ziel von CI/CD und GitOps ist es, den Weg einer Anwendung durch
@@ -847,7 +848,7 @@ Fall das Container-Image) übersichtlich und nachvollziehbar in einer Textdatei 
 konnte dies auch zunehmend durch den Entwicklungsbereich übernommen werden.
 Gleichzeitig konnte die Konfiguration der physischen oder virtuellen Server
 stark vereinfacht werden, da sie nur noch in der Lage sein mussten, Container auszuführen.
-Ob diese Server auf eigener Hardware oder in der Cloud betrieben wurden, spielte damit auch nur
+Ob diese Server auf eigener Hardware oder in der Cloud betrieben wurden, spielte damit nur
 noch eine untergeordnete Rolle \cite{cicd_with_kubernetes_devops} (S. 19).
 Dieser Ansatz wird auch als \emph{Infrastructure as Code} bezeichnet \cite{domingus2022cloud} (S. 6).
 
@@ -860,10 +861,10 @@ kann diese Konfiguration mit gängigen Werkzeugen zur Versionskontrolle
 in dem ein zentrales Repository alle Informationen, einschließlich Quellcode und Konfiguration,
 enthält, die zum Betrieb einer Anwendung erforderlich sind.
 Jede Änderung, die vorgenommen werden soll, wird durch eine Aktualisierung
-des zentralen Repositories ausgelöst. Ein CI/CD Prozess sorgt dann dafür,
+des zentralen Repositories ausgelöst. Ein CI/CD-Prozess sorgt dann dafür,
 dass diese Änderungen auch ausgebracht werden.
-Im Umkehrschluss wird ein strenger GitOps Prozess auch dafür sorgen,
-dass manuelle Änderungen, die zum Beispiel durch über einen Kommandozeilenbefehl
+Im Umkehrschluss wird ein strenger GitOps Prozess dafür sorgen,
+dass manuelle Änderungen, die zum Beispiel durch einen Kommandozeilenbefehl
 vorgenommen wurden und die von dem erwünschten Status im zentralen Repository
 abweichen, automatisch zurückgesetzt werden.
 Dadurch wird erreicht, dass es nur eine einzige gültige und zugleich transparente
@@ -875,7 +876,7 @@ In diesem Kapitel soll anhand mehrerer Fallbeispiele dargestellt werden, wie Unt
 Kubernetes in der Praxis nutzen, um Anwendungen bereitzustellen.
 Obwohl die aufgeführten Angaben direkt von den Unternehmen stammen und daher nicht im Detail
 überprüft werden können, sind sie dennoch geeignet, einen Eindruck davon zu vermitteln,
-in welchen Größendimensionen Kubernetes genutzt werden kann und wie es durch
+in welchen Größenordnungen Kubernetes genutzt werden kann und wie es durch
 einheitliche Schnittstellen und vereinfachte Skalierung
 einen Mehrwert erzeugt.
 \subsection{Zalando}
@@ -896,7 +897,7 @@ Zalando betreibt über 40 Cluster und plant noch weiter zu skalieren \cite{story
 
 \subsection{Spotify}
 Spotify ist ein Streaming-Dienst für Musik, der 2008 gegründet wurde
-und über 200 Millionen aktive Nutzer pro Monat verzeichnet.
+und über 200 Millionen aktive Nutzende pro Monat verzeichnet.
 Bereits seit 2014 nutzte Spotify ein eigens entwickeltes System zur Container-Orchestrierung
 namens \emph{Helios}. Dabei wurde beobachtet, dass die Weiterentwicklung von Helios
 durch das vergleichsweise kleine Team bei Spotify wenig effizient war.
@@ -908,7 +909,7 @@ Zusätzlich wurde dieser Schritt dadurch motiviert, dass ein Großteil
 vergleichbarer Unternehmen ebenfalls Kubernetes zu nutzen schienen.
 Spotify gelang es dabei, die eigenen Anwendungen schrittweise
 von Helios nach Kubernetes zu überführen und damit zu zeigen, dass Kubernetes
-auch im Verbund mit anderen Container-Orchestrierungs-Tools genutzt werden.
+auch im Verbund mit anderen Container-Orchestrierungs-Tools genutzt werden kann.
 Als Mehrwert, der durch die Nutzung von Kubernetes generiert wird,
 gibt das Unternehmen an, dass Entwickler sich besser auf konkrete Entwicklungsaufgaben
 konzentrieren können und dass sich die Ausnutzung von Rechenressourcen
@@ -930,7 +931,7 @@ und zusätzliche Ressourcen vom Cloud-Anbieter nur dann eingebunden wurden,
 wenn diese zwingend erforderlich waren.
 OpenAI gibt an, durch Kubernetes die Zeit, die für bestimmte Entwicklungsaufgaben
 benötigt wurde, von mehreren Monaten auf ein bis zwei Wochen reduziert zu haben.
-Das Unternehmen nutzte 2018 über 2500 Nodes \cite{openai_scaling_2500} und 2021 über 7500 \cite{openai_scaling_7500} \cite{story_openai}.
+Das Unternehmen nutzte 2018 über 2500 \cite{openai_scaling_2500} und 2021 über 7500 Nodes \cite{openai_scaling_7500} \cite{story_openai}.
 
 \section{Fazit und Ausblick}
 In dieser Arbeit wurden die Historie und die Technologien, die der Entwicklung von Kubernetes
@@ -944,7 +945,7 @@ Es existierten bereits Images, die genutzt werden konnten, um virtuelle Maschine
 zu erstellen. Container bieten allerdings eine leichtgewichtige Alternative zu diesem Prinzip,
 deren Konfiguration auf Basis von menschenlesbaren Textdateien leicht nachvollziehbar ist.
 Auch konnten Anwendungen bereits früher schon repliziert werden.
-Das Vorgehen dazu war aber meist anwendungsspezifisch und erforderte spezifische Kenntnisse.
+Das Vorgehen dazu war aber meist anwendungsspezifisch und erforderte gesonderte Kenntnisse.
 Durch \mbox{ReplicaSets} bietet Kubernetes eine Lösung, die Teil der Plattform ist
 und alle Arten von Anwendungen auf die gleiche Weise replizieren kann.
 Mit Kubernetes definierte Deployments schaffen ebenfalls kein gänzlich neues Konzept.
