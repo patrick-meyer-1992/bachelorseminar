@@ -290,7 +290,7 @@ Jede Änderung an den Cluster-Ressourcen wird im Etcd gespeichert und von dort w
 Etcd wird auf jedem Master Node ausgeführt, wobei einer dieser Nodes als „Anführer“
 ausgewählt wird und die Schreibanfragen verarbeitet \cite{Schmeling_Dargatz_2022} (S. 8).
 
-Die übliche Vorgehensweise um mit einem Kubernetes Cluster zu interagieren, ist das Kommandozeilenwerkzeug \emph{kubectl}.
+Die übliche Vorgehensweise um mit einem Kubernetes-Cluster zu interagieren, ist das Kommandozeilenwerkzeug \emph{kubectl}.
 Dieses Werkzeug ermöglicht sowohl die Abfrage als auch die Änderung von im Cluster vorhandenen Ressourcen.
 Im Hintergrund stellt \emph{kubectl} eine Anfrage an den \emph{Kube-apiserver}, der Endpunkte anbietet,
 um mit dem Cluster zu interagieren. Vergleichbar mit der Kommandobrücke des Leitschiffs ist der Kube-apiserver
@@ -303,7 +303,7 @@ dies zu erkennen und über eine Anfrage an den Kube-apiserver den gewünschten Z
 Er überwacht also symbolisch die Containerschiffe. \cite{Schmeling_Dargatz_2022} (S. 11).
 
 Der \emph{Kube-Scheduler} entscheidet, welche Container auf welchem Node betrieben werden.
-Im Sinne der Containerschiffmetapher ist dies die Komponente, die bestimmt
+Im Sinne der Containerschiffmetapher ist dies die Komponente, die bestimmt,
 wie und wo welche Container verstaut werden.
 Er verwaltet dazu Informationen über verfügbare Rechen- und Speicherressourcen sowie über weitere Eigenschaften
 der Nodes \cite{Schmeling_Dargatz_2022} (S. 12).
@@ -339,7 +339,7 @@ um Minikube zu nutzen auch die vorherige Installation einer Virtualisierungsanwe
 Näheres kann der Minikube Dokumentation entnommen werden \cite{minikube}.
 
 \subsection{Pods}
-\emph{Pods} sind die kleinste adressierbare Einheit in einem Kubernetes Cluster.
+\emph{Pods} sind die kleinste adressierbare Einheit in einem Kubernetes-Cluster.
 Sie sind die Entitäten, innerhalb derer der Anwendungscode ausgeführt wird.
 Im Kapitel \ref{sec:WorkerNodeKomponenten} wurde beschrieben, dass Container auf Nodes betrieben werden.
 Diese Darstellung ist allerdings nur indirekt richtig. Tatsächlich werden nicht Container,
@@ -362,8 +362,8 @@ Eine mögliche minimale Konfiguration könnte beispielsweise wie in Listing \ref
 \lstinputlisting[caption={Ein beispielhaftes Kubernetes-Manifest zur Konfiguration eines Pods \cite{Schmeling_Dargatz_2022} (S. 20).}, label=lst:pod-config]{../kubernetes/nginx/pod.yaml}
 
 Ein Kubernetes-Manifest ist hierarchisch aufgebaut
-und enthält stets die gleichen vier übergeordneten Schlüssel.
-Die \emph{apiVersion} gibt an welche Version der Endpunkte des Kube-apiservers für diese Ressource
+und enthält in der Regel die folgenden vier übergeordneten Schlüssel.
+Die \emph{apiVersion} gibt an, welche Version der Endpunkte des Kube-apiservers für diese Ressource
 verwendet werden soll (vgl. \ref{sec:MasterNodeKomponenten}).
 Der Schlüssel \emph{kind} gibt an, um welche Art von Ressource es sich handelt.
 In diesem Fall handelt es sich um einen Pod.
@@ -371,7 +371,8 @@ Unter dem Schlüssel \emph{metadata} wird zum einen ein Name für den Pod
 und zum anderen eine Menge von frei wählbaren Labels definiert.
 Schließlich werden unter \emph{spec} die inhaltlichen Spezifikationen des Pods
 definiert. Für dieses Beispiel enthält der Pod nur einen Container, der ebenfalls den Namen
-\emph{webserver} trägt. Das für den Container verwendete nginx-Image \cite{nginx} wird aus einer
+\emph{webserver} trägt. Das für den Container verwendete 
+nginx-Image\footnote{nginx ist ein populärer, hochperformanter Webserver \cite{nginx}.} wird aus einer
 öffentlichen Container-Registry in der Version 1.20.1 geladen. Da diesbezüglich keine weiteren
 Einschränkungen gemacht werden, wird standardmäßig \linebreak \lstinline|https://hub.docker.com| als Container Registry
 verwendet. Abschließend wird der Container über den Port 80 erreichbar gemacht \cite{Schmeling_Dargatz_2022} (S. 18-21).
@@ -383,14 +384,14 @@ ein Pod mit dem Namen \emph{webserver} gestartet werden.
 Über das Kommando \lstinline|kubectl get pod webserver| kann kontrolliert werden,
 ob der Pod erfolgreich gestartet wurde. Eine mögliche Ausgabe ist in
 Listing \ref{lst:pod-state} angegeben. Darin ist zu sehen, dass
-von dem einen vorgesehenen Container im Pod \emph{webserver} auch einer vorhanden ist.
+von dem einen vorgesehenen Container im Pod \emph{webserver} genau einer vorhanden ist.
 Der Status „Running“ zeigt an, dass der Pod einem Node zugewiesen und alle seine Container erstellt wurden.
 Mindestens einer dieser Container läuft ebenfalls gerade oder wird gerade gestartet.
 Weitere mögliche Zustände sind \cite{kubernetes.io_pod_lifecycle}:
 \begin{itemize}
-  \item \textbf{Pending}: Der Pod wurde erstellt, aber einer oder mehrere Container sind noch nicht gestartet.
+  \item \textbf{Pending}: Der Pod wurde erstellt, aber ein oder mehrere Container sind noch nicht gestartet.
   \item \textbf{Succeeded}: Alle Container im Pod haben ihre Ausführung erfolgreich beendet.
-  \item \textbf{Failed}: Einer oder mehrere Container im Pod haben ihre Ausführung nicht erfolgreich beendet.
+  \item \textbf{Failed}: Ein oder mehrere Container im Pod haben ihre Ausführung nicht erfolgreich beendet.
   \item \textbf{Unknown}: Der Status des Pods kann nicht ermittelt werden, normalerweise aufgrund eines Kommunikationsproblems mit dem Node.
 \end{itemize}
 Weiterhin wird angezeigt, dass noch kein Neustartversuch unternommen wurde
@@ -483,17 +484,17 @@ Version zurückkehren möchte \cite{Schmeling_Dargatz_2022} (S. 30-32).
 
 Das Kubernetes-Manifest für ein Deployment ist genauso aufgebaut, wie bereits beim ReplicaSet in
 Listing \ref{lst:rs-config}, mit der Ausnahme, dass der Schlüssel \emph{kind} den Wert
-\emph{Deployment} statt \emph{ReplicaSet} hat. Es kann auch ebenfalls mit dem Befehl
+\emph{Deployment} statt \emph{ReplicaSet} hat. Es kann ebenfalls mit dem Befehl
 \lstinline|kubectl create -f <Pfad/zum/Manifest>| gestartet werden.
 Dadurch wird ein Deployment erstellt, das wiederum ein ReplicaSet enthält.
 Möchte man nun eine Änderung an dem Webserver vornehmen, beispielsweise indem
 man ein aktuelleres Image verwendet, reicht es, den zugehörigen Wert im Manifest
 zu verändern und anschließend mit \lstinline|kubectl apply -f <Pfad/zum/Manifest>| anzuwenden.
-Listing \ref{lst:deploy-rollout} stellt dar wie durch mehrfaches Aufrufen
+Listing \ref{lst:deploy-rollout} stellt dar, wie durch mehrfaches Aufrufen
 von \lstinline|kubectl get rs| sichtbar wird, wie das alte
 ReplicaSet schrittweise abgebaut und das neue schrittweise aufgebaut wird \cite{Schmeling_Dargatz_2022} (S. 30-31).
 
-Alternativ kann nach Initialisierung des Deployments die Anzahl der Replikationen auch mit
+Alternativ kann nach Initialisierung des Deployments die Anzahl der Replikationen mit
 dem Befehl \lstinline|kubectl scale --replicas=<Anzahl Replicas> deployment/<Name des Deployments>|
 verändert werden.
 
@@ -536,9 +537,9 @@ von Pods zugeordnet. Anfragen können nun an den Service gestellt werden und die
 an welchen seiner zugehörigen Pods diese Anfrage weitergegeben wird. Der Service vereinfacht also die
 Adressierbarkeit und ermöglicht gleichzeitig eine effiziente Lastverteilung (sog. \emph{Load Balancing}).
 Natürlich kann auch ein Service gelöscht und neu gestartet werden, wodurch ihm eine neue IP-Adresse zugewiesen wird.
-Es ist also in der Regel nicht zielführend einen Service anhand seiner IP-Adresse anzusprechen.
+Es ist also in der Regel nicht zielführend, einen Service anhand seiner IP-Adresse anzusprechen.
 Damit das nicht notwendig ist, verwaltet Kubernetes ein internes Domain-Name-System (DNS), in dem
-der Services beim Start automatisch registriert wird und anschließend unter seinem Namen
+der Service beim Start automatisch registriert wird und anschließend unter seinem Namen
 erreichbar ist. \cite{Schmeling_Dargatz_2022} (S. 37-39).
 
 Listing \ref{lst:svc-config} zeigt ein Beispiel für ein Manifest,
@@ -584,7 +585,7 @@ Bei PV handelt es sich um eine Abstraktion eines Speicherbereichs des Hostsystem
 Ein PVC beansprucht ein derartiges PersistentVolume und spiegelt es in einen
 definierten Speicherbereich zugehöriger Pods. Um ein PVC zu nutzen, wird dieses innerhalb eines Deployments festgelegt.
 Alle zu diesem Deployment gehörigen Pods teilen sich also dasselbe Volume.
-Beispiele für die Konfiguration eines PV bzw. eines PVC sind in Listing \ref{lst:pv} und Listing \ref{lst:pvc}
+Beispiele für die Konfiguration eines PV und eines PVC sind in Listing \ref{lst:pv} und Listing \ref{lst:pvc}
 aufgeführt. Bezüglich der Konfiguration des PV ist insbesondere zu beachten, dass hier
 festgelegt wird, dass ein Speicherbereich des Hostsystems genutzt wird (Schlüssel \emph{hostPath}),
 welchen Pfad dieser hat (hier \emph{„/mnt/data“})
@@ -607,13 +608,14 @@ innerhalb des Pods das PV auf welchen Pfad abbildet \cite{Schmeling_Dargatz_2022
 \lstinputlisting[caption={Auszug aus einem beispielhaften Manifest für ein Deployment, das ein Persistent Volume Claim einbindet \cite{Schmeling_Dargatz_2022} (S. 45-46).}, label=lst:deploy-pvc]{../kubernetes/nginx/pvc-deployment.yaml}
 
 \subsection{ConfigMaps und Secrets}
-Die Daten, die von einer Anwendung in Volumes gespeichert werden, unterliegen oft regelmäßigen Veränderungen
-(zum Beispiel bei einer Datenbank). Darüber hinaus benötigen Anwendungen aber auch einige Informationen, die sich nur
+Die Daten, die von einer Anwendung in Volumes gespeichert werden, unterliegen oft regelmäßigen Veränderungen.
+Ein Beispiel hierfür sind Schreibvorgänge bei einer Datenbank. 
+Darüber hinaus benötigen Anwendungen aber auch einige Informationen, die sich nur
 selten verändern. Dabei handelt es sich häufig um Konfigurationsdaten, die zum Beispiel die URL eines anderen
 Services enthalten oder Informationen über die Umgebung, in der die Anwendung betrieben wird.
 Derartige Daten können Pods über \emph{ConfigMaps} in Form von Schlüssel-Wert-Paaren bereitgestellt werden.
-Listing \ref{lst:config} zeigt ein Beispiel für eine ConfigMap Ressource.
-Unter dem Schlüssel \emph{data} sind Host und Port einer Datenbankanwendung angegeben,
+Listing \ref{lst:config} zeigt ein Beispiel für eine ConfigMap-Ressource.
+Unter dem Schlüssel \emph{data} sind Hostname und Port einer Datenbankanwendung angegeben,
 die von anderen Anwendungen genutzt werden können. Dazu müssen sie in der Konfiguration des
 Deployments eingebunden werden. Ein Beispiel dazu ist in Listing \ref{lst:deploy-with-conf} dargestellt \cite{Schmeling_Dargatz_2022} (S. 47-50).
 
@@ -632,7 +634,7 @@ Aus Listing \ref{lst:secret} ist eine beispielhafte Strukturierung eines Secrets
 Die Angabe \emph{type: Opaque} ist eine von mehreren in Kubernetes integrierten Möglichkeiten,
 um Secrets zu verwalten. Der Typ Opaque erlaubt das Festlegen eines beliebigen Wertes \cite{kubernetes.io_secret_types}.
 Listing \ref{lst:deploy-with-conf} enthält ebenfalls ein Beispiel, wie Werte aus einem
-Secret oder aus einer ConfigMap in ein Deployment eingebunden werden können.
+Secret in ein Deployment eingebunden werden können.
 
 \lstinputlisting[caption={Ein beispielhaftes Manifest zur Erstellung eines Secrets, das vertrauliche Daten im Cluster bereitstellt.}, label=lst:secret]{../kubernetes/nginx/secret-example.yaml}
 \begin{lstlisting}[caption={Referenzen zur ConfigMaps und Secrets können in einem Deployment unter dem Schlüssel \emph{env} definiert werden \cite{Schmeling_Dargatz_2022} (S. 50).}, label={lst:deploy-with-conf}]
@@ -681,7 +683,7 @@ aufgebaut sein, mit dem Unterschied, dass hier eine andere ConfigMap Ressource v
 So können Entwicklungs- und Produktivumgebung ohne großen Aufwand mit minimalen Unterschieden betrieben
 werden, was dazu beitragen kann, die Entwicklung und Bereitstellung von Anwendung zu beschleunigen.
 Schließlich können Namespaces auch genutzt werden, um verschiedene Nutzergruppen innerhalb eines Clusters
-zu trennen. Innerhalb einer Nutzergruppe können so Änderungen an den zugehörigen Ressourcen vorgenommen werden,
+zu trennen. Innerhalb einer Nutzergruppe können Änderungen an den zugehörigen Ressourcen vorgenommen werden,
 ohne Gefahr zu laufen, Ressourcen anderer Namespaces zu beeinflussen.
 Namespaces eines Clusters können über die Befehle \lstinline|kubectl create ns <name>| und
 \lstinline|kubectl get ns| erstellt und angezeigt werden \cite{Schmeling_Dargatz_2022} (S. 52-53).
@@ -699,7 +701,7 @@ In einer zentralen Datei \emph{values.yaml} werden die konkreten Werte definiert
 Zusammen bilden diese beiden Komponenten ein \emph{Helm Chart}.
 Helm Charts bieten weiterhin grundlegende Kontrollstrukturen (if/else) und Schleifen (for-each),
 die die Nutzung der Templates flexibler machen.
-Insgesamt erlauben das einfache und transparente Ausbringen von Anwendungen
+Insgesamt erlauben sie das einfache und transparente Ausbringen von Anwendungen
 und werden daher unter anderem in den Bereichen Softwareentwicklung und Betrieb genutzt
 (vgl. \ref{sec:devops}) \cite{Schmeling_Dargatz_2022} (S. 174-176).
 
