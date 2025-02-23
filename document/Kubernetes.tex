@@ -87,7 +87,7 @@ von Kubernetes sowie einem Ausblick zur erwarteten zukünftigen Rolle von Kubern
 in Wirtschaft und Forschung.
 
 Zunächst soll die Historie betrachtet werden, vor deren Hintergrund Kubernetes entstanden ist.
-Das stetige Ziel, das sich durch diese Historie zieht, ist das Bereitstellen von Anwendungen.
+Ein stetiges Ziel, das sich durch diese Historie zieht, ist das Bereitstellen von Anwendungen.
 Kominos et al. \cite{7899247} beschreiben die 1960er Jahre als Ursprung des Cloud-Computings.
 Zu dieser Zeit liefen Anwendungen oft auf einer gemeinsamen Hardware und die Ressourcenverteilung erfolgte unmittelbar durch das zugrundeliegende Betriebssystem.
 Ein derartiges Szenario, das auch als „Bare-Metal“ bezeichnet wird, bringt in der Regel mehrere Herausforderungen mit sich.
@@ -144,11 +144,11 @@ leichteren Skalierbarkeit einzelner Module und darin, dass Services weitgehend u
 ausgebracht werden können. Zusätzlich erlauben sie, dass einzelne Services in unterschiedlichen Programmiersprachen
 verfasst sein und sogar von unterschiedlichen Teams entwickelt werden können \cite{microservices}.
 
-Andererseits bringen Microservice-Architekturen im Vergleich zu monolithischen Anwendungen
+Andererseits bringen Microservice-Architekturen
 auch neue Herausforderungen mit sich.
-Grundsätzlich ist es komplexer eine Microservice-Architektur aufzubauen.
+Grundsätzlich ist es komplexer, eine Microservice-Architektur aufzubauen, als eine monolithische Anwendung.
 Dazu gehört insbesondere, zu definieren, aus welchen Microservices eine Anwendung bestehen soll
-und welche Aufgaben diese jeweils umfassen. Darüber hinaus kann das Testen von Microservice-Architektur
+und welche Aufgaben diese jeweils umfassen. Darüber hinaus kann das Testen von Microservice-Architekturen
 herausfordernd sein \cite{8406008}.
 
 Kubernetes bietet als eines der heute populärsten Tools zur Orchestrierung von Containern
@@ -166,8 +166,7 @@ Entwickelt wurde Kubernetes von Google. Dort wurde seit den frühen 2000er Jahre
 ein selbst entwickeltes Container-Management-System namens \emph{Borg} \cite{43438} genutzt,
 um Googles Services möglichst performant zu betreiben.
 Im Jahr 2013 wurde \emph{Borg} von dessen Nachfolger \emph{Omega} abgelöst. Im selben Jahr erschien auch \emph{Docker},
-was ein wesentlicher Baustein des Kubernetes
-Projekts werden sollte \cite{ibm_history}.
+was ein wesentlicher Baustein des Kubernetes-Projekts werden sollte \cite{ibm_history}.
 
 Die drei bei Google beschäftigten Ingenieure Craig McLuckie, Joe Beda und Brendan Burns setzten sich damals dafür ein,
 die bei \emph{Borg} und \emph{Omega} gemachten Erfahrungen zu nutzen, um ein leichter bedienbares Container-Orchestrierungs-Tool
@@ -190,7 +189,7 @@ Darauf aufbauend folgt eine Erklärung der wesentlichen Konzepte von Kubernetes.
 Wie eingangs beschrieben handelt es sich bei Containern im Prinzip um leichtgewichtige virtuelle Maschinen.
 Als Container-Technologie haben sich mit der Zeit mehrere Alternativen entwickelt, die unterschiedliche
 Stärken und Schwächen aufweisen. Zum einen gibt es die Technologien \emph{Singularity} und \emph{uDocker}, deren Stärken
-vor allem in wissenschaftlichen Anwendungen über verteilte Rechenressourcen wie zum Beispiel High-Performance Computing
+vor allem in wissenschaftlichen Anwendungen auf verteilter Hardware, wie zum Beispiel High-Performance Computing,
 liegen. Zum anderen gibt es die Technologie \emph{Docker}, die sich als die heutzutage populärste Containertechnologie
 herausgestellt hat und daher auch für die folgenden Kapitel als Grundlage angenommen wird \cite{Bentaleb_Belloum_Sebaa_El-Maouhab_2021}.
 
@@ -213,7 +212,7 @@ Eine Visualisierung dieses Konzepts ist in Abbildung \ref{fig:overlay} dargestel
 
 Für viele populäre Anwendungen gibt es vorgefertigte Images, die kostenfrei aus im Internet verfügbaren
 Container-Repositories (zum Beispiel \lstinline|https://hub.docker.com|) heruntergeladen werden können.
-Darüber hinaus ist es auch möglich private Container-Repositories zu betreiben,
+Darüber hinaus ist es möglich private Container-Repositories zu betreiben,
 die zum Beispiel Images enthalten können, die von einem Unternehmen entwickelt wurden
 und Dritten nicht zur Verfügung gestellt werden sollen.
 Für einen konkreten Anwendungsfall kann es sinnvoll sein, ein bestehendes Basis-Image für die eigenen Zwecke anzupassen.
