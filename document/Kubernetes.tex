@@ -92,7 +92,7 @@ Kominos et al. \cite{7899247} beschreiben die 1960er Jahre als Ursprung des Clou
 Zu dieser Zeit liefen Anwendungen oft auf einer gemeinsamen Hardware und die Ressourcenverteilung erfolgte unmittelbar durch das zugrundeliegende Betriebssystem.
 Ein derartiges Szenario, das auch als „Bare-Metal“ bezeichnet wird, bringt in der Regel mehrere Herausforderungen mit sich.
 Zum einen kann es schnell zu Abhängigkeitskonflikten zwischen den verschiedenen Anwendungen kommen.
-Ist beispielsweise eine Anwendung darauf angewiesen eine bestimmte Abhängigkeit in der Version <1.4 zu nutzen und eine andere
+Ist beispielsweise eine Anwendung darauf angewiesen, eine bestimmte Abhängigkeit in der Version <1.4 zu nutzen und eine andere
 benötigt eine Version \(\geq 1.4\) derselben Abhängigkeit, lässt sich das nur schwer vereinbaren.
 Zum anderen erschwert dieser Aufbau eine effiziente Ressourcenverteilung.
 Selbst wenn eine Anwendung alleine auf einem Rechner betrieben wird, um zum Beispiel Konflikte zu anderen
@@ -127,7 +127,7 @@ Durch diesen Umstand und dadurch, dass Container meist innerhalb weniger Sekunde
 um flexibel auf unterschiedliche Anfrageintensitäten zu reagieren und Ressourcen effizient zu verteilen \cite{kofler2021docker} (S. 48).
 
 Abbildung \ref{fig:arch-vergleich} visualisiert exemplarisch, welche Ebenen bei Bare-Metal-Architekturen, virtuellen Maschinen und Containern
-jeweils zwischen Hardware und den Anwendungen liegen und wie Anwendungen voneinander isoliert werden.
+jeweils zwischen Hardware und den Anwendungen liegen und wie Anwendungen voneinander isoliert sind.
 
 \begin{figure}[h]
   \centering
@@ -146,7 +146,7 @@ verfasst sein und sogar von unterschiedlichen Teams entwickelt werden können \c
 
 Andererseits bringen Microservice-Architekturen
 auch neue Herausforderungen mit sich.
-Grundsätzlich ist es komplexer, eine Microservice-Architektur aufzubauen, als eine monolithische Anwendung.
+Grundsätzlich ist es komplexer, eine Microservice-Architek-\linebreak tur aufzubauen, als eine monolithische Anwendung.
 Dazu gehört insbesondere, zu definieren, aus welchen Microservices eine Anwendung bestehen soll
 und welche Aufgaben diese jeweils umfassen. Darüber hinaus kann das Testen von Microservice-Architekturen
 herausfordernd sein \cite{8406008}.
@@ -159,7 +159,7 @@ Es abstrahiert dazu von allen beteiligten Rechnern und deren Ressourcen und biet
 Es handelt sich um eine Software, die sich der Ausbringung (Deployment),
 der Skalierung und der Überwachung (Monitoring) von Containern widmet.
 Dieser Vorgang wird als Container-Orchestrierung
-oder als Container-Management bezeichnet \cite{Bisong2019} (S. 664).
+oder als Contai-\linebreak ner-Management bezeichnet \cite{Bisong2019} (S. 664).
 In diesem Zusammenhang ist Kubernetes auch als das \emph{Betriebssystem der Cloud} bekannt
 \cite{Schmeling_Dargatz_2022} (S. 4).
 Entwickelt wurde Kubernetes von Google. Dort wurde seit den frühen 2000er Jahren
@@ -241,7 +241,7 @@ Ressourcenanforderungen moderner Anwendungen oft nicht gerecht \cite{Schmeling_D
 
 Horizontale Skalierung sieht im Gegensatz dazu vor, dass eine Anwendung
 auf mehrere Rechner verteilt wird. Durch Hinzufügen weiterer Rechner können die zur Verfügung stehenden Ressourcen nahezu beliebig erweitert werden.
-Zusätzlich ist auch eine geografische Optimierung möglich, indem zum Beispiel Server in der Nähe der erwarteten Clients platziert werden.
+Zusätzlich ist eine geografische Optimierung möglich, indem zum Beispiel Server in der Nähe der erwarteten Clients platziert werden.
 Letztendlich trägt horizontale Skalierung auch zur Ausfallsicherheit einer Anwendung bei, da der Ausfall einzelner Instanzen durch andere Instanzen
 aufgefangen werden kann.
 Container haben sich als eine wesentliche Grundlage für die horizontale Skalierung etabliert.
@@ -252,7 +252,7 @@ Im folgenden Kapitel soll beschrieben werden, welche Werkzeuge Kubernetes anbiet
 
 \section{Grundlegende Kubernetes-Konzepte}
 \label{sec:Grundlegende_Kubernetes-Konzepte}
-Ein durch Kubernetes verwaltetes System wird üblicherweise als \emph{Cluster} bezeichnet.
+Ein durch Kubernetes verwaltetes System wird als \emph{Cluster} bezeichnet.
 Ein Cluster besteht aus einer oder mehreren physischen und/oder virtuellen Maschinen, die darin eingebunden sind.
 Jede Maschine wird dabei als ein \emph{Node} (deutsch: Knoten) bezeichnet. Diese Nodes werden wiederum unterschieden in
 \emph{Master Nodes} und \emph{Worker Nodes}.
@@ -370,7 +370,7 @@ Unter dem Schlüssel \emph{metadata} wird zum einen ein Name für den Pod
 und zum anderen eine Menge von frei wählbaren Labels definiert.
 Schließlich werden unter \emph{spec} die inhaltlichen Spezifikationen des Pods
 definiert. Für dieses Beispiel enthält der Pod nur einen Container, der ebenfalls den Namen
-\emph{webserver} trägt. Das für den Container verwendete 
+\emph{webserver} trägt. Das für den Container verwendete
 nginx-Image\footnote{nginx ist ein populärer, hochperformanter Webserver \cite{nginx}.} wird aus einer
 öffentlichen Container-Registry in der Version 1.20.1 geladen. Da diesbezüglich keine weiteren
 Einschränkungen gemacht werden, wird standardmäßig \linebreak \lstinline|https://hub.docker.com| als Container Registry
@@ -494,7 +494,7 @@ von \lstinline|kubectl get rs| sichtbar wird, wie das alte
 ReplicaSet schrittweise abgebaut und das neue schrittweise aufgebaut wird \cite{Schmeling_Dargatz_2022} (S. 30-31).
 
 Alternativ kann nach Initialisierung des Deployments die Anzahl der Replikationen mit
-dem Befehl \lstinline|kubectl scale --replicas=<Anzahl Replicas> deployment/<Name des Deployments>|
+\lstinline|kubectl scale --replicas=<Anzahl Replicas> deployment/<Name des Deployments>|
 verändert werden.
 
 \begin{lstlisting}[caption={Ein Deployment, das schrittweise ein Update ausführt \cite{Schmeling_Dargatz_2022} (S. 31).}, label={lst:deploy-rollout}]
@@ -608,7 +608,7 @@ innerhalb des Pods das PV auf welchen Pfad abbildet \cite{Schmeling_Dargatz_2022
 
 \subsection{ConfigMaps und Secrets}
 Die Daten, die von einer Anwendung in Volumes gespeichert werden, unterliegen oft regelmäßigen Veränderungen.
-Ein Beispiel hierfür sind Schreibvorgänge bei einer Datenbank. 
+Ein Beispiel hierfür sind Schreibvorgänge bei einer Datenbank.
 Darüber hinaus benötigen Anwendungen aber auch einige Informationen, die sich nur
 selten verändern. Dabei handelt es sich häufig um Konfigurationsdaten, die zum Beispiel die URL eines anderen
 Services enthalten oder Informationen über die Umgebung, in der die Anwendung betrieben wird.
@@ -675,10 +675,10 @@ Einmal im Namespace \emph{default} und einmal im Namespace \emph{dev}.
 Ersterer wäre dann im Cluster über den FQDN \lstinline|http://webserver.default.svc.cluster.local/|
 erreichbar, während für letzteren \lstinline|http://webserver.dev.svc.cluster.local/| zutreffen würde.
 Zum anderen können mithilfe von Namespaces verschiedene Entwicklungsstadien getrennt werden.
-So könnte in einem Namespace \emph{dev} eine ConfigMap Ressource bereitgestellt werden,
+So könnte in einem Namespace \emph{dev} eine ConfigMap-Ressource bereitgestellt werden,
 die Umgebungsvariablen für andere Ressourcen definiert, die spezifisch für diese
 Entwicklungsumgebung sind. Ein anderer Namespace \emph{prod} könnte analog zu \emph{dev}
-aufgebaut sein, mit dem Unterschied, dass hier eine andere ConfigMap Ressource vorliegt.
+aufgebaut sein, mit dem Unterschied, dass hier eine andere ConfigMap-Ressource vorliegt.
 So können Entwicklungs- und Produktivumgebung ohne großen Aufwand mit minimalen Unterschieden betrieben
 werden, was dazu beitragen kann, die Entwicklung und Bereitstellung von Anwendung zu beschleunigen.
 Schließlich können Namespaces auch genutzt werden, um verschiedene Nutzergruppen innerhalb eines Clusters
@@ -695,11 +695,11 @@ Namen oder Labels, erstellt werden.
 Dies kann durch die Verwendung von \emph{Helm} vereinfacht werden. % TODO: Fußnote für Helm?
 Helm ist eine \emph{templating language} (dt. Vorlagensprache) für
 Kubernetes-Manifeste. Redundante Werte können in den Manifesten
-durch Platzhalter ersetzt werden, wodurch sie zu \emph{templates} werden.
+durch Platzhalter ersetzt werden, wodurch die Manifeste zu \emph{templates} werden.
 In einer zentralen Datei \emph{values.yaml} werden die konkreten Werte definiert.
 Zusammen bilden diese beiden Komponenten ein \emph{Helm Chart}.
 Helm Charts bieten weiterhin grundlegende Kontrollstrukturen (if/else) und Schleifen (for-each),
-die die Nutzung der Templates flexibler machen.
+die die Nutzung der templates flexibler machen.
 Insgesamt erlauben sie das einfache und transparente Ausbringen von Anwendungen
 und werden daher unter anderem in den Bereichen Softwareentwicklung und Betrieb genutzt
 (vgl. \ref{sec:devops}) \cite{Schmeling_Dargatz_2022} (S. 174-176).
@@ -728,9 +728,8 @@ kann seine oder ihre Umgebung für sich konfigurieren und Änderungen, die von a
 Personen am Quellcode vorgenommen werden, haben keinen unmittelbaren Einfluss \cite{Schmeling_Dargatz_2022} (S. 247).
 
 Darauf folgt die \emph{Integrationsumgebung}. Meist handelt es sich dabei
-um ein zentrales Quellcode-\emph{Repository}, das mit einem System zu Versionskontrolle
-verwaltet wird, wie zum Beispiel 
-\emph{git}\footnote{git ist eine Open-Source-Anwendung zur Versionskontrolle, mit der Versionen von Dateien überwacht werden können \cite{chacon2014pro}.}.
+um ein zentrales Quellcode-\emph{Repository}, das mit einem System zu Versionskontrolle, wie zum Beispiel
+\emph{git}\footnote{git ist eine Open-Source-Anwendung zur Versionskontrolle, mit der Versionen von Dateien überwacht werden können \cite{chacon2014pro}.}, verwaltet wird.
 Entwickelnde integrieren ihre Arbeit in das zentrale Repository, wo sie
 automatisch kompiliert und ihn lauffähige Software übersetzt wird (sog. \emph{build}).
 Weiterhin werden die individuellen Komponenten der Anwendung getestet (sog. \emph{Unit-Test}).
@@ -840,7 +839,7 @@ die Entwicklung nur begrenzte Kenntnisse über das Ausbringen und den Betrieb vo
 Zusätzlich waren verwendete Server oft stark spezialisiert und schwierig zu ersetzen.
 Als Lösungsansatz für letzteres wurden Prozesse entwickelt, um automatisiert Images
 für virtuelle Maschinen zu erstellen, die die Anwendung inklusive ihrer Abhängigkeiten
-und des Betriebssystems enthielt. Das erhöhte die Zuverlässigkeit von
+und des Betriebssystems enthielten. Das erhöhte die Zuverlässigkeit von
 Anwendungen in der Produktivumgebung, war aber immer noch vergleichsweise langsam \cite{cicd_with_kubernetes_devops} (S. 33-35).
 
 Mit dem Aufkommen von Containern konnte dieser Prozess nicht nur performanter, sondern
@@ -905,7 +904,7 @@ durch das vergleichsweise kleine Team bei Spotify wenig effizient war.
 Folglich wurde 2017 nach einer Lösung gesucht, die von einer größeren Gemeinschaft
 unterstützt wird. Gleichzeitig erfolgte die Migration von hauseigener Infrastruktur
 zu Google Cloud. Spotify entschied sich, zukünftig Kubernetes zur Container-Orchestrierung zu nutzen,
-da dies einen breiteren Funktionsumfang anbot als Helios.
+da dies einen breiteren Funktionsumfang anbot, als Helios.
 Zusätzlich wurde dieser Schritt dadurch motiviert, dass ein Großteil
 vergleichbarer Unternehmen ebenfalls Kubernetes zu nutzen schienen.
 Spotify gelang es dabei, die eigenen Anwendungen schrittweise
@@ -968,7 +967,7 @@ hohen Mehraufwand bedeuten.
 Bei allen Vereinfachungen, die Kubernetes mit sich bringt, muss beachtet werden,
 dass die Situationen, für die es entwickelt wurde, äußerst komplex sind.
 Naturgemäß sind der Vereinfachung dadurch Grenzen gesetzt und
-sowohl die Migration zu und das Betreiben von Kubernetes bleiben
+sowohl die Migration zu als auch das Betreiben von Kubernetes bleiben
 arbeitsintensive Aufgaben \cite{domingus2022cloud} (S. 39).
 Für eine Migration müssen außerdem möglicherweise über Jahre gewachsene monolithische
 Anwendungen in containerisierte Microservices aufgeteilt und übersetzt werden,
